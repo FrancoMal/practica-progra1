@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tuplas, Conjuntos y Diccionarios - Clase 10</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.7}
+        .container{max-width:920px;margin:0 auto;padding:20px}
+        h1{text-align:center;font-size:2.2em;margin:30px 0;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        h2{color:#38bdf8;margin:30px 0 15px;font-size:1.5em;border-bottom:2px solid #1e3a5f;padding-bottom:8px}
+        h3{color:#a78bfa;margin:15px 0 10px}
+        .tabs{display:flex;flex-wrap:wrap;gap:5px;margin:20px 0;justify-content:center}
+        .tab-btn{padding:10px 18px;background:#1e293b;border:2px solid #334155;color:#94a3b8;border-radius:8px;cursor:pointer;font-size:.95em;transition:.3s}
+        .tab-btn:hover{border-color:#38bdf8;color:#38bdf8}
+        .tab-btn.active{background:#1e3a5f;border-color:#38bdf8;color:#38bdf8;font-weight:bold}
+        .section{display:none;animation:fadeIn .4s}.section.active{display:block}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .card{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0;border-left:4px solid #38bdf8}
+        .card.danger{border-left-color:#ef4444;background:#1e1b2e}
+        .card.success{border-left-color:#22c55e;background:#1a2e1a}
+        .card.warning{border-left-color:#f59e0b;background:#2e2a1a}
+        pre{background:#0c1222;border:1px solid #334155;border-radius:8px;padding:15px;overflow-x:auto;font-family:Consolas,'Courier New',monospace;font-size:.9em;margin:10px 0}
+        code{font-family:Consolas,monospace}
+        .kw{color:#c084fc}.str{color:#86efac}.cmt{color:#64748b;font-style:italic}.fn{color:#38bdf8}
+        .err-hl{background:rgba(239,68,68,.2);display:block;padding:2px 0}
+        .ok-hl{background:rgba(34,197,94,.15);display:block;padding:2px 0}
+        .label{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.8em;font-weight:bold;margin:3px}
+        .label-ok{background:#166534;color:#86efac}.label-bad{background:#7f1d1d;color:#fca5a5}.label-info{background:#1e3a5f;color:#93c5fd}
+        .comparison{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
+        @media(max-width:700px){.comparison{grid-template-columns:1fr}}
+        .diagram{display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0;flex-wrap:wrap}
+        .diagram-box{padding:15px 25px;border-radius:10px;font-weight:bold;text-align:center}
+        .diagram-arrow{font-size:1.5em;color:#64748b}
+        .step-number{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:#2563eb;border-radius:50%;color:white;font-weight:bold;margin-right:8px}
+        ul,ol{margin:10px 0 10px 25px}li{margin:5px 0}
+        .diff{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.75em;font-weight:bold;margin-left:10px}
+        .diff-f{background:#166534;color:#86efac}.diff-m{background:#854d0e;color:#fde68a}.diff-d{background:#7f1d1d;color:#fca5a5}
+
+        .progress-bar{width:100%;height:8px;background:#334155;border-radius:4px;margin:10px 0;overflow:hidden}
+        .progress-fill{height:100%;background:linear-gradient(90deg,#38bdf8,#818cf8);border-radius:4px;transition:width .5s}
+        .score-display{text-align:center;padding:15px;background:#1e293b;border-radius:12px;margin:15px 0;font-size:1.2em}
+        .score-num{color:#38bdf8;font-weight:bold;font-size:1.5em}
+
+        /* Buttons */
+        .btn{padding:10px 25px;border:none;border-radius:8px;cursor:pointer;font-size:1em;font-weight:bold;margin:8px 5px 8px 0;transition:.3s}
+        .btn-p{background:#2563eb;color:white}.btn-p:hover{background:#1d4ed8}
+        .btn-s{background:#16a34a;color:white}.btn-s:hover{background:#15803d}
+        .btn-w{background:#d97706;color:white}.btn-w:hover{background:#b45309}
+        .btn-d{background:#dc2626;color:white}.btn-d:hover{background:#b91c1c}
+
+        /* Exercise area */
+        .ex-area{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0}
+        .ex-area textarea{width:100%;min-height:240px;background:#0c1222;color:#e2e8f0;border:2px solid #334155;border-radius:8px;padding:15px;font-family:Consolas,monospace;font-size:.95em;resize:vertical;tab-size:4}
+        .ex-area textarea:focus{outline:none;border-color:#38bdf8}
+
+        .result{margin-top:10px;padding:15px;border-radius:8px;display:none}
+        .result.show{display:block}
+
+        /* Order challenge */
+        .oc{background:#1e293b;border-radius:12px;padding:20px;margin:20px 0;border:2px solid #334155}
+        .oc-pool{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:#0f172a;border-radius:8px;min-height:50px;margin:10px 0}
+        .oc-target{border:2px dashed #475569;border-radius:8px;padding:10px;margin:10px 0;min-height:60px}
+        .oc-target .oc-item{width:100%;margin:3px 0}
+        .oc-item{padding:10px 16px;background:#2563eb;color:white;border-radius:6px;cursor:pointer;user-select:none;font-family:Consolas,monospace;font-size:.9em;transition:.2s;display:flex;align-items:center;gap:8px}
+        .oc-pool .oc-item{display:inline-flex}
+        .oc-item:hover{background:#3b82f6}
+        .oc-item.right{background:#16a34a!important}.oc-item.wrong{background:#dc2626!important}
+        .oc-item .item-text{flex:1}
+        .oc-arrows{display:flex;flex-direction:column;gap:1px;margin-right:4px}
+        .oc-arrows button{background:rgba(255,255,255,.2);border:none;color:white;cursor:pointer;font-size:.7em;padding:1px 5px;border-radius:3px;line-height:1}
+        .oc-arrows button:hover{background:rgba(255,255,255,.4)}
+        .oc-pool .oc-arrows{display:none}
+        .oc-ret{background:rgba(255,255,255,.2);border:none;color:white;cursor:pointer;font-size:.8em;padding:2px 8px;border-radius:3px;margin-left:4px}
+        .oc-ret:hover{background:rgba(239,68,68,.5)}
+        .oc-pool .oc-ret{display:none}
+
+        /* Quiz */
+        .question{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0;border:2px solid #334155}
+        .question>p{margin-bottom:12px;font-weight:bold}
+        .opts{display:flex;flex-direction:column;gap:8px}
+        .opt{padding:12px 15px;background:#0f172a;border:2px solid #334155;border-radius:8px;cursor:pointer;transition:.3s}
+        .opt:hover{border-color:#38bdf8;background:#1e3a5f}
+        .opt.ok{border-color:#22c55e!important;background:#14532d!important;color:#86efac}
+        .opt.no{border-color:#ef4444!important;background:#7f1d1d!important;color:#fca5a5}
+        .opt.dis{pointer-events:none;opacity:.7}
+        .fb{margin-top:10px;padding:10px 15px;border-radius:8px;display:none;font-size:.95em}
+        .fb.show{display:block}
+        .fb.fb-ok{background:#14532d;color:#86efac;border:1px solid #22c55e}
+        .fb.fb-no{background:#7f1d1d;color:#fca5a5;border:1px solid #ef4444}
+
+        /* Error finder - multiple choice style */
+        .ef-block{background:#0c1222;border:1px solid #334155;border-radius:8px;padding:15px;margin:10px 0;font-family:Consolas,monospace;font-size:.9em;line-height:2}
+        .ef-opt{padding:8px 15px;background:#0f172a;border:2px solid #334155;border-radius:8px;cursor:pointer;transition:.3s;margin:5px 0;display:block}
+        .ef-opt:hover{border-color:#38bdf8}
+        .ef-opt.selected{border-color:#f59e0b;background:#2e2a1a}
+        .ef-opt.ans-ok{border-color:#22c55e!important;background:#14532d!important}
+        .ef-opt.ans-no{border-color:#ef4444!important;background:#7f1d1d!important}
+
+        /* Que devuelve */
+        .qd-input{width:100%;background:#0c1222;color:#e2e8f0;border:2px solid #334155;border-radius:8px;padding:12px 15px;font-family:Consolas,monospace;font-size:1em;margin:8px 0}
+        .qd-input:focus{outline:none;border-color:#38bdf8}
+        .qd-card{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0;border:2px solid #334155}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Tuplas, Conjuntos y Diccionarios</h1>
+    <p style="text-align:center;color:#94a3b8;margin-bottom:10px;">Guia interactiva - Clase 10</p>
+
+    <div class="progress-bar"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
+    <div class="score-display">Puntaje: <span class="score-num" id="sDisp">0</span> / <span id="sTotal">0</span></div>
+
+    <div class="tabs" id="tabBar"></div>
+
+    <!-- ===== TEORIA ===== -->
+    <div class="section active" id="sec-teoria">
+        <h2>Teoria Completa</h2>
+
+        <!-- === TUPLAS === -->
+        <h2 style="color:#a78bfa;border-bottom-color:#7c3aed">Tuplas</h2>
+
+        <div class="card"><h3>Que es una tupla?</h3>
+            <p>Las tuplas son similares a las listas: se accede a sus elementos a traves de un <b>subindice</b>. La diferencia principal es que las tuplas son <b style="color:#ef4444">inmutables</b> (no se pueden modificar).</p>
+            <div class="diagram">
+                <div class="diagram-box" style="background:#2d1b69;border:2px solid #a78bfa"><small style="color:#94a3b8">LISTA</small><br>[ ] Mutable</div>
+                <div class="diagram-arrow">vs</div>
+                <div class="diagram-box" style="background:#1e3a5f;border:2px solid #38bdf8"><small style="color:#94a3b8">TUPLA</small><br>( ) Inmutable</div>
+            </div>
+        </div>
+
+        <div class="card"><h3>Crear tuplas</h3>
+<pre><span class="cmt"># Con parentesis</span>
+salsas = (<span class="str">"tartara"</span>, <span class="str">"criolla"</span>, <span class="str">"chimichurri"</span>)
+
+<span class="cmt"># Sin parentesis (tambien crea tupla)</span>
+salsas = <span class="str">"tartara"</span>, <span class="str">"criolla"</span>, <span class="str">"chimichurri"</span>
+
+<span class="cmt"># Tupla vacia</span>
+aderezos = ()
+
+<span class="cmt"># Tupla de UN solo elemento (coma obligatoria!)</span>
+misalsa = (<span class="str">"barbacoa"</span>,)
+misalsa = <span class="str">"barbacoa"</span>,</pre>
+            <p style="color:#f59e0b"><b>Sin la coma final, NO es tupla, es solo un string entre parentesis.</b></p>
+        </div>
+
+        <div class="card"><h3>Tipos mixtos y anidamiento</h3>
+<pre><span class="cmt"># Tipos mixtos</span>
+primavera = (<span class="fn">21</span>, <span class="str">"Septiembre"</span>)
+
+<span class="cmt"># Tuplas anidadas</span>
+alumno = (<span class="fn">152408</span>, <span class="str">"Luis Arce"</span>, <span class="str">"Lima 717"</span>, (<span class="fn">1</span>, <span class="str">"Mayo"</span>, <span class="fn">1998</span>))
+<span class="fn">print</span>(alumno[<span class="fn">1</span>])      <span class="cmt"># Luis Arce</span>
+<span class="fn">print</span>(alumno[<span class="fn">3</span>][<span class="fn">1</span>])   <span class="cmt"># Mayo</span></pre>
+        </div>
+
+        <div class="card danger"><h3>Inmutabilidad - TypeError</h3>
+<pre>t = (<span class="fn">1</span>, <span class="fn">2</span>, <span class="fn">3</span>)
+<span class="err-hl">t[<span class="fn">0</span>] = <span class="fn">4</span>   <span class="cmt"># TypeError: 'tuple' object does not support item assignment</span></span></pre>
+            <p style="color:#fca5a5">Las tuplas NO se pueden modificar por subindice.</p>
+        </div>
+
+        <div class="card"><h3>Concatenar y repetir</h3>
+<pre><span class="cmt"># Concatenacion (crea nueva tupla)</span>
+aderezos = ()
+aderezos = aderezos + (<span class="str">"mayonesa"</span>,)
+
+<span class="cmt"># Repeticion</span>
+binario = (<span class="fn">0</span>, <span class="fn">1</span>) * <span class="fn">3</span>
+<span class="fn">print</span>(binario)  <span class="cmt"># (0, 1, 0, 1, 0, 1)</span></pre>
+        </div>
+
+        <div class="card"><h3>Funciones y metodos disponibles</h3>
+            <div class="comparison">
+                <div class="card success" style="margin:0"><h3><span class="label label-ok">SI</span> Disponibles</h3>
+                    <ul>
+                        <li><code>len()</code>, <code>max()</code>, <code>min()</code>, <code>sum()</code></li>
+                        <li>Operador <code>in</code> / <code>not in</code></li>
+                        <li><code>.index()</code>, <code>.count()</code></li>
+                        <li>Rebanadas (slicing)</li>
+                        <li>Recorrido con <code>for</code></li>
+                    </ul>
+                </div>
+                <div class="card danger" style="margin:0"><h3><span class="label label-bad">NO</span> Disponibles</h3>
+                    <ul>
+                        <li><code>.append()</code></li>
+                        <li><code>.remove()</code></li>
+                        <li><code>.pop()</code></li>
+                        <li><code>.sort()</code></li>
+                        <li>Cualquier metodo que modifique <i>in situ</i></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card"><h3>Conversion y aplicaciones</h3>
+<pre><span class="cmt"># Lista a Tupla</span>
+lista = [<span class="fn">1</span>, <span class="fn">2</span>, <span class="fn">3</span>]
+tupla = <span class="fn">tuple</span>(lista)   <span class="cmt"># (1, 2, 3)</span>
+
+<span class="cmt"># Tupla a Lista</span>
+nueva = <span class="fn">list</span>(tupla)    <span class="cmt"># [1, 2, 3]</span>
+
+<span class="cmt"># Intercambio de variables (tuple unpacking)</span>
+a, b = b, a
+
+<span class="cmt"># Uso tipico: datos heterogeneos</span>
+fecha = (dia, mes, anio)</pre>
+        </div>
+
+        <!-- === CONJUNTOS === -->
+        <h2 style="color:#22c55e;border-bottom-color:#16a34a">Conjuntos (Sets)</h2>
+
+        <div class="card"><h3>Que es un conjunto?</h3>
+            <p>Un conjunto es una coleccion de elementos <b style="color:#f59e0b">sin orden</b> y <b style="color:#f59e0b">sin duplicados</b>. No es una secuencia (no tiene subindices). Ideal para eliminar repetidos.</p>
+<pre>frutas = {<span class="str">"banana"</span>, <span class="str">"manzana"</span>, <span class="str">"naranja"</span>, <span class="str">"pera"</span>, <span class="str">"banana"</span>}
+<span class="fn">print</span>(frutas)  <span class="cmt"># {"banana", "manzana", "naranja", "pera"}</span>
+<span class="cmt"># "banana" quedo solo una vez</span></pre>
+        </div>
+
+        <div class="card warning"><h3>Conjunto vacio: set() NO {}</h3>
+<pre><span class="ok-hl">conjunto = <span class="fn">set</span>()   <span class="cmt"># Conjunto vacio CORRECTO</span></span>
+<span class="err-hl">oops = {}           <span class="cmt"># Esto es un DICCIONARIO vacio, NO un conjunto!</span></span></pre>
+        </div>
+
+        <div class="card"><h3>Mutabilidad del conjunto vs elementos</h3>
+            <p>Los conjuntos son <b style="color:#22c55e">mutables</b> (se pueden modificar), pero sus elementos deben ser de tipo <b style="color:#ef4444">inmutable</b> (numeros, strings, tuplas).</p>
+<pre><span class="cmt"># OK: elementos inmutables</span>
+<span class="ok-hl">validos = {<span class="fn">1</span>, <span class="str">"hola"</span>, (<span class="fn">2</span>, <span class="fn">3</span>)}</span>
+
+<span class="cmt"># ERROR: listas son mutables, no se pueden agregar</span>
+<span class="err-hl">lenguajes = {[<span class="str">"Python"</span>, <span class="str">"Perl"</span>]}  <span class="cmt"># TypeError: unhashable type: 'list'</span></span></pre>
+        </div>
+
+        <div class="card"><h3>Operaciones de conjuntos</h3>
+            <table style="width:100%;border-collapse:collapse">
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><span class="label label-info">|</span></td><td style="padding:8px"><b>Union</b> - A U B - Todos los elementos de ambos</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><span class="label label-info">&amp;</span></td><td style="padding:8px"><b>Interseccion</b> - A &cap; B - Solo los comunes</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><span class="label label-info">-</span></td><td style="padding:8px"><b>Diferencia</b> - A - B - Los de A que no estan en B</td></tr>
+                <tr><td style="padding:8px"><span class="label label-info">^</span></td><td style="padding:8px"><b>Diferencia simetrica</b> - A &Delta; B - Los que NO son comunes</td></tr>
+            </table>
+<pre>A = {<span class="fn">1</span>, <span class="fn">2</span>, <span class="fn">3</span>, <span class="fn">4</span>}
+B = {<span class="fn">3</span>, <span class="fn">4</span>, <span class="fn">5</span>, <span class="fn">6</span>}
+<span class="fn">print</span>(A | B)   <span class="cmt"># {1, 2, 3, 4, 5, 6}</span>
+<span class="fn">print</span>(A &amp; B)   <span class="cmt"># {3, 4}</span>
+<span class="fn">print</span>(A - B)   <span class="cmt"># {1, 2}</span>
+<span class="fn">print</span>(A ^ B)   <span class="cmt"># {1, 2, 5, 6}</span></pre>
+        </div>
+
+        <div class="card"><h3>Metodos de conjuntos</h3>
+            <table style="width:100%;border-collapse:collapse">
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code>add(elem)</code></td><td style="padding:8px">Agrega un elemento (como append en listas)</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code>remove(elem)</code></td><td style="padding:8px">Elimina elem. <b style="color:#ef4444">KeyError</b> si no existe</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code>discard(elem)</code></td><td style="padding:8px">Elimina elem. <b style="color:#22c55e">NO da error</b> si no existe</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code>pop()</code></td><td style="padding:8px">Elimina y devuelve un elemento al azar. KeyError si vacio</td></tr>
+                <tr><td style="padding:8px"><code>clear()</code></td><td style="padding:8px">Elimina todos los elementos</td></tr>
+            </table>
+<pre>conj = {<span class="fn">3</span>, <span class="fn">4</span>, <span class="fn">5</span>}
+conj.<span class="fn">add</span>(<span class="fn">6</span>)       <span class="cmt"># {3, 4, 5, 6}</span>
+conj.<span class="fn">remove</span>(<span class="fn">4</span>)    <span class="cmt"># {3, 5, 6}</span>
+conj.<span class="fn">discard</span>(<span class="fn">99</span>)  <span class="cmt"># Sin error, {3, 5, 6}</span>
+x = conj.<span class="fn">pop</span>()     <span class="cmt"># Saca uno al azar</span>
+conj.<span class="fn">clear</span>()       <span class="cmt"># set()</span></pre>
+        </div>
+
+        <!-- === DICCIONARIOS === -->
+        <h2 style="color:#f59e0b;border-bottom-color:#d97706">Diccionarios</h2>
+
+        <div class="card"><h3>Que es un diccionario?</h3>
+            <p>Estructura que relaciona <b>claves</b> y <b>valores</b>. Cada elemento es una dupla <code>clave:valor</code>. Tambien llamados arreglos asociativos (PHP), tablas de hash (Perl) o hashmaps (Java).</p>
+            <div class="diagram">
+                <div class="diagram-box" style="background:#2e2a1a;border:2px solid #f59e0b"><small style="color:#94a3b8">CLAVE</small><br>inmutable, unica</div>
+                <div class="diagram-arrow">&#10132;</div>
+                <div class="diagram-box" style="background:#1a2e1a;border:2px solid #22c55e"><small style="color:#94a3b8">VALOR</small><br>cualquier tipo</div>
+            </div>
+<pre>edades = {<span class="str">"Dante"</span>: <span class="fn">27</span>, <span class="str">"Brenda"</span>: <span class="fn">18</span>, <span class="str">"Malena"</span>: <span class="fn">23</span>}
+<span class="fn">print</span>(edades[<span class="str">"Brenda"</span>])  <span class="cmt"># 18</span></pre>
+        </div>
+
+        <div class="card"><h3>Reglas de los diccionarios</h3>
+            <ul>
+                <li>Las <b>claves deben ser inmutables</b> (numeros, strings, tuplas)</li>
+                <li>Los <b>valores pueden ser de cualquier tipo</b> (listas, dicts, etc.)</li>
+                <li>Las claves deben ser <b>unicas</b></li>
+                <li><b>No son secuencias</b>: no tienen orden, no usan subindice numerico</li>
+                <li>Las <b>rebanadas no aplican</b></li>
+            </ul>
+<pre>colores = {
+    <span class="str">"Rojo"</span>:  [<span class="fn">255</span>, <span class="fn">0</span>, <span class="fn">0</span>],
+    <span class="str">"Verde"</span>: [<span class="fn">0</span>, <span class="fn">255</span>, <span class="fn">0</span>],
+    <span class="str">"Azul"</span>:  [<span class="fn">0</span>, <span class="fn">0</span>, <span class="fn">255</span>]
+}</pre>
+        </div>
+
+        <div class="card"><h3>Agregar, modificar y eliminar</h3>
+<pre><span class="cmt"># Agregar o modificar (misma sintaxis)</span>
+colores[<span class="str">"Gris"</span>] = [<span class="fn">128</span>, <span class="fn">128</span>, <span class="fn">128</span>]  <span class="cmt"># crea nueva clave</span>
+colores[<span class="str">"Rojo"</span>] = [<span class="fn">200</span>, <span class="fn">0</span>, <span class="fn">0</span>]      <span class="cmt"># modifica existente</span>
+
+<span class="cmt"># Eliminar con del</span>
+<span class="kw">del</span> colores[<span class="str">"Rojo"</span>]
+
+<span class="cmt"># Eliminar diccionario completo</span>
+<span class="kw">del</span> colores</pre>
+        </div>
+
+        <div class="card"><h3>Recorrer un diccionario</h3>
+<pre><span class="cmt"># for itera sobre las CLAVES</span>
+<span class="kw">for</span> color <span class="kw">in</span> colores:
+    <span class="fn">print</span>(color, <span class="str">"=>"</span>, colores[color])
+
+<span class="cmt"># items() devuelve tuplas (clave, valor)</span>
+<span class="kw">for</span> color, RGB <span class="kw">in</span> colores.<span class="fn">items</span>():
+    <span class="fn">print</span>(color, <span class="str">"=>"</span>, RGB)</pre>
+        </div>
+
+        <div class="card"><h3>Metodos del diccionario</h3>
+            <table style="width:100%;border-collapse:collapse">
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code>get(clave [, default])</code></td><td style="padding:8px">Devuelve valor o None (o default). <b>Sin KeyError</b></td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code>keys()</code></td><td style="padding:8px">Secuencia de claves</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code>values()</code></td><td style="padding:8px">Secuencia de valores</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code>items()</code></td><td style="padding:8px">Secuencia de tuplas (clave, valor)</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code>pop(clave [, default])</code></td><td style="padding:8px">Elimina y devuelve valor. KeyError si no existe y no hay default</td></tr>
+                <tr><td style="padding:8px"><code>dict.fromkeys(seq [, val])</code></td><td style="padding:8px">Crea dict desde secuencia con valor None o val</td></tr>
+            </table>
+<pre><span class="cmt"># get() seguro</span>
+a = colores.<span class="fn">get</span>(<span class="str">"Cian"</span>, <span class="str">"No encontrado"</span>)
+
+<span class="cmt"># keys(), values(), items()</span>
+claves = <span class="fn">list</span>(colores.<span class="fn">keys</span>())    <span class="cmt"># ['Rojo', 'Verde', 'Azul']</span>
+valores = <span class="fn">list</span>(colores.<span class="fn">values</span>())  <span class="cmt"># [[255,0,0], [0,255,0], ...]</span>
+
+<span class="cmt"># pop()</span>
+a = colores.<span class="fn">pop</span>(<span class="str">"Verde"</span>)   <span class="cmt"># devuelve [0, 255, 0] y elimina</span>
+
+<span class="cmt"># fromkeys()</span>
+d = <span class="fn">dict</span>.<span class="fn">fromkeys</span>(<span class="str">"aeiou"</span>, <span class="fn">0</span>)
+<span class="cmt"># {'a': 0, 'e': 0, 'i': 0, 'o': 0, 'u': 0}</span>
+
+<span class="cmt"># Diccionario por comprension</span>
+dic = {x: x**<span class="fn">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">1</span>, <span class="fn">5</span>)}
+<span class="cmt"># {1: 1, 2: 4, 3: 9, 4: 16}</span></pre>
+        </div>
+
+        <div class="card danger"><h3>Acceso con clave inexistente = KeyError</h3>
+<pre><span class="err-hl">edades[<span class="str">"Carlos"</span>]    <span class="cmt"># KeyError: 'Carlos'</span></span>
+<span class="ok-hl">edades.<span class="fn">get</span>(<span class="str">"Carlos"</span>)  <span class="cmt"># None (sin error)</span></span>
+<span class="ok-hl"><span class="kw">if</span> <span class="str">"Carlos"</span> <span class="kw">in</span> edades:  <span class="cmt"># verificar antes</span></span></pre>
+        </div>
+
+        <div class="card warning"><h3>Comparacion rapida: Lista vs Tupla vs Conjunto vs Diccionario</h3>
+            <table style="width:100%;border-collapse:collapse;text-align:center">
+                <tr style="border-bottom:1px solid #334155"><th style="padding:8px">Tipo</th><th style="padding:8px">Sintaxis</th><th style="padding:8px">Mutable?</th><th style="padding:8px">Ordenado?</th><th style="padding:8px">Duplicados?</th></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px">Lista</td><td style="padding:8px"><code>[ ]</code></td><td style="padding:8px;color:#22c55e">Si</td><td style="padding:8px;color:#22c55e">Si</td><td style="padding:8px;color:#22c55e">Si</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px">Tupla</td><td style="padding:8px"><code>( )</code></td><td style="padding:8px;color:#ef4444">No</td><td style="padding:8px;color:#22c55e">Si</td><td style="padding:8px;color:#22c55e">Si</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px">Conjunto</td><td style="padding:8px"><code>{ }</code></td><td style="padding:8px;color:#22c55e">Si</td><td style="padding:8px;color:#ef4444">No</td><td style="padding:8px;color:#ef4444">No</td></tr>
+                <tr><td style="padding:8px">Diccionario</td><td style="padding:8px"><code>{k:v}</code></td><td style="padding:8px;color:#22c55e">Si</td><td style="padding:8px;color:#ef4444">No*</td><td style="padding:8px;color:#ef4444">No (claves)</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===== QUIZ ===== -->
+    <div class="section" id="sec-quiz">
+        <h2>Quiz</h2>
+        <div id="quizBox"></div>
+        <div style="text-align:center;margin:20px 0"><button class="btn btn-w" onclick="resetQuiz()">Reiniciar Quiz</button></div>
+    </div>
+
+    <!-- ===== EJERCICIOS ===== -->
+    <div class="section" id="sec-ejercicios">
+        <h2>Ejercicios - Completa el Codigo</h2>
+        <p style="color:#94a3b8">La verificacion revisa la estructura de tu codigo: que uses los patrones correctos y las funciones/metodos adecuados.</p>
+        <div id="exBox"></div>
+    </div>
+
+    <!-- ===== ORDENAR ===== -->
+    <div class="section" id="sec-ordenar">
+        <h2>Ordena el Codigo</h2>
+        <p style="color:#94a3b8">Haz clic en las lineas del banco para moverlas al destino. Usa las flechas para reordenar y la X para devolver. Luego verifica.</p>
+        <div id="orderBox"></div>
+    </div>
+
+    <!-- ===== ERRORES ===== -->
+    <div class="section" id="sec-errores">
+        <h2>Encuentra los Errores</h2>
+        <p style="color:#94a3b8">Cada codigo tiene errores. Selecciona todas las opciones que consideres correctas y luego verifica.</p>
+        <div id="errBox"></div>
+    </div>
+
+    <!-- ===== QUE DEVUELVE ===== -->
+    <div class="section" id="sec-quedevuelve">
+        <h2>EXTRA: Que devuelve?</h2>
+        <p style="color:#94a3b8">Analiza el codigo y escribe exactamente lo que devuelve/imprime. Respeta el formato de Python (parentesis, llaves, comillas, etc.).</p>
+        <div id="qdBox"></div>
+    </div>
+
+</div>
+
+<script>
+// ===== GLOBALS =====
+let score=0, answered={};
+const TABS=[
+    {id:'teoria',label:'1. Teoria'},
+    {id:'quiz',label:'2. Quiz'},
+    {id:'ejercicios',label:'3. Ejercicios'},
+    {id:'ordenar',label:'4. Ordenar'},
+    {id:'errores',label:'5. Errores'},
+    {id:'quedevuelve',label:'6. Que devuelve?'}
+];
+
+function init(){
+    const tb=document.getElementById('tabBar');
+    TABS.forEach((t,i)=>{
+        const b=document.createElement('button');
+        b.className='tab-btn'+(i===0?' active':'');
+        b.textContent=t.label;
+        b.onclick=()=>{
+            document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+            document.getElementById('sec-'+t.id).classList.add('active');
+            b.classList.add('active');
+        };
+        tb.appendChild(b);
+    });
+    buildQuiz();
+    buildExercises();
+    buildOrderChallenges();
+    buildErrorFinders();
+    buildQueDevuelve();
+    updateTotal();
+}
+
+function updateTotal(){
+    const t=quizData.length + exData.length + orderData.length + errData.length + qdData.length;
+    document.getElementById('sTotal').textContent=t;
+}
+function addScore(id){
+    if(answered[id])return;
+    answered[id]=true;
+    score++;
+    document.getElementById('sDisp').textContent=score;
+    const t=parseInt(document.getElementById('sTotal').textContent);
+    document.getElementById('pFill').style.width=(t>0?(score/t)*100:0)+'%';
+}
+
+// ===== QUIZ =====
+const quizData=[
+    {q:"Cual es la principal diferencia entre una lista y una tupla?",o:["La lista usa parentesis","La tupla es inmutable","La tupla permite duplicados","No hay diferencia"],c:1,e:"Las tuplas son inmutables: no se pueden modificar una vez creadas."},
+    {q:"Como se crea una tupla de UN solo elemento?",o:["t = (5)","t = (5,)","t = [5]","t = {5}"],c:1,e:"Se necesita la coma: (5,). Sin la coma, (5) es simplemente el entero 5."},
+    {q:"Que error da t[0] = 10 si t es una tupla?",o:["IndexError","ValueError","TypeError","KeyError"],c:2,e:"TypeError: 'tuple' object does not support item assignment."},
+    {q:"Que funcion convierte una lista en tupla?",o:["list()","tuple()","set()","dict()"],c:1,e:"tuple() convierte una lista (o cualquier iterable) en tupla."},
+    {q:"Como se crea un conjunto vacio?",o:["c = {}","c = set()","c = ()","c = []"],c:1,e:"{} crea un diccionario vacio, NO un conjunto. Se usa set()."},
+    {q:"Que pasa si agregas una lista a un conjunto?",o:["Se agrega normalmente","TypeError: unhashable type: 'list'","Se convierte a tupla","Se ignora"],c:1,e:"Los elementos de un conjunto deben ser inmutables. Las listas son mutables."},
+    {q:"Que operador representa la union de conjuntos?",o:["&","|","-","^"],c:1,e:"| es la union (A U B). & es interseccion, - es diferencia."},
+    {q:"Cual es la diferencia entre remove() y discard() en conjuntos?",o:["No hay diferencia","remove da KeyError si no existe, discard no","discard es mas lento","remove elimina todos, discard uno"],c:1,e:"remove() lanza KeyError si el elemento no esta. discard() no da error."},
+    {q:"Como se accede a un valor en un diccionario?",o:["dict[0]","dict.value","dict[clave]","dict(clave)"],c:2,e:"Se accede usando la clave: diccionario[clave]."},
+    {q:"Que pasa al acceder a una clave inexistente con dict[clave]?",o:["Devuelve None","Devuelve 0","KeyError","IndexError"],c:2,e:"Acceder con [] a una clave que no existe lanza KeyError."},
+    {q:"Que metodo devuelve None si la clave no existe en un diccionario?",o:["find()","search()","get()","fetch()"],c:2,e:"get(clave) devuelve el valor o None si la clave no existe."},
+    {q:"Que devuelve dict.keys()?",o:["Una lista de valores","Una lista de claves","Una lista de tuplas","Un entero"],c:1,e:"keys() devuelve una vista de las claves del diccionario."},
+    {q:"Que devuelve dict.items()?",o:["Solo claves","Solo valores","Tuplas (clave, valor)","Un string"],c:2,e:"items() devuelve una secuencia de tuplas (clave, valor)."},
+    {q:"Las claves de un diccionario pueden ser listas?",o:["Si, siempre","No, deben ser inmutables","Solo si son listas de strings","Depende del valor"],c:1,e:"Las claves deben ser de tipo inmutable: numeros, strings o tuplas."},
+    {q:"Que hace dict.fromkeys('abc', 0)?",o:["Error","{'abc': 0}","{'a': 0, 'b': 0, 'c': 0}","[0, 0, 0]"],c:2,e:"fromkeys crea un diccionario con cada caracter del string como clave y 0 como valor."},
+];
+
+function buildQuiz(){
+    const box=document.getElementById('quizBox');
+    box.innerHTML='';
+    quizData.forEach((q,i)=>{
+        let h=`<div class="question" id="q${i}"><p>${i+1}. ${q.q}</p><div class="opts">`;
+        q.o.forEach((o,j)=>{h+=`<div class="opt" id="q${i}o${j}" onclick="ansQ(${i},${j})">${o}</div>`;});
+        h+=`</div><div class="fb" id="qfb${i}"></div></div>`;
+        box.innerHTML+=h;
+    });
+}
+function ansQ(qi,oi){
+    const el=document.getElementById('q'+qi);
+    if(el.dataset.done)return;el.dataset.done='1';
+    el.querySelectorAll('.opt').forEach(o=>o.classList.add('dis'));
+    const fb=document.getElementById('qfb'+qi);
+    if(oi===quizData[qi].c){
+        document.getElementById('q'+qi+'o'+oi).classList.add('ok');
+        fb.className='fb show fb-ok';fb.textContent='Correcto! '+quizData[qi].e;
+        addScore('q'+qi);
+    }else{
+        document.getElementById('q'+qi+'o'+oi).classList.add('no');
+        document.getElementById('q'+qi+'o'+quizData[qi].c).classList.add('ok');
+        fb.className='fb show fb-no';fb.textContent='Incorrecto. '+quizData[qi].e;
+    }
+}
+function resetQuiz(){
+    quizData.forEach((_,i)=>delete answered['q'+i]);
+    score=Object.keys(answered).length;
+    document.getElementById('sDisp').textContent=score;
+    const t=parseInt(document.getElementById('sTotal').textContent);
+    document.getElementById('pFill').style.width=(t>0?(score/t)*100:0)+'%';
+    buildQuiz();
+}
+
+// ===== EXERCISES =====
+const exData=[
+    {id:1,title:"Tupla: desempaquetar y mostrar",diff:"f",
+     desc:'Dada una tupla alumno = (152408, "Luis Arce", "Lima 717"), desempaquetala en 3 variables e imprime cada una.',
+     template:`alumno = (152408, "Luis Arce", "Lima 717")\n# COMPLETA: desempaquetar en legajo, nombre, direccion\n# Imprimir cada variable`,
+     solution:`alumno = (152408, "Luis Arce", "Lima 717")\nlegajo, nombre, direccion = alumno\nprint("Legajo:", legajo)\nprint("Nombre:", nombre)\nprint("Direccion:", direccion)`,
+     checks:[
+         {type:'need',re:/,\s*\w+\s*,\s*\w+\s*=\s*alumno|alumno\[\d\]/,msg:'Falta desempaquetar la tupla o acceder por indice'},
+         {type:'need',re:/print\s*\(/,msg:'Falta print() para mostrar'},
+     ]},
+    {id:2,title:"Conjunto: eliminar duplicados",diff:"f",
+     desc:'Dada una lista con numeros repetidos, usa un conjunto para quedarte con los unicos y mostrarlos ordenados.',
+     template:`numeros = [4, 2, 7, 2, 8, 4, 1, 7, 3, 1]\n# COMPLETA: convertir a set, luego a lista ordenada\n# Imprimir resultado`,
+     solution:`numeros = [4, 2, 7, 2, 8, 4, 1, 7, 3, 1]\nunicos = set(numeros)\nordenados = sorted(unicos)\nprint("Unicos ordenados:", ordenados)`,
+     checks:[
+         {type:'need',re:/set\s*\(/,msg:'Falta usar set() para eliminar duplicados'},
+         {type:'need',re:/sorted|\.sort/,msg:'Falta ordenar el resultado (sorted o .sort)'},
+         {type:'need',re:/print\s*\(/,msg:'Falta print()'},
+     ]},
+    {id:3,title:"Diccionario: contar palabras",diff:"m",
+     desc:'Dada una frase, contar cuantas veces aparece cada palabra usando un diccionario. Usar .get() para simplificar.',
+     template:`frase = "buenos son los viejos amigos pero solo los buenos llegan a viejos"\npalabras = frase.split()\n# COMPLETA: crear diccionario y contar cada palabra\n# Usar dic[p] = dic.get(p, 0) + 1\n# Imprimir resultado`,
+     solution:`frase = "buenos son los viejos amigos pero solo los buenos llegan a viejos"\npalabras = frase.split()\ndic = {}\nfor p in palabras:\n    dic[p] = dic.get(p, 0) + 1\nfor palabra in sorted(dic):\n    print(palabra, ":", dic[palabra], "veces")`,
+     checks:[
+         {type:'need',re:/\.get\s*\(/,msg:'Falta usar .get() para acceso seguro'},
+         {type:'need',re:/for\s+\w+\s+in/,msg:'Falta ciclo for para recorrer'},
+         {type:'need',re:/\{\s*\}|dict\s*\(/,msg:'Falta crear diccionario vacio'},
+         {type:'need',re:/print\s*\(/,msg:'Falta print()'},
+     ]},
+    {id:4,title:"Operaciones de conjuntos",diff:"m",
+     desc:'Dados dos conjuntos de materias (cursadas y aprobadas), calcular: materias en curso (cursadas - aprobadas), total unicas, y comunes.',
+     template:`cursadas = {"Matematica", "Fisica", "Quimica", "Programacion", "Algebra"}\naprobadas = {"Matematica", "Algebra", "Historia"}\n# COMPLETA: calcular en_curso (diferencia), total (union), comunes (interseccion)\n# Imprimir cada resultado`,
+     solution:`cursadas = {"Matematica", "Fisica", "Quimica", "Programacion", "Algebra"}\naprobadas = {"Matematica", "Algebra", "Historia"}\nen_curso = cursadas - aprobadas\ntotal = cursadas | aprobadas\ncomunes = cursadas & aprobadas\nprint("En curso:", en_curso)\nprint("Total unicas:", total)\nprint("Comunes:", comunes)`,
+     checks:[
+         {type:'need',re:/\-/,msg:'Falta operador de diferencia (-)'},
+         {type:'need',re:/\|/,msg:'Falta operador de union (|)'},
+         {type:'need',re:/&/,msg:'Falta operador de interseccion (&)'},
+         {type:'need',re:/print\s*\(/,msg:'Falta print()'},
+     ]},
+    {id:5,title:"Diccionario: agenda telefonica",diff:"m",
+     desc:'Crear una agenda telefonica (diccionario). Agregar 3 contactos, buscar uno con get(), eliminar uno con del, recorrer con items().',
+     template:`# COMPLETA: crear diccionario agenda con 3 contactos\n# Buscar un contacto con .get()\n# Eliminar un contacto con del\n# Recorrer e imprimir con .items()`,
+     solution:`agenda = {"Ana": "1234-5678", "Luis": "2345-6789", "Maria": "3456-7890"}\n\nbuscar = agenda.get("Pedro", "No encontrado")\nprint("Pedro:", buscar)\n\ndel agenda["Luis"]\n\nfor nombre, tel in agenda.items():\n    print(nombre, "=>", tel)`,
+     checks:[
+         {type:'need',re:/\.get\s*\(/,msg:'Falta usar .get() para busqueda segura'},
+         {type:'need',re:/del\s+/,msg:'Falta usar del para eliminar'},
+         {type:'need',re:/\.items\s*\(/,msg:'Falta usar .items() para recorrer'},
+         {type:'need',re:/print\s*\(/,msg:'Falta print()'},
+     ]},
+    {id:6,title:"Poker: mano sin repetidos",diff:"d",
+     desc:'Simular la entrega de 5 naipes de poker usando un conjunto para evitar repetidos. Usar random y tuplas (numero, palo).',
+     template:`import random\nsimbolo = ("Trebol", "Pica", "Corazon", "Diamante")\nmano = set()\n# COMPLETA: while hasta tener 5 cartas\n# Generar numero (1-13) y palo (0-3)\n# Crear tupla carta = (numero, simbolo[palo])\n# Agregar al conjunto con add()\n# Imprimir la mano`,
+     solution:`import random\nsimbolo = ("Trebol", "Pica", "Corazon", "Diamante")\nmano = set()\nintentos = 0\nwhile len(mano) < 5:\n    numero = random.randint(1, 13)\n    palo = random.randint(0, 3)\n    carta = (numero, simbolo[palo])\n    mano.add(carta)\n    intentos += 1\nprint(mano)\nprint("Intentos realizados:", intentos)`,
+     checks:[
+         {type:'need',re:/while\s+len\s*\(\s*mano\s*\)\s*<\s*5|while\s+len\s*\(\s*mano\s*\)\s*!=\s*5/,msg:'Falta while con condicion len(mano) < 5'},
+         {type:'need',re:/random\.\s*randint/,msg:'Falta random.randint()'},
+         {type:'need',re:/\.add\s*\(/,msg:'Falta .add() para agregar al conjunto'},
+         {type:'need',re:/print\s*\(/,msg:'Falta print()'},
+     ]},
+];
+
+function buildExercises(){
+    const box=document.getElementById('exBox');
+    box.innerHTML='';
+    const diffLabels={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffClass={f:'diff-f',m:'diff-m',d:'diff-d'};
+    exData.forEach(ex=>{
+        box.innerHTML+=`
+        <div class="ex-area">
+            <h3>Ejercicio ${ex.id}: ${ex.title} <span class="diff ${diffClass[ex.diff]}">${diffLabels[ex.diff]}</span></h3>
+            <p style="color:#94a3b8;margin:10px 0">${ex.desc}</p>
+            <textarea id="ext${ex.id}" spellcheck="false">${ex.template}</textarea>
+            <button class="btn btn-p" onclick="checkEx(${ex.id})">Verificar</button>
+            <button class="btn btn-s" onclick="showSol(${ex.id})">Ver Solucion</button>
+            <div class="result" id="exr${ex.id}"></div>
+        </div>`;
+    });
+}
+
+function checkEx(id){
+    const ex=exData.find(e=>e.id===id);
+    const code=document.getElementById('ext'+id).value;
+    const r=document.getElementById('exr'+id);
+    let errors=[],goods=[];
+
+    if(/COMPLETA/.test(code)){
+        r.innerHTML='<div style="color:#f59e0b">Todavia no completaste el codigo. Reemplaza los comentarios con tu solucion.</div>';
+        r.className='result show';r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+        return;
+    }
+
+    ex.checks.forEach(ch=>{
+        if(ch.type==='bad' && ch.re.test(code)) errors.push(ch.msg);
+        if(ch.type==='need' && !ch.re.test(code)) errors.push(ch.msg);
+    });
+
+    if(/print\s*\(/.test(code)) goods.push('Usa print()');
+    if(/\.get\s*\(/.test(code)) goods.push('Usa get() seguro');
+    if(/\.items\s*\(/.test(code)) goods.push('Usa items()');
+    if(/set\s*\(/.test(code)) goods.push('Usa set()');
+    if(/\.add\s*\(/.test(code)) goods.push('Usa add()');
+    if(/for\s+\w+\s+in/.test(code)) goods.push('Recorre con for');
+    if(/sorted|\.sort/.test(code)) goods.push('Ordena resultado');
+
+    let h='';
+    if(goods.length){h+='<div style="color:#86efac"><b>Bien hecho:</b><ul>';goods.forEach(g=>h+='<li>'+g+'</li>');h+='</ul></div>';}
+    if(errors.length){h+='<div style="color:#fca5a5;margin-top:8px"><b>Problemas:</b><ul>';errors.forEach(e=>h+='<li>'+e+'</li>');h+='</ul></div>';}
+
+    if(!errors.length){
+        h+='<div style="color:#86efac;font-size:1.1em;margin-top:8px"><b>Excelente! Codigo correcto.</b></div>';
+        addScore('ex'+id);
+    }
+    r.innerHTML=h;r.className='result show';
+    r.style.background=errors.length?'#1e1b2e':'#1a2e1a';
+    r.style.border='1px solid '+(errors.length?'#a78bfa':'#22c55e');
+}
+
+function showSol(id){
+    const ex=exData.find(e=>e.id===id);
+    document.getElementById('ext'+id).value=ex.solution;
+    const r=document.getElementById('exr'+id);
+    r.innerHTML='<div style="color:#93c5fd">Solucion mostrada. Estudiala y trata de hacerla sin mirar!</div>';
+    r.className='result show';r.style.background='#1e3a5f';r.style.border='1px solid #38bdf8';
+}
+
+// ===== ORDER CHALLENGES =====
+const orderData=[
+    {id:1,title:"Contar palabras con diccionario",diff:"m",lines:[
+        "frase = input(\"Ingrese una frase:\\n\")",
+        "listadepalabras = frase.split()",
+        "dic = {}",
+        "for palabra in listadepalabras:",
+        "    dic[palabra] = dic.get(palabra, 0) + 1",
+        "for p in sorted(dic):",
+        "    print(p, \":\", dic[p], \"veces\")"
+    ]},
+    {id:2,title:"Mano de poker con conjuntos",diff:"d",lines:[
+        "import random",
+        "simbolo = (\"Trebol\", \"Pica\", \"Corazon\", \"Diamante\")",
+        "mano = set()",
+        "while len(mano) < 5:",
+        "    numero = random.randint(1, 13)",
+        "    palo = random.randint(0, 3)",
+        "    carta = (numero, simbolo[palo])",
+        "    mano.add(carta)",
+        "print(mano)"
+    ]},
+    {id:3,title:"Recorrer diccionario con items()",diff:"f",lines:[
+        "colores = {",
+        "    \"Rojo\": [255, 0, 0],",
+        "    \"Verde\": [0, 255, 0],",
+        "    \"Azul\": [0, 0, 255]",
+        "}",
+        "for color, RGB in colores.items():",
+        "    print(color, \"=>\", RGB)"
+    ]},
+    {id:4,title:"Operaciones de conjuntos",diff:"m",lines:[
+        "A = {1, 2, 3, 4, 5}",
+        "B = {4, 5, 6, 7, 8}",
+        "union = A | B",
+        "interseccion = A & B",
+        "diferencia = A - B",
+        "simetrica = A ^ B",
+        "print(\"Union:\", union)",
+        "print(\"Interseccion:\", interseccion)",
+        "print(\"Diferencia:\", diferencia)",
+        "print(\"Simetrica:\", simetrica)"
+    ]},
+];
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+function buildOrderChallenges(){
+    const box=document.getElementById('orderBox');
+    box.innerHTML='';
+    const diffL={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffC={f:'diff-f',m:'diff-m',d:'diff-d'};
+    let allHTML='';
+    orderData.forEach(ch=>{
+        allHTML+=`
+        <div class="oc" id="oc${ch.id}">
+            <h3>Desafio ${ch.id}: ${ch.title} <span class="diff ${diffC[ch.diff]}">${diffL[ch.diff]}</span></h3>
+            <p style="color:#94a3b8;margin:8px 0">Banco (clic para enviar al destino):</p>
+            <div class="oc-pool" id="ocp${ch.id}"></div>
+            <p style="color:#94a3b8;margin:8px 0">Destino (usa &#9650;&#9660; para reordenar, &#10005; para devolver):</p>
+            <div class="oc-target" id="oct${ch.id}"></div>
+            <button class="btn btn-p" onclick="checkOC(${ch.id})">Verificar</button>
+            <button class="btn btn-w" onclick="resetOC(${ch.id})">Reiniciar</button>
+            <div class="result" id="ocr${ch.id}"></div>
+        </div>`;
+    });
+    box.innerHTML=allHTML;
+    orderData.forEach(ch=>resetOC(ch.id));
+}
+
+function makeOCItem(id, item){
+    const pool=document.getElementById('ocp'+id);
+    const tgt=document.getElementById('oct'+id);
+    const d=document.createElement('div');
+    d.className='oc-item';
+    d.dataset.idx=item.idx;
+    const arrows=document.createElement('span');
+    arrows.className='oc-arrows';
+    arrows.innerHTML='<button onclick="event.stopPropagation();moveOC(this.closest(\'.oc-item\'),-1)">&#9650;</button><button onclick="event.stopPropagation();moveOC(this.closest(\'.oc-item\'),1)">&#9660;</button>';
+    d.appendChild(arrows);
+    const span=document.createElement('span');
+    span.className='item-text';
+    span.textContent=item.text;
+    d.appendChild(span);
+    const ret=document.createElement('button');
+    ret.className='oc-ret';
+    ret.textContent='\u2715';
+    ret.onclick=function(e){e.stopPropagation();pool.appendChild(d);d.classList.remove('right','wrong');};
+    d.appendChild(ret);
+    d.onclick=function(){
+        if(this.parentElement===pool){
+            tgt.appendChild(this);
+            this.classList.remove('right','wrong');
+        }
+    };
+    return d;
+}
+
+function moveOC(el, dir){
+    const parent=el.parentElement;
+    if(dir===-1 && el.previousElementSibling){
+        parent.insertBefore(el, el.previousElementSibling);
+    }else if(dir===1 && el.nextElementSibling){
+        parent.insertBefore(el.nextElementSibling, el);
+    }
+    el.classList.remove('right','wrong');
+}
+
+function resetOC(id){
+    const ch=orderData.find(c=>c.id===id);
+    const pool=document.getElementById('ocp'+id);
+    const tgt=document.getElementById('oct'+id);
+    pool.innerHTML='';tgt.innerHTML='';
+    document.getElementById('ocr'+id).className='result';
+    const shuffled=shuffle(ch.lines.map((l,i)=>({text:l,idx:i})));
+    shuffled.forEach(item=>{
+        pool.appendChild(makeOCItem(id, item));
+    });
+}
+
+function checkOC(id){
+    const ch=orderData.find(c=>c.id===id);
+    const tgt=document.getElementById('oct'+id);
+    const items=tgt.querySelectorAll('.oc-item');
+    const r=document.getElementById('ocr'+id);
+    if(items.length<ch.lines.length){
+        r.innerHTML='<div style="color:#f59e0b">Faltan lineas. Haz clic en cada una del banco para moverla.</div>';
+        r.className='result show';r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+        return;
+    }
+    let allOk=true;
+    items.forEach((item,i)=>{
+        if(parseInt(item.dataset.idx)===i){
+            item.classList.add('right');item.classList.remove('wrong');
+        }else{
+            item.classList.add('wrong');item.classList.remove('right');
+            allOk=false;
+        }
+    });
+    if(allOk){
+        r.innerHTML='<div style="color:#86efac;font-size:1.1em"><b>Perfecto! Orden correcto.</b></div>';
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';
+        addScore('oc'+id);
+    }else{
+        r.innerHTML='<div style="color:#fca5a5"><b>Hay errores.</b> Verde = posicion correcta. Rojo = posicion incorrecta.</div>';
+        r.style.background='#1e1b2e';r.style.border='1px solid #ef4444';
+    }
+    r.className='result show';
+}
+
+// ===== ERROR FINDERS =====
+const errData=[
+    {id:1,title:"Codigo 1 - Modificar tupla",diff:"f",
+     consigna:"Se quiere cambiar el segundo elemento de una tupla.",
+     code:`datos = ("Ana", "Luis", "Maria")\ndatos[1] = "Carlos"\nprint(datos)`,
+     question:"Cuales son los errores?",
+     options:[
+         {text:"Las tuplas son inmutables: no se puede hacer datos[1] = 'Carlos'",correct:true},
+         {text:"Da TypeError: 'tuple' object does not support item assignment",correct:true},
+         {text:"Deberia convertir a lista primero, modificar, y reconvertir a tupla",correct:true},
+         {text:"El print esta mal",correct:false},
+         {text:"Falta usar append()",correct:false},
+     ]},
+    {id:2,title:"Codigo 2 - Lista en conjunto",diff:"m",
+     consigna:"Se quiere crear un conjunto con listas de lenguajes.",
+     code:`lenguajes = {["Python", "Perl"], ["Java", "C++"]}\nprint(lenguajes)`,
+     question:"Cuales son los errores?",
+     options:[
+         {text:"Las listas son mutables (unhashable) y no pueden ser elementos de un conjunto",correct:true},
+         {text:"TypeError: unhashable type: 'list'",correct:true},
+         {text:"Deberia usar tuplas en vez de listas: {('Python','Perl'), ('Java','C++')}",correct:true},
+         {text:"Faltan comillas en los strings",correct:false},
+         {text:"El print esta mal",correct:false},
+     ]},
+    {id:3,title:"Codigo 3 - Acceso a diccionario inexistente",diff:"m",
+     consigna:"Se quiere acceder a una clave que puede no existir en el diccionario.",
+     code:`edades = {"Dante": 27, "Brenda": 18}\nprint(edades["Carlos"])\nprint("Fin del programa")`,
+     question:"Cuales son los errores?",
+     options:[
+         {text:"'Carlos' no existe como clave, da KeyError",correct:true},
+         {text:"Deberia usar edades.get('Carlos') o verificar con 'in' antes",correct:true},
+         {text:"'Fin del programa' nunca se ejecuta porque el programa crashea antes",correct:true},
+         {text:"El diccionario esta mal definido",correct:false},
+         {text:"Falta convertir a string",correct:false},
+     ]},
+    {id:4,title:"Codigo 4 - Clave mutable en diccionario",diff:"d",
+     consigna:"Se quiere usar una lista como clave de un diccionario.",
+     code:`inventario = {}\nclave = [1, 2, 3]\ninventario[clave] = "producto"\nprint(inventario)`,
+     question:"Cuales son los errores?",
+     options:[
+         {text:"Las listas no pueden ser claves de diccionario (son mutables/unhashable)",correct:true},
+         {text:"TypeError: unhashable type: 'list'",correct:true},
+         {text:"Deberia usar una tupla como clave: clave = (1, 2, 3)",correct:true},
+         {text:"Falta definir inventario como dict()",correct:false},
+         {text:"El print esta mal",correct:false},
+     ]},
+    {id:5,title:"Codigo 5 - append en tupla y {} vacio",diff:"d",
+     consigna:"Se quiere crear una tupla, agregarle elementos, y un conjunto vacio.",
+     code:`datos = (1, 2, 3)\ndatos.append(4)\nprint(datos)\n\nconjunto = {}\nconjunto.add(5)\nprint(conjunto)`,
+     question:"Cuales son los errores?",
+     options:[
+         {text:"Las tuplas no tienen append() porque son inmutables",correct:true},
+         {text:"{} crea un DICCIONARIO vacio, no un conjunto. Deberia ser set()",correct:true},
+         {text:"Para 'agregar' a una tupla hay que concatenar: datos = datos + (4,)",correct:true},
+         {text:"add() es correcto para conjuntos, pero {} no es un conjunto",correct:true},
+         {text:"Los numeros no se pueden agregar a tuplas ni conjuntos",correct:false},
+     ]},
+];
+
+function buildErrorFinders(){
+    const box=document.getElementById('errBox');
+    box.innerHTML='';
+    const diffL={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffC={f:'diff-f',m:'diff-m',d:'diff-d'};
+    errData.forEach(er=>{
+        let h=`<div class="oc" id="er${er.id}">
+            <h3>${er.title} <span class="diff ${diffC[er.diff]}">${diffL[er.diff]}</span></h3>
+            <p style="color:#94a3b8;margin:5px 0"><b>Consigna:</b> ${er.consigna}</p>
+            <div class="ef-block"><pre style="margin:0;border:none;padding:0;background:transparent">${er.code}</pre></div>
+            <p style="margin:10px 0"><b>${er.question}</b></p>
+            <div id="ero${er.id}">`;
+        er.options.forEach((op,j)=>{
+            h+=`<div class="ef-opt" id="er${er.id}o${j}" onclick="toggleEF(${er.id},${j})">${op.text}</div>`;
+        });
+        h+=`</div>
+            <button class="btn btn-p" onclick="checkEF(${er.id})">Verificar</button>
+            <div class="result" id="err${er.id}"></div>
+        </div>`;
+        box.innerHTML+=h;
+    });
+}
+
+function toggleEF(id,oi){
+    const el=document.getElementById('er'+id+'o'+oi);
+    if(el.classList.contains('ans-ok')||el.classList.contains('ans-no'))return;
+    el.classList.toggle('selected');
+}
+
+function checkEF(id){
+    const er=errData.find(e=>e.id===id);
+    const r=document.getElementById('err'+id);
+    let allOk=true;
+    er.options.forEach((op,j)=>{
+        const el=document.getElementById('er'+id+'o'+j);
+        const selected=el.classList.contains('selected');
+        if(op.correct&&selected){el.className='ef-opt ans-ok';}
+        else if(op.correct&&!selected){el.className='ef-opt ans-no';allOk=false;}
+        else if(!op.correct&&selected){el.className='ef-opt ans-no';allOk=false;}
+        else{el.className='ef-opt ans-ok';}
+    });
+    if(allOk){
+        r.innerHTML='<div style="color:#86efac;font-size:1.1em"><b>Perfecto! Identificaste todos los errores correctamente.</b></div>';
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';
+        addScore('ef'+id);
+    }else{
+        r.innerHTML='<div style="color:#fca5a5"><b>No del todo.</b> Verde = opcion correcta. Rojo = te faltaron o marcaste de mas.</div>';
+        r.style.background='#1e1b2e';r.style.border='1px solid #ef4444';
+    }
+    r.className='result show';
+}
+
+// ===== QUE DEVUELVE? =====
+const qdData=[
+    {id:1,title:"Tuple unpacking",
+     code:`a, b, c = (10, 20, 30)\nprint(a + c)`,
+     answer:"40",
+     hint:"a=10, c=30. La suma es 40.",
+     normalize:s=>s.trim()},
+    {id:2,title:"Tupla de un elemento",
+     code:`x = (5)\ny = (5,)\nprint(type(x).__name__, type(y).__name__)`,
+     answer:"int tuple",
+     hint:"(5) es solo el entero 5. (5,) es una tupla.",
+     normalize:s=>s.trim().replace(/\s+/g,' ')},
+    {id:3,title:"Repeticion de tupla",
+     code:`t = (1, 2) * 3\nprint(t)`,
+     answer:"(1, 2, 1, 2, 1, 2)",
+     hint:"El operador * repite la tupla 3 veces.",
+     normalize:s=>s.trim().replace(/\s+/g,'').replace(/,(?=\))/g,'')},
+    {id:4,title:"Union de conjuntos",
+     code:`A = {1, 2, 3}\nB = {3, 4, 5}\nprint(len(A | B))`,
+     answer:"5",
+     hint:"A | B = {1,2,3,4,5}. len = 5.",
+     normalize:s=>s.trim()},
+    {id:5,title:"Interseccion de conjuntos",
+     code:`A = {1, 2, 3, 4}\nB = {2, 4, 6, 8}\nprint(A & B)`,
+     answer:"{2, 4}",
+     hint:"Solo los elementos comunes: 2 y 4.",
+     normalize:s=>s.trim().replace(/\s+/g,'').split(',').sort().join(',')},
+    {id:6,title:"Diferencia de conjuntos",
+     code:`A = {10, 20, 30, 40}\nB = {20, 40}\nprint(A - B)`,
+     answer:"{10, 30}",
+     hint:"Elementos de A que NO estan en B.",
+     normalize:s=>s.trim().replace(/\s+/g,'').split(',').sort().join(',')},
+    {id:7,title:"dict.get() con default",
+     code:`d = {"a": 1, "b": 2}\nprint(d.get("c", 99))`,
+     answer:"99",
+     hint:"'c' no existe, devuelve el default: 99.",
+     normalize:s=>s.trim()},
+    {id:8,title:"dict.keys()",
+     code:`d = {"x": 10, "y": 20, "z": 30}\nprint(list(d.keys()))`,
+     answer:"['x', 'y', 'z']",
+     hint:"keys() devuelve las claves. list() las convierte a lista.",
+     normalize:s=>s.trim().replace(/\s+/g,'').replace(/"/g,"'")},
+    {id:9,title:"dict.items() y unpacking",
+     code:`d = {"a": 1, "b": 2}\nfor k, v in d.items():\n    print(k, v)`,
+     answer:"a 1\nb 2",
+     hint:"items() devuelve tuplas (clave, valor). Se imprimen una por linea.",
+     normalize:s=>s.trim().replace(/\s+/g,' ')},
+    {id:10,title:"Conjunto con duplicados",
+     code:`nums = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]\nprint(len(set(nums)))`,
+     answer:"7",
+     hint:"set elimina duplicados: {1,2,3,4,5,6,9} = 7 elementos.",
+     normalize:s=>s.trim()},
+];
+
+function buildQueDevuelve(){
+    const box=document.getElementById('qdBox');
+    box.innerHTML='';
+    qdData.forEach(qd=>{
+        box.innerHTML+=`
+        <div class="qd-card" id="qd${qd.id}">
+            <h3>${qd.id}. ${qd.title}</h3>
+            <div class="ef-block"><pre style="margin:0;border:none;padding:0;background:transparent">${qd.code}</pre></div>
+            <p style="margin:10px 0"><b>Que imprime?</b></p>
+            <input class="qd-input" id="qdi${qd.id}" type="text" placeholder="Escribe la salida exacta..." autocomplete="off">
+            <button class="btn btn-p" onclick="checkQD(${qd.id})">Verificar</button>
+            <button class="btn btn-w" onclick="hintQD(${qd.id})">Pista</button>
+            <button class="btn btn-s" onclick="showQD(${qd.id})">Ver Respuesta</button>
+            <div class="result" id="qdr${qd.id}"></div>
+        </div>`;
+    });
+}
+
+function checkQD(id){
+    const qd=qdData.find(q=>q.id===id);
+    const input=document.getElementById('qdi'+id).value;
+    const r=document.getElementById('qdr'+id);
+    const userNorm=qd.normalize(input);
+    const ansNorm=qd.normalize(qd.answer);
+    if(userNorm===ansNorm){
+        r.innerHTML=`<div style="color:#86efac"><b>Correcto!</b> La salida es: <code>${qd.answer}</code></div>`;
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';
+        addScore('qd'+id);
+    }else{
+        r.innerHTML=`<div style="color:#fca5a5"><b>Incorrecto.</b> Tu respuesta: <code>${input}</code>. Intenta de nuevo o pide una pista.</div>`;
+        r.style.background='#1e1b2e';r.style.border='1px solid #ef4444';
+    }
+    r.className='result show';
+}
+
+function hintQD(id){
+    const qd=qdData.find(q=>q.id===id);
+    const r=document.getElementById('qdr'+id);
+    r.innerHTML=`<div style="color:#fde68a"><b>Pista:</b> ${qd.hint}</div>`;
+    r.className='result show';r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+}
+
+function showQD(id){
+    const qd=qdData.find(q=>q.id===id);
+    const r=document.getElementById('qdr'+id);
+    document.getElementById('qdi'+id).value=qd.answer;
+    r.innerHTML=`<div style="color:#93c5fd"><b>Respuesta:</b> <code>${qd.answer}</code><br>${qd.hint}</div>`;
+    r.className='result show';r.style.background='#1e3a5f';r.style.border='1px solid #38bdf8';
+}
+
+window.onload=init;
+</script>
+</body>
+</html>

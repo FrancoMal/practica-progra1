@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archivos en Python - v3 (con ejecucion real)</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.7}
+        .container{max-width:920px;margin:0 auto;padding:20px}
+        h1{text-align:center;font-size:2.2em;margin:30px 0;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        h2{color:#38bdf8;margin:30px 0 15px;font-size:1.5em;border-bottom:2px solid #1e3a5f;padding-bottom:8px}
+        h3{color:#a78bfa;margin:15px 0 10px}
+        .tabs{display:flex;flex-wrap:wrap;gap:5px;margin:20px 0;justify-content:center}
+        .tab-btn{padding:10px 18px;background:#1e293b;border:2px solid #334155;color:#94a3b8;border-radius:8px;cursor:pointer;font-size:.95em;transition:.3s}
+        .tab-btn:hover{border-color:#38bdf8;color:#38bdf8}
+        .tab-btn.active{background:#1e3a5f;border-color:#38bdf8;color:#38bdf8;font-weight:bold}
+        .section{display:none;animation:fadeIn .4s}.section.active{display:block}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .card{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0;border-left:4px solid #38bdf8}
+        .card.danger{border-left-color:#ef4444;background:#1e1b2e}
+        .card.success{border-left-color:#22c55e;background:#1a2e1a}
+        .card.warning{border-left-color:#f59e0b;background:#2e2a1a}
+        pre{background:#0c1222;border:1px solid #334155;border-radius:8px;padding:15px;overflow-x:auto;font-family:Consolas,'Courier New',monospace;font-size:.9em;margin:10px 0;white-space:pre-wrap}
+        code{font-family:Consolas,monospace}
+        .kw{color:#c084fc}.str{color:#86efac}.cmt{color:#64748b;font-style:italic}.fn{color:#38bdf8}
+        .err-hl{background:rgba(239,68,68,.2);display:block;padding:2px 0}
+        .ok-hl{background:rgba(34,197,94,.15);display:block;padding:2px 0}
+        .label{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.8em;font-weight:bold;margin:3px}
+        .label-ok{background:#166534;color:#86efac}.label-bad{background:#7f1d1d;color:#fca5a5}.label-info{background:#1e3a5f;color:#93c5fd}
+        .comparison{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
+        @media(max-width:700px){.comparison{grid-template-columns:1fr}}
+        .diagram{display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0;flex-wrap:wrap}
+        .diagram-box{padding:15px 25px;border-radius:10px;font-weight:bold;text-align:center}
+        .diagram-arrow{font-size:1.5em;color:#64748b}
+        .step-number{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:#2563eb;border-radius:50%;color:white;font-weight:bold;margin-right:8px}
+        ul,ol{margin:10px 0 10px 25px}li{margin:5px 0}
+        .diff{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.75em;font-weight:bold;margin-left:10px}
+        .diff-f{background:#166534;color:#86efac}.diff-m{background:#854d0e;color:#fde68a}.diff-d{background:#7f1d1d;color:#fca5a5}
+
+        .progress-bar{width:100%;height:8px;background:#334155;border-radius:4px;margin:10px 0;overflow:hidden}
+        .progress-fill{height:100%;background:linear-gradient(90deg,#38bdf8,#818cf8);border-radius:4px;transition:width .5s}
+        .score-display{text-align:center;padding:15px;background:#1e293b;border-radius:12px;margin:15px 0;font-size:1.2em}
+        .score-num{color:#38bdf8;font-weight:bold;font-size:1.5em}
+
+        .btn{padding:10px 25px;border:none;border-radius:8px;cursor:pointer;font-size:1em;font-weight:bold;margin:8px 5px 8px 0;transition:.3s}
+        .btn-p{background:#2563eb;color:white}.btn-p:hover{background:#1d4ed8}
+        .btn-s{background:#16a34a;color:white}.btn-s:hover{background:#15803d}
+        .btn-w{background:#d97706;color:white}.btn-w:hover{background:#b45309}
+        .btn-d{background:#dc2626;color:white}.btn-d:hover{background:#b91c1c}
+        .btn:disabled{opacity:.5;cursor:not-allowed}
+
+        .ex-area{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0}
+        .ex-area textarea{width:100%;min-height:280px;background:#0c1222;color:#e2e8f0;border:2px solid #334155;border-radius:8px;padding:15px;font-family:Consolas,monospace;font-size:.95em;resize:vertical;tab-size:4}
+        .ex-area textarea:focus{outline:none;border-color:#38bdf8}
+        .result{margin-top:10px;padding:15px;border-radius:8px;display:none}
+        .result.show{display:block}
+
+        /* Pyodide loading */
+        #pyStatus{text-align:center;padding:15px;background:#1e293b;border-radius:12px;margin:15px 0;font-size:1em}
+        .spinner{display:inline-block;width:20px;height:20px;border:3px solid #334155;border-top-color:#38bdf8;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:8px}
+        @keyframes spin{to{transform:rotate(360deg)}}
+
+        /* Order */
+        .oc{background:#1e293b;border-radius:12px;padding:20px;margin:20px 0;border:2px solid #334155}
+        .oc-pool{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:#0f172a;border-radius:8px;min-height:50px;margin:10px 0}
+        .oc-target{border:2px dashed #475569;border-radius:8px;padding:10px;margin:10px 0;min-height:60px}
+        .oc-target .oc-item{width:100%;margin:3px 0}
+        .oc-item{padding:10px 16px;background:#2563eb;color:white;border-radius:6px;cursor:pointer;user-select:none;font-family:Consolas,monospace;font-size:.9em;transition:.2s;display:flex;align-items:center;gap:8px}
+        .oc-pool .oc-item{display:inline-flex}
+        .oc-item:hover{background:#3b82f6}
+        .oc-item.right{background:#16a34a!important}.oc-item.wrong{background:#dc2626!important}
+        .oc-item .item-text{flex:1}
+        .oc-arrows{display:flex;flex-direction:column;gap:1px;margin-right:4px}
+        .oc-arrows button{background:rgba(255,255,255,.2);border:none;color:white;cursor:pointer;font-size:.7em;padding:1px 5px;border-radius:3px;line-height:1}
+        .oc-arrows button:hover{background:rgba(255,255,255,.4)}
+        .oc-pool .oc-arrows{display:none}
+        .oc-ret{background:rgba(255,255,255,.2);border:none;color:white;cursor:pointer;font-size:.8em;padding:2px 8px;border-radius:3px;margin-left:4px}
+        .oc-ret:hover{background:rgba(239,68,68,.5)}
+        .oc-pool .oc-ret{display:none}
+
+        /* Quiz */
+        .question{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0;border:2px solid #334155}
+        .question>p{margin-bottom:12px;font-weight:bold}
+        .opts{display:flex;flex-direction:column;gap:8px}
+        .opt{padding:12px 15px;background:#0f172a;border:2px solid #334155;border-radius:8px;cursor:pointer;transition:.3s}
+        .opt:hover{border-color:#38bdf8;background:#1e3a5f}
+        .opt.ok{border-color:#22c55e!important;background:#14532d!important;color:#86efac}
+        .opt.no{border-color:#ef4444!important;background:#7f1d1d!important;color:#fca5a5}
+        .opt.dis{pointer-events:none;opacity:.7}
+        .fb{margin-top:10px;padding:10px 15px;border-radius:8px;display:none;font-size:.95em}
+        .fb.show{display:block}
+        .fb.fb-ok{background:#14532d;color:#86efac;border:1px solid #22c55e}
+        .fb.fb-no{background:#7f1d1d;color:#fca5a5;border:1px solid #ef4444}
+
+        /* Error finder */
+        .ef-opt{padding:8px 15px;background:#0f172a;border:2px solid #334155;border-radius:8px;cursor:pointer;transition:.3s;margin:5px 0;display:block}
+        .ef-opt:hover{border-color:#38bdf8}
+        .ef-opt.selected{border-color:#f59e0b;background:#2e2a1a}
+        .ef-opt.ans-ok{border-color:#22c55e!important;background:#14532d!important}
+        .ef-opt.ans-no{border-color:#ef4444!important;background:#7f1d1d!important}
+
+        /* Output console */
+        .console-out{background:#000;color:#22c55e;font-family:Consolas,monospace;font-size:.9em;padding:12px;border-radius:8px;margin:10px 0;min-height:40px;white-space:pre-wrap;max-height:300px;overflow-y:auto}
+        .console-out .err-text{color:#ef4444}
+        .console-out .warn-text{color:#f59e0b}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Archivos en Python - v3</h1>
+    <p style="text-align:center;color:#94a3b8;margin-bottom:10px;">Con ejecucion real de Python en el navegador</p>
+
+    <div id="pyStatus"><span class="spinner"></span> Cargando Python (Pyodide)... puede tardar unos segundos la primera vez.</div>
+
+    <div class="progress-bar"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
+    <div class="score-display">Puntaje: <span class="score-num" id="sDisp">0</span> / <span id="sTotal">0</span></div>
+
+    <div class="tabs" id="tabBar"></div>
+
+    <!-- ===== TEORIA ===== -->
+    <div class="section active" id="sec-teoria">
+        <h2>Teoria Completa</h2>
+        <div class="card"><h3>Estructura</h3>
+            <div class="diagram">
+                <div class="diagram-box" style="background:#1e3a5f;border:2px solid #38bdf8"><small style="color:#94a3b8">ARCHIVO</small><br>Conjunto de registros</div>
+                <div class="diagram-arrow">&#10132;</div>
+                <div class="diagram-box" style="background:#2d1b69;border:2px solid #a78bfa"><small style="color:#94a3b8">REGISTRO</small><br>Conjunto de campos</div>
+                <div class="diagram-arrow">&#10132;</div>
+                <div class="diagram-box" style="background:#1a3a1a;border:2px solid #22c55e"><small style="color:#94a3b8">CAMPO</small><br>Dato individual</div>
+            </div>
+<pre>1042735;Vignale, Juan Jose       <span class="cmt">&larr; registro (legajo ; nombre)</span>
+1118693;Garay, Mariela Daiana    <span class="cmt">&larr; otro registro</span></pre>
+        </div>
+        <div class="card"><h3>3 Etapas</h3>
+            <div class="diagram">
+                <div class="diagram-box" style="background:#1e3a5f;border:2px solid #38bdf8"><span class="step-number">1</span>APERTURA<br><small>open()</small></div>
+                <div class="diagram-arrow">&#10132;</div>
+                <div class="diagram-box" style="background:#2d1b69;border:2px solid #a78bfa"><span class="step-number">2</span>PROCESO<br><small>read/write</small></div>
+                <div class="diagram-arrow">&#10132;</div>
+                <div class="diagram-box" style="background:#1a3a1a;border:2px solid #22c55e"><span class="step-number">3</span>CIERRE<br><small>close()</small></div>
+            </div>
+        </div>
+        <div class="card"><h3>Modos de apertura</h3>
+            <table style="width:100%;border-collapse:collapse">
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><span class="label label-info">r</span></td><td style="padding:8px"><b>Read</b> - Solo lectura. Archivo DEBE existir.</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><span class="label label-info">w</span></td><td style="padding:8px"><b>Write</b> - Solo escritura. Si existe lo DESTRUYE.</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><span class="label label-info">a</span></td><td style="padding:8px"><b>Append</b> - Escritura al final. No borra.</td></tr>
+                <tr><td style="padding:8px"><span class="label label-info">t</span></td><td style="padding:8px"><b>Text</b> - Modificador: "rt", "wt", "at". Default: "rt".</td></tr>
+            </table>
+        </div>
+        <div class="card warning"><h3>Rutas en Windows</h3>
+<pre><span class="cmt"># MAL - \n es salto de linea:</span>
+<span class="err-hl"><span class="fn">open</span>(<span class="str">"c:\nuevo\datos.txt"</span>, <span class="str">"wt"</span>)</span>
+<span class="cmt"># BIEN:</span>
+<span class="ok-hl"><span class="fn">open</span>(<span class="str">"c:\\nuevo\\datos.txt"</span>, <span class="str">"wt"</span>)  <span class="cmt"># doble barra</span></span>
+<span class="ok-hl"><span class="fn">open</span>(<span class="str">"c:/nuevo/datos.txt"</span>, <span class="str">"wt"</span>)   <span class="cmt"># barra normal</span></span>
+<span class="ok-hl"><span class="fn">open</span>(<span class="kw">r</span><span class="str">"c:\nuevo\datos.txt"</span>, <span class="str">"wt"</span>)  <span class="cmt"># raw string</span></span></pre>
+        </div>
+        <div class="card"><h3>Estructura obligatoria</h3>
+<pre><span class="kw">try</span>:
+    arch = <span class="fn">open</span>(<span class="str">"datos.txt"</span>, <span class="str">"rt"</span>)
+    <span class="cmt"># procesamiento...</span>
+<span class="kw">except</span> <span class="fn">FileNotFoundError</span> <span class="kw">as</span> msg:
+    <span class="fn">print</span>(<span class="str">"No encontrado:"</span>, msg)
+<span class="kw">except</span> <span class="fn">OSError</span> <span class="kw">as</span> msg:
+    <span class="fn">print</span>(<span class="str">"Error:"</span>, msg)
+<span class="kw">finally</span>:
+    <span class="kw">try</span>:
+        arch.<span class="fn">close</span>()
+    <span class="kw">except</span> <span class="fn">NameError</span>:
+        <span class="kw">pass</span></pre>
+            <p style="color:#f59e0b"><b>FileNotFoundError ANTES de OSError.</b></p>
+        </div>
+        <h2>Lectura</h2>
+        <div class="comparison">
+            <div class="card success"><h3><span class="label label-ok">OK</span> readline() / for</h3>
+<pre><span class="ok-hl">linea = arch.<span class="fn">readline</span>()</span>
+<span class="kw">while</span> linea:
+<span class="ok-hl">    linea = arch.<span class="fn">readline</span>()</span>
+<span class="cmt"># o tambien:</span>
+<span class="ok-hl"><span class="kw">for</span> linea <span class="kw">in</span> arch:</span></pre>
+            </div>
+            <div class="card danger"><h3><span class="label label-bad">PROHIBIDO</span></h3>
+<pre><span class="err-hl">arch.<span class="fn">readlines</span>()  <span class="cmt"># lista</span></span>
+<span class="err-hl">arch.<span class="fn">read</span>()       <span class="cmt"># string</span></span>
+<span class="err-hl"><span class="fn">list</span>(arch)       <span class="cmt"># lista</span></span>
+<span class="cmt"># Cargan TODO en memoria</span></pre>
+            </div>
+        </div>
+        <div class="card warning"><h3>NUNCA cargar archivo completo en memoria</h3><p><b style="color:#fca5a5">Otros lo hacen. Nosotros NO.</b></p></div>
+        <div class="card"><h3>seek(0) para releer</h3>
+<pre><span class="ok-hl">arch.<span class="fn">seek</span>(0)  <span class="cmt"># vuelve al inicio</span></span></pre>
+        </div>
+        <h2>Escritura</h2>
+        <div class="card"><h3>write() - \n manual, un write por registro</h3>
+<pre>arch.<span class="fn">write</span>(lu + <span class="str">';'</span> + nombre + <span class="str">'\n'</span>)</pre>
+        </div>
+        <h2>Los 7 Errores que Desaprueban</h2>
+        <div class="card danger"><h3>1.</h3> Cargar todo en memoria (read/readlines/list)</div>
+        <div class="card danger"><h3>2.</h3> Mezclar for con readline</div>
+        <div class="card danger"><h3>3.</h3> Abrir/cerrar por cada registro</div>
+        <div class="card danger"><h3>4.</h3> Sin try/except/finally</div>
+        <div class="card danger"><h3>5.</h3> No sacar \n al leer (rstrip)</div>
+        <div class="card danger"><h3>6.</h3> Cerrar/reabrir mismo modo en vez de seek(0)</div>
+        <div class="card danger"><h3>7.</h3> Grabar campo por campo (varios write por registro)</div>
+    </div>
+
+    <!-- ===== QUIZ ===== -->
+    <div class="section" id="sec-quiz">
+        <h2>Quiz</h2>
+        <div id="quizBox"></div>
+        <div style="text-align:center;margin:20px 0"><button class="btn btn-w" onclick="resetQuiz()">Reiniciar Quiz</button></div>
+    </div>
+
+    <!-- ===== EJERCICIOS ===== -->
+    <div class="section" id="sec-ejercicios">
+        <h2>Ejercicios con Ejecucion Real</h2>
+        <div class="card">
+            <p><b>Como funciona:</b> Tu codigo se ejecuta con Python real (Pyodide). Se crean archivos de prueba en memoria y se verifica:</p>
+            <ul>
+                <li><span class="label label-bad">Malas practicas</span> - readlines(), read(), list(arch), mezclar for+readline</li>
+                <li><span class="label label-ok">Ejecucion</span> - Se corre tu codigo y se muestra la salida real</li>
+                <li><span class="label label-ok">Resultado</span> - Se verifica que la salida sea la esperada</li>
+            </ul>
+        </div>
+        <div id="exBox"></div>
+    </div>
+
+    <!-- ===== ORDENAR ===== -->
+    <div class="section" id="sec-ordenar">
+        <h2>Ordena el Codigo</h2>
+        <p style="color:#94a3b8">Clic en una linea del banco para enviarla al destino. Usa las flechas para reordenar y X para devolver.</p>
+        <div id="orderBox"></div>
+    </div>
+
+    <!-- ===== ERRORES ===== -->
+    <div class="section" id="sec-errores">
+        <h2>Encuentra los Errores</h2>
+        <p style="color:#94a3b8">Selecciona todas las opciones que sean errores reales, luego verifica.</p>
+        <div id="errBox"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.4/full/pyodide.js"></script>
+<script>
+// ===== GLOBALS =====
+let pyodide=null, pyReady=false;
+let score=0, answered={};
+
+const TABS=[
+    {id:'teoria',label:'1. Teoria'},
+    {id:'quiz',label:'2. Quiz'},
+    {id:'ejercicios',label:'3. Ejercicios'},
+    {id:'ordenar',label:'4. Ordenar'},
+    {id:'errores',label:'5. Errores'}
+];
+
+async function initPyodide(){
+    try{
+        pyodide=await loadPyodide();
+        pyReady=true;
+        document.getElementById('pyStatus').innerHTML='<span style="color:#22c55e">&#10003; Python cargado y listo.</span>';
+        document.getElementById('pyStatus').style.borderLeft='4px solid #22c55e';
+        document.querySelectorAll('.btn-run').forEach(b=>b.disabled=false);
+    }catch(e){
+        document.getElementById('pyStatus').innerHTML='<span style="color:#ef4444">Error cargando Python: '+e.message+'</span>';
+        document.getElementById('pyStatus').style.borderLeft='4px solid #ef4444';
+    }
+}
+
+function init(){
+    const tb=document.getElementById('tabBar');
+    TABS.forEach((t,i)=>{
+        const b=document.createElement('button');
+        b.className='tab-btn'+(i===0?' active':'');
+        b.textContent=t.label;
+        b.onclick=()=>{
+            document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+            document.getElementById('sec-'+t.id).classList.add('active');
+            b.classList.add('active');
+        };
+        tb.appendChild(b);
+    });
+    buildQuiz();
+    buildExercises();
+    buildOrderChallenges();
+    buildErrorFinders();
+    updateTotal();
+    initPyodide();
+}
+
+function updateTotal(){
+    const t=quizData.length+exData.length+orderData.length+errData.length;
+    document.getElementById('sTotal').textContent=t;
+}
+function addScore(id){
+    if(answered[id])return;answered[id]=true;score++;
+    document.getElementById('sDisp').textContent=score;
+    const t=parseInt(document.getElementById('sTotal').textContent);
+    document.getElementById('pFill').style.width=(t>0?(score/t)*100:0)+'%';
+}
+
+// ===== QUIZ =====
+const quizData=[
+    {q:"Cual metodo PROHIBIDO carga todo en una lista?",o:["readline()","readlines()","read(1)","for linea in arch"],c:1,e:"readlines() carga TODO en una lista."},
+    {q:"Que modo DESTRUYE el archivo existente?",o:["r","a","w","t"],c:2,e:"'w' borra el archivo y crea uno nuevo."},
+    {q:"Como volver al inicio sin cerrar?",o:["arch.reset()","arch.seek(0)","arch.rewind()","arch.start()"],c:1,e:"seek(0) mueve el puntero al inicio."},
+    {q:"Que excepcion va ANTES de OSError?",o:["ValueError","TypeError","FileNotFoundError","NameError"],c:2,e:"FileNotFoundError es mas especifica."},
+    {q:"Por que try/except NameError en el finally?",o:["close() siempre falla","Si no se abrio, la variable no existe","finally es opcional","close() necesita parametros"],c:1,e:"Si open() fallo, 'arch' no existe."},
+    {q:"Que pasa si mezclas for con readline()?",o:["Funciona bien","Error de sintaxis","Se pierden datos","Se duplican datos"],c:2,e:"for avanza el puntero, readline() de nuevo: se saltean registros."},
+    {q:"Modo por defecto si no se especifica?",o:['"wt"','"rt"','"at"','"rb"'],c:1,e:"Default: 'rt'."},
+    {q:"write() agrega \\n automaticamente?",o:["Si","No, hay que agregarlo","Solo en Windows","Solo con writelines"],c:1,e:"write() NO agrega \\n."},
+    {q:"Que hace append ('a')?",o:["Lee desde el final","Borra y escribe","Escribe al final sin borrar","Lee y escribe"],c:2,e:"Append agrega al final sin borrar."},
+    {q:"rstrip('\\n') sirve para?",o:["Agregar salto","Quitar \\n del final","Convertir a mayusc","Separar campos"],c:1,e:"Quita el \\n del final."},
+    {q:"Si abris con 'r' un archivo inexistente?",o:["Se crea vacio","FileNotFoundError","Se abre sin datos","Usa modo 'w'"],c:1,e:"Modo 'r' requiere que exista."},
+    {q:"Es correcto hacer varios write() para un registro?",o:["Si","No, un write por registro","Solo si son pocos campos","Depende"],c:1,e:"Un write por registro completo."},
+    {q:"Que es un registro en archivo de texto?",o:["Un caracter","Una palabra","Una linea","Un campo"],c:2,e:"Cada linea es un registro."},
+    {q:"Cuantas veces recorrer un archivo?",o:["Las que quiera","El minimo posible","Exactamente 2","Solo 1"],c:1,e:"Minimizar recorridos."},
+    {q:"encoding='UTF8' se agrega siempre?",o:["Si","No, solo cuando es necesario","Solo lectura","Solo escritura"],c:1,e:"Solo cuando es necesario."},
+];
+function buildQuiz(){
+    const box=document.getElementById('quizBox');box.innerHTML='';
+    quizData.forEach((q,i)=>{
+        let h=`<div class="question" id="q${i}"><p>${i+1}. ${q.q}</p><div class="opts">`;
+        q.o.forEach((o,j)=>{h+=`<div class="opt" id="q${i}o${j}" onclick="ansQ(${i},${j})">${o}</div>`;});
+        h+=`</div><div class="fb" id="qfb${i}"></div></div>`;box.innerHTML+=h;
+    });
+}
+function ansQ(qi,oi){
+    const el=document.getElementById('q'+qi);if(el.dataset.done)return;el.dataset.done='1';
+    el.querySelectorAll('.opt').forEach(o=>o.classList.add('dis'));
+    const fb=document.getElementById('qfb'+qi);
+    if(oi===quizData[qi].c){
+        document.getElementById('q'+qi+'o'+oi).classList.add('ok');
+        fb.className='fb show fb-ok';fb.textContent='Correcto! '+quizData[qi].e;addScore('q'+qi);
+    }else{
+        document.getElementById('q'+qi+'o'+oi).classList.add('no');
+        document.getElementById('q'+qi+'o'+quizData[qi].c).classList.add('ok');
+        fb.className='fb show fb-no';fb.textContent='Incorrecto. '+quizData[qi].e;
+    }
+}
+function resetQuiz(){
+    quizData.forEach((_,i)=>delete answered['q'+i]);
+    score=Object.keys(answered).length;
+    document.getElementById('sDisp').textContent=score;
+    const t=parseInt(document.getElementById('sTotal').textContent);
+    document.getElementById('pFill').style.width=(t>0?(score/t)*100:0)+'%';
+    buildQuiz();
+}
+
+// ===== EXERCISES WITH PYODIDE =====
+const exData=[
+    {id:1,title:"Imprimir lineas con 'a'",diff:"f",
+     desc:'Lee "texto.txt" e imprime solo las lineas que contengan la letra "a" (minuscula).',
+     files:{"texto.txt":"La casa es grande\nEl sol brilla\nUna mesa azul\nEl cielo es lindo\nLa vida es bella\n"},
+     template:`try:\n    arch = open("texto.txt", "rt")\n    # COMPLETA: recorrer linea por linea\n    # imprimir solo las que contengan 'a'\n\nexcept FileNotFoundError as msg:\n    print("No se puede abrir:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     solution:`try:\n    arch = open("texto.txt", "rt")\n    for linea in arch:\n        linea = linea.rstrip('\\n')\n        if 'a' in linea:\n            print(linea)\nexcept FileNotFoundError as msg:\n    print("No se puede abrir:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     expected:["La casa es grande","Una mesa azul","La vida es bella"],
+     expectedDesc:'Debe imprimir las 3 lineas que contienen "a"'},
+
+    {id:2,title:"Contar productos caros",diff:"f",
+     desc:'"productos.txt" tiene formato codigo;descripcion;precio. Contar cuantos tienen precio > 1000 e imprimir la cantidad.',
+     files:{"productos.txt":"001;Laptop;52000\n002;Mouse;500\n003;Teclado;1500\n004;Cable;200\n005;Monitor;35000\n"},
+     template:`try:\n    arch = open("productos.txt", "rt")\n    # COMPLETA: inicializar contador\n    # recorrer, split, convertir precio, comparar\n    # imprimir resultado\n\nexcept FileNotFoundError as msg:\n    print("No encontrado:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     solution:`try:\n    arch = open("productos.txt", "rt")\n    contador = 0\n    for linea in arch:\n        linea = linea.rstrip('\\n')\n        campos = linea.split(';')\n        precio = float(campos[2])\n        if precio > 1000:\n            contador += 1\n    print(contador)\nexcept FileNotFoundError as msg:\n    print("No encontrado:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     expected:["3"],
+     expectedDesc:'Debe imprimir "3" (Laptop, Teclado, Monitor)'},
+
+    {id:3,title:"Copiar registros filtrados",diff:"m",
+     desc:'Lee "alumnos.txt" (legajo;nombre), copia a "filtrados.txt" solo legajos < 1100000. Al final imprime cuantos copio.',
+     files:{"alumnos.txt":"1042735;Vignale, Juan\n1118693;Garay, Mariela\n1094219;Zanini, Candela\n1200001;Lopez, Pedro\n1008752;Blanco, Rodrigo\n"},
+     template:`# COMPLETA TODO desde cero\n# Abrir alumnos.txt en "rt" y filtrados.txt en "wt"\n# Leer con for, filtrar legajo < 1100000, escribir\n# Imprimir cantidad de copiados al final`,
+     solution:`try:\n    entrada = open("alumnos.txt", "rt")\n    salida = open("filtrados.txt", "wt")\n    cont = 0\n    for linea in entrada:\n        lu, nombre = linea.split(';')\n        if int(lu) < 1100000:\n            salida.write(linea)\n            cont += 1\n    print(cont)\nexcept FileNotFoundError as msg:\n    print("No encontrado:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        entrada.close()\n        salida.close()\n    except NameError:\n        pass`,
+     expected:["3"],
+     expectedDesc:'Debe imprimir "3" (Vignale, Zanini, Blanco) y crear filtrados.txt',
+     checkFile:{name:"filtrados.txt",contains:["1042735","1094219","1008752"],notContains:["1118693","1200001"]}},
+
+    {id:4,title:"Encontrar el mayor precio",diff:"m",
+     desc:'"ventas.txt" tiene producto;cantidad;precio_unitario. Imprime el nombre del producto con mayor precio unitario.',
+     files:{"ventas.txt":"Laptop;5;52000\nMouse;20;500\nMonitor;8;35000\nTeclado;15;1500\n"},
+     template:`# COMPLETA TODO\n# Variables para max_precio y producto_max\n# Recorrer, split, comparar, actualizar maximo\n# Imprimir el producto mas caro`,
+     solution:`try:\n    arch = open("ventas.txt", "rt")\n    max_precio = -1\n    prod_max = ""\n    for linea in arch:\n        linea = linea.rstrip('\\n')\n        prod, cant, precio = linea.split(';')\n        if float(precio) > max_precio:\n            max_precio = float(precio)\n            prod_max = prod\n    print(prod_max)\nexcept FileNotFoundError as msg:\n    print("No encontrado:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     expected:["Laptop"],
+     expectedDesc:'Debe imprimir "Laptop" (precio 52000)'},
+
+    {id:5,title:"Calcular sueldos",diff:"m",
+     desc:'"empleados.txt" tiene nombre;sueldo_basico;antiguedad. Crea "sueldos.txt" con nombre;sueldo_final donde sueldo_final = basico * (1 + antiguedad * 0.03). Imprime "Listo" al final.',
+     files:{"empleados.txt":"Juan;50000;10\nMaria;60000;5\nPedro;40000;0\n"},
+     template:`# COMPLETA TODO\n# Abrir entrada "rt" y salida "wt"\n# Calcular sueldo_final = basico * (1 + antiguedad * 0.03)\n# Grabar nombre;sueldo_final\n# Imprimir "Listo"`,
+     solution:`try:\n    ent = open("empleados.txt", "rt")\n    sal = open("sueldos.txt", "wt")\n    for linea in ent:\n        linea = linea.rstrip('\\n')\n        nombre, basico, ant = linea.split(';')\n        sueldo = float(basico) * (1 + int(ant) * 0.03)\n        sal.write(nombre + ';' + str(sueldo) + '\\n')\n    print("Listo")\nexcept FileNotFoundError as msg:\n    print("No encontrado:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        ent.close()\n        sal.close()\n    except NameError:\n        pass`,
+     expected:["Listo"],
+     expectedDesc:'Debe imprimir "Listo" y crear sueldos.txt con los calculos',
+     checkFile:{name:"sueldos.txt",contains:["Juan","Maria","Pedro"]}},
+
+    {id:6,title:"Contar palabras",diff:"f",
+     desc:'Lee "texto.txt" y cuenta el total de palabras. Imprime solo el numero.',
+     files:{"texto.txt":"La casa es grande\nEl sol brilla\nUna mesa azul\n"},
+     template:`# COMPLETA TODO\n# split() sin parametro separa por espacios\n# len() cuenta elementos de una lista`,
+     solution:`try:\n    arch = open("texto.txt", "rt")\n    total = 0\n    for linea in arch:\n        total += len(linea.split())\n    print(total)\nexcept FileNotFoundError as msg:\n    print("No encontrado:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     expected:["10"],
+     expectedDesc:'Debe imprimir "10" (4+3+3 palabras)'},
+
+    {id:7,title:"Buscar un legajo",diff:"m",
+     desc:'"alumnos.txt" tiene legajo;nombre. Buscar el legajo "1094219". Si existe imprimir el nombre, si no imprimir "No encontrado".',
+     files:{"alumnos.txt":"1042735;Vignale, Juan\n1118693;Garay, Mariela\n1094219;Zanini, Candela\n1008752;Blanco, Rodrigo\n"},
+     template:`# COMPLETA TODO\n# El legajo a buscar es "1094219" (hardcodeado, no input)\n# Usar booleano "encontrado"\n# Recorrer, comparar, imprimir nombre si lo encuentra`,
+     solution:`try:\n    arch = open("alumnos.txt", "rt")\n    buscar = "1094219"\n    encontrado = False\n    for linea in arch:\n        linea = linea.rstrip('\\n')\n        lu, nombre = linea.split(';')\n        if lu == buscar:\n            print(nombre)\n            encontrado = True\n    if not encontrado:\n        print("No encontrado")\nexcept FileNotFoundError as msg:\n    print("Error:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     expected:["Zanini, Candela"],
+     expectedDesc:'Debe imprimir "Zanini, Candela"'},
+
+    {id:8,title:"Agregar con append",diff:"m",
+     desc:'"alumnos.txt" ya tiene datos. Agrega DOS registros nuevos: "1300001;Nuevo, Alumno" y "1300002;Otro, Mas". Luego imprime "Agregados".',
+     files:{"alumnos.txt":"1042735;Vignale, Juan\n1118693;Garay, Mariela\n"},
+     template:`# COMPLETA TODO\n# Modo "at" (append text)\n# Agregar los 2 registros con write\n# Imprimir "Agregados"`,
+     solution:`try:\n    arch = open("alumnos.txt", "at")\n    arch.write("1300001;Nuevo, Alumno\\n")\n    arch.write("1300002;Otro, Mas\\n")\n    print("Agregados")\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     expected:["Agregados"],
+     expectedDesc:'Debe imprimir "Agregados" y el archivo debe tener 4 registros',
+     checkFile:{name:"alumnos.txt",contains:["1042735","1118693","1300001","1300002"]}},
+
+    {id:9,title:"Totales y promedio",diff:"d",
+     desc:'"ventas.txt" tiene producto;cantidad;precio_unitario. Imprime en lineas separadas: total de registros, monto total (cant*precio), y promedio por venta (redondeado a 2 decimales).',
+     files:{"ventas.txt":"Laptop;2;50000\nMouse;10;500\nMonitor;3;30000\n"},
+     template:`# COMPLETA TODO\n# Necesitas: contador y acumulador\n# monto = int(cant) * float(precio)\n# Imprimir: registros, total, promedio`,
+     solution:`try:\n    arch = open("ventas.txt", "rt")\n    cont = 0\n    total = 0\n    for linea in arch:\n        linea = linea.rstrip('\\n')\n        prod, cant, precio = linea.split(';')\n        total += int(cant) * float(precio)\n        cont += 1\n    print(cont)\n    print(total)\n    print(round(total/cont, 2))\nexcept FileNotFoundError as msg:\n    print("No encontrado:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     expected:["3","195000","65000"],
+     expectedDesc:'Debe imprimir: 3, 195000.0 (o 195000), 65000.0 (o 65000.0)'},
+
+    {id:10,title:"Doble recorrido con seek",diff:"d",
+     desc:'"numeros.txt" tiene un numero por linea. 1er recorrido: calcular promedio. Usar seek(0). 2do recorrido: imprimir solo los mayores al promedio.',
+     files:{"numeros.txt":"10\n20\n30\n40\n50\n"},
+     template:`# COMPLETA TODO\n# 1er recorrido: sumar y contar\n# promedio = suma / cantidad\n# arch.seek(0)\n# 2do recorrido: imprimir si > promedio`,
+     solution:`try:\n    arch = open("numeros.txt", "rt")\n    suma = 0\n    cant = 0\n    for linea in arch:\n        suma += float(linea.rstrip('\\n'))\n        cant += 1\n    promedio = suma / cant\n    arch.seek(0)\n    for linea in arch:\n        n = float(linea.rstrip('\\n'))\n        if n > promedio:\n            print(int(n))\nexcept FileNotFoundError as msg:\n    print("No encontrado:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     expected:["40","50"],
+     expectedDesc:'Promedio=30. Debe imprimir 40 y 50 (mayores a 30)'},
+];
+
+function buildExercises(){
+    const box=document.getElementById('exBox');box.innerHTML='';
+    const diffL={f:'Facil',m:'Medio',d:'Dificil'},diffC={f:'diff-f',m:'diff-m',d:'diff-d'};
+    exData.forEach(ex=>{
+        // show test files
+        let filesHtml='<div style="margin:10px 0"><b>Archivo(s) de prueba:</b></div>';
+        for(const [fname,content] of Object.entries(ex.files)){
+            filesHtml+=`<div style="color:#94a3b8;font-size:.85em">${fname}:</div><pre style="font-size:.85em;padding:8px;margin:2px 0 8px">${content.replace(/\n$/,'')}</pre>`;
+        }
+        box.innerHTML+=`
+        <div class="ex-area">
+            <h3>Ejercicio ${ex.id}: ${ex.title} <span class="diff ${diffC[ex.diff]}">${diffL[ex.diff]}</span></h3>
+            <p style="color:#94a3b8;margin:8px 0">${ex.desc}</p>
+            ${filesHtml}
+            <p style="color:#93c5fd;font-size:.9em"><b>Resultado esperado:</b> ${ex.expectedDesc}</p>
+            <textarea id="ext${ex.id}" spellcheck="false">${ex.template}</textarea>
+            <button class="btn btn-p btn-run" onclick="runExercise(${ex.id})" ${pyReady?'':'disabled'}>Ejecutar y Verificar</button>
+            <button class="btn btn-s" onclick="showSol(${ex.id})">Ver Solucion</button>
+            <div class="console-out" id="exout${ex.id}" style="display:none"></div>
+            <div class="result" id="exr${ex.id}"></div>
+        </div>`;
+    });
+}
+
+async function runExercise(id){
+    if(!pyReady){alert('Python todavia no cargo. Espera unos segundos.');return;}
+    const ex=exData.find(e=>e.id===id);
+    const code=document.getElementById('ext'+id).value;
+    const outEl=document.getElementById('exout'+id);
+    const rEl=document.getElementById('exr'+id);
+    outEl.style.display='block';
+    outEl.innerHTML='<span style="color:#94a3b8">Ejecutando...</span>';
+
+    // Static analysis first
+    let warnings=[];
+    if(/\.readlines\s*\(/.test(code)) warnings.push('Usas readlines() - PROHIBIDO en el curso');
+    if(/\.read\s*\(\s*\)/.test(code)) warnings.push('Usas read() sin parametro - PROHIBIDO');
+    if(/list\s*\(\s*arch/.test(code)||/list\s*\(\s*entrada/.test(code)||/list\s*\(\s*ent/.test(code)) warnings.push('Usas list(arch) - PROHIBIDO');
+    if(/for\s+\w+\s+in\s+\w+/.test(code)&&/\.readline\s*\(/.test(code)&&!/while/.test(code)) warnings.push('Mezclas for con readline() - PIERDE DATOS');
+    if(!/try\s*:/.test(code)) warnings.push('Falta try/except (obligatorio)');
+    if(!/finally\s*:/.test(code)) warnings.push('Falta finally (obligatorio)');
+    if(!/\.close\s*\(/.test(code)) warnings.push('Falta close() en finally');
+
+    // Create files in Pyodide's virtual filesystem
+    for(const [fname,content] of Object.entries(ex.files)){
+        pyodide.FS.writeFile(fname, content);
+    }
+
+    // Run the code
+    let output='', error='';
+    try{
+        // Capture stdout
+        pyodide.runPython(`
+import sys, io
+_captured = io.StringIO()
+sys.stdout = _captured
+sys.stderr = _captured
+`);
+        pyodide.runPython(code);
+        pyodide.runPython(`sys.stdout = sys.__stdout__; sys.stderr = sys.__stderr__`);
+        output=pyodide.runPython(`_captured.getvalue()`);
+    }catch(e){
+        pyodide.runPython(`
+import sys
+sys.stdout = sys.__stdout__
+sys.stderr = sys.__stderr__
+`);
+        error=e.message;
+        // Clean up the traceback to show only the relevant part
+        const lines=error.split('\n');
+        const pyErr=lines.filter(l=>!l.includes('pyodide')&&!l.includes('wasm')).join('\n').trim();
+        error=pyErr||error;
+    }
+
+    // Display output
+    let outHtml='';
+    if(output) outHtml+='<span style="color:#22c55e">'+escHtml(output)+'</span>';
+    if(error) outHtml+='<span class="err-text">'+escHtml(error)+'</span>';
+    if(!output&&!error) outHtml='<span style="color:#94a3b8">(sin salida)</span>';
+    outEl.innerHTML=outHtml;
+
+    // Check results
+    let resultHtml='';
+    const hasProhibited=warnings.length>0;
+
+    if(hasProhibited){
+        resultHtml+='<div style="color:#fca5a5;margin-bottom:10px"><b>Malas practicas detectadas:</b><ul>';
+        warnings.forEach(w=>resultHtml+='<li>'+w+'</li>');
+        resultHtml+='</ul></div>';
+    }
+
+    if(error){
+        resultHtml+='<div style="color:#ef4444"><b>Error de ejecucion.</b> Revisa tu codigo.</div>';
+        rEl.innerHTML=resultHtml;rEl.className='result show';
+        rEl.style.background='#1e1b2e';rEl.style.border='1px solid #ef4444';
+        return;
+    }
+
+    // Compare output
+    const outLines=output.trim().split('\n').map(l=>l.trim()).filter(l=>l);
+    const expLines=ex.expected;
+
+    let outputMatch=true;
+    if(outLines.length!==expLines.length){
+        outputMatch=false;
+    }else{
+        for(let i=0;i<expLines.length;i++){
+            // Flexible comparison: handle float/int differences
+            const got=outLines[i], want=expLines[i];
+            if(got===want) continue;
+            // Try numeric comparison
+            const gn=parseFloat(got), wn=parseFloat(want);
+            if(!isNaN(gn)&&!isNaN(wn)&&Math.abs(gn-wn)<0.01) continue;
+            outputMatch=false;
+            break;
+        }
+    }
+
+    // Check output file if needed
+    let fileCheck=true, fileMsg='';
+    if(ex.checkFile){
+        try{
+            const fContent=pyodide.FS.readFile(ex.checkFile.name,{encoding:'utf8'});
+            if(ex.checkFile.contains){
+                for(const s of ex.checkFile.contains){
+                    if(!fContent.includes(s)){fileCheck=false;fileMsg+=`"${s}" no encontrado en ${ex.checkFile.name}. `;}
+                }
+            }
+            if(ex.checkFile.notContains){
+                for(const s of ex.checkFile.notContains){
+                    if(fContent.includes(s)){fileCheck=false;fileMsg+=`"${s}" no deberia estar en ${ex.checkFile.name}. `;}
+                }
+            }
+            if(fileCheck) fileMsg=`${ex.checkFile.name} creado correctamente.`;
+        }catch(e){
+            fileCheck=false;fileMsg=`${ex.checkFile.name} no fue creado.`;
+        }
+    }
+
+    if(outputMatch&&fileCheck&&!hasProhibited){
+        resultHtml+='<div style="color:#86efac;font-size:1.1em"><b>PERFECTO! Salida correcta y sin malas practicas.</b></div>';
+        if(fileMsg) resultHtml+=`<div style="color:#86efac;margin-top:5px">${fileMsg}</div>`;
+        rEl.style.background='#1a2e1a';rEl.style.border='1px solid #22c55e';
+        addScore('ex'+id);
+    }else if(outputMatch&&fileCheck&&hasProhibited){
+        resultHtml+='<div style="color:#f59e0b;margin-top:8px"><b>La salida es correcta, pero usas malas practicas.</b> En un examen te desaprueban por esto.</div>';
+        rEl.style.background='#2e2a1a';rEl.style.border='1px solid #f59e0b';
+    }else{
+        resultHtml+='<div style="color:#fca5a5;margin-top:8px"><b>Salida incorrecta.</b></div>';
+        resultHtml+=`<div style="margin-top:5px"><b>Esperado:</b> ${expLines.join(' | ')}</div>`;
+        resultHtml+=`<div><b>Obtenido:</b> ${outLines.join(' | ')||'(nada)'}</div>`;
+        if(fileMsg&&!fileCheck) resultHtml+=`<div style="color:#fca5a5;margin-top:5px">${fileMsg}</div>`;
+        rEl.style.background='#1e1b2e';rEl.style.border='1px solid #ef4444';
+    }
+
+    rEl.innerHTML=resultHtml;rEl.className='result show';
+}
+
+function showSol(id){
+    const ex=exData.find(e=>e.id===id);
+    document.getElementById('ext'+id).value=ex.solution;
+    const r=document.getElementById('exr'+id);
+    r.innerHTML='<div style="color:#93c5fd">Solucion mostrada. Estudiala y hacela sin mirar! Podes ejecutarla para ver que funciona.</div>';
+    r.className='result show';r.style.background='#1e3a5f';r.style.border='1px solid #38bdf8';
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ===== ORDER CHALLENGES =====
+const orderData=[
+    {id:1,title:"Leer e imprimir archivo",diff:"f",lines:[
+        "try:","    arch = open(\"datos.txt\", \"rt\")","    for linea in arch:","        print(linea.rstrip('\\n'))","except FileNotFoundError as msg:","    print(\"No encontrado:\", msg)","finally:","    try: arch.close()","    except NameError: pass"]},
+    {id:2,title:"Crear archivo desde teclado",diff:"f",lines:[
+        "try:","    arch = open(\"datos.txt\", \"wt\")","    dato = input(\"Dato? \")","    while dato != \"\":","        arch.write(dato + '\\n')","        dato = input(\"Dato? \")","    print(\"Creado.\")","except OSError as msg:","    print(\"Error:\", msg)","finally:","    try: arch.close()","    except NameError: pass"]},
+    {id:3,title:"Filtrar CSV",diff:"m",lines:[
+        "try:","    arch = open(\"alumnos.txt\", \"rt\")","    for linea in arch:","        lu, nombre = linea.split(';')","        nombre = nombre.rstrip('\\n')","        if int(lu) < 1000000:","            print(f\"LU: {lu} - {nombre}\")","except FileNotFoundError as msg:","    print(\"No encontrado:\", msg)","except OSError as msg:","    print(\"Error:\", msg)","finally:","    try: arch.close()","    except NameError: pass"]},
+    {id:4,title:"Copiar a mayusculas",diff:"m",lines:[
+        "try:","    entrada = open(\"notas.txt\", \"rt\")","    salida = open(\"notas2.txt\", \"wt\")","    for linea in entrada:","        salida.write(linea.upper())","except FileNotFoundError as msg:","    print(\"No encontrado:\", msg)","except OSError as msg:","    print(\"Error:\", msg)","finally:","    try:","        entrada.close()","        salida.close()","    except NameError: pass"]},
+    {id:5,title:"Lectura con readline",diff:"m",lines:[
+        "try:","    arch = open(\"datos.txt\", \"rt\")","    linea = arch.readline()","    while linea:","        linea = linea.rstrip('\\n')","        print(linea)","        linea = arch.readline()","except FileNotFoundError as msg:","    print(\"No encontrado:\", msg)","finally:","    try: arch.close()","    except NameError: pass"]},
+    {id:6,title:"Buscar con booleano",diff:"d",lines:[
+        "buscar = input(\"Legajo: \")","try:","    arch = open(\"alumnos.txt\", \"rt\")","    encontrado = False","    for linea in arch:","        lu, nombre = linea.rstrip('\\n').split(';')","        if lu == buscar:","            print(\"Encontrado:\", nombre)","            encontrado = True","    if not encontrado:","        print(\"No encontrado.\")","except FileNotFoundError as msg:","    print(\"Error:\", msg)","finally:","    try: arch.close()","    except NameError: pass"]},
+    {id:7,title:"Doble recorrido con seek",diff:"d",lines:[
+        "try:","    arch = open(\"numeros.txt\", \"rt\")","    suma = 0","    cant = 0","    for linea in arch:","        suma += float(linea.rstrip('\\n'))","        cant += 1","    promedio = suma / cant","    arch.seek(0)","    for linea in arch:","        n = float(linea.rstrip('\\n'))","        if n > promedio:","            print(n)","finally:","    try: arch.close()","    except NameError: pass"]},
+];
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+function buildOrderChallenges(){
+    const box=document.getElementById('orderBox');box.innerHTML='';
+    const diffL={f:'Facil',m:'Medio',d:'Dificil'},diffC={f:'diff-f',m:'diff-m',d:'diff-d'};
+    let allHTML='';
+    orderData.forEach(ch=>{
+        allHTML+=`<div class="oc" id="oc${ch.id}">
+            <h3>Desafio ${ch.id}: ${ch.title} <span class="diff ${diffC[ch.diff]}">${diffL[ch.diff]}</span></h3>
+            <p style="color:#94a3b8;margin:8px 0">Banco (clic para enviar al destino):</p>
+            <div class="oc-pool" id="ocp${ch.id}"></div>
+            <p style="color:#94a3b8;margin:8px 0">Destino (&#9650;&#9660; reordenar, &#10005; devolver):</p>
+            <div class="oc-target" id="oct${ch.id}"></div>
+            <button class="btn btn-p" onclick="checkOC(${ch.id})">Verificar</button>
+            <button class="btn btn-w" onclick="resetOC(${ch.id})">Reiniciar</button>
+            <div class="result" id="ocr${ch.id}"></div>
+        </div>`;
+    });
+    box.innerHTML=allHTML;
+    orderData.forEach(ch=>resetOC(ch.id));
+}
+
+function makeOCItem(id,item){
+    const pool=document.getElementById('ocp'+id);
+    const tgt=document.getElementById('oct'+id);
+    const d=document.createElement('div');
+    d.className='oc-item';d.dataset.idx=item.idx;
+    const arrows=document.createElement('span');arrows.className='oc-arrows';
+    arrows.innerHTML='<button onclick="event.stopPropagation();moveOC(this.closest(\'.oc-item\'),-1)">&#9650;</button><button onclick="event.stopPropagation();moveOC(this.closest(\'.oc-item\'),1)">&#9660;</button>';
+    d.appendChild(arrows);
+    const span=document.createElement('span');span.className='item-text';span.textContent=item.text;d.appendChild(span);
+    const ret=document.createElement('button');ret.className='oc-ret';ret.textContent='\u2715';
+    ret.onclick=function(e){e.stopPropagation();pool.appendChild(d);d.classList.remove('right','wrong');};
+    d.appendChild(ret);
+    d.onclick=function(){if(this.parentElement===pool){tgt.appendChild(this);this.classList.remove('right','wrong');}};
+    return d;
+}
+function moveOC(el,dir){
+    const p=el.parentElement;
+    if(dir===-1&&el.previousElementSibling)p.insertBefore(el,el.previousElementSibling);
+    else if(dir===1&&el.nextElementSibling)p.insertBefore(el.nextElementSibling,el);
+    el.classList.remove('right','wrong');
+}
+function resetOC(id){
+    const ch=orderData.find(c=>c.id===id);
+    const pool=document.getElementById('ocp'+id);
+    const tgt=document.getElementById('oct'+id);
+    pool.innerHTML='';tgt.innerHTML='';
+    document.getElementById('ocr'+id).className='result';
+    shuffle(ch.lines.map((l,i)=>({text:l,idx:i}))).forEach(item=>pool.appendChild(makeOCItem(id,item)));
+}
+function checkOC(id){
+    const ch=orderData.find(c=>c.id===id);
+    const tgt=document.getElementById('oct'+id);
+    const items=tgt.querySelectorAll('.oc-item');
+    const r=document.getElementById('ocr'+id);
+    if(items.length<ch.lines.length){
+        r.innerHTML='<div style="color:#f59e0b">Faltan lineas. Clic en cada una del banco.</div>';
+        r.className='result show';r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';return;
+    }
+    let allOk=true;
+    items.forEach((item,i)=>{
+        if(parseInt(item.dataset.idx)===i){item.classList.add('right');item.classList.remove('wrong');}
+        else{item.classList.add('wrong');item.classList.remove('right');allOk=false;}
+    });
+    if(allOk){
+        r.innerHTML='<div style="color:#86efac;font-size:1.1em"><b>Perfecto!</b></div>';
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';addScore('oc'+id);
+    }else{
+        r.innerHTML='<div style="color:#fca5a5"><b>Hay errores.</b> Verde=correcto, Rojo=incorrecto. Usa flechas o devolvelas.</div>';
+        r.style.background='#1e1b2e';r.style.border='1px solid #ef4444';
+    }
+    r.className='result show';
+}
+
+// ===== ERROR FINDERS =====
+const errData=[
+    {id:1,title:"Codigo 1",diff:"f",
+     code:`arch = open("datos.txt", "rt")\ncontenido = arch.read()\nlineas = contenido.split('\\n')\nfor linea in lineas:\n    print(linea)\narch.close()`,
+     question:"Cuales son los errores?",
+     options:[
+         {text:"read() carga todo en memoria (PROHIBIDO)",correct:true},
+         {text:"split() crea otra copia completa en memoria",correct:true},
+         {text:"No tiene try/except/finally",correct:true},
+         {text:"close() fuera de un finally",correct:true},
+         {text:"open() tiene mal el modo",correct:false},
+     ]},
+    {id:2,title:"Codigo 2",diff:"m",
+     code:`try:\n    arch = open("datos.txt", "rt")\n    for linea in arch:\n        datos = arch.readline()\n        print(linea)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try: arch.close()\n    except NameError: pass`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"Mezcla for con readline() (pierde datos)",correct:true},
+         {text:"Falta FileNotFoundError antes de OSError",correct:true},
+         {text:"Falta rstrip('\\n')",correct:true},
+         {text:"El modo de apertura esta mal",correct:false},
+         {text:"Falta finally",correct:false},
+     ]},
+    {id:3,title:"Codigo 3",diff:"m",
+     code:`try:\n    arch = open("ventas.txt", "rt")\n    total = 0\n    for linea in arch:\n        prod, cant, precio = linea.split(';')\n        total += int(cant) * float(precio)\n    print("Total:", total)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try: arch.close()\n    except NameError: pass`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"precio trae \\n, falta rstrip",correct:true},
+         {text:"Falta FileNotFoundError antes de OSError",correct:true},
+         {text:"Usa readlines()",correct:false},
+         {text:"Falta finally",correct:false},
+         {text:"No cierra el archivo",correct:false},
+     ]},
+    {id:4,title:"Codigo 4",diff:"d",
+     code:`try:\n    arch = open("notas.txt", "rt")\n    linea = arch.readline()\n    while linea:\n        print(linea)\n        linea = arch.readline()\n    arch.close()\n    arch = open("notas.txt", "rt")\n    linea = arch.readline()\n    while linea:\n        print(linea)\n        linea = arch.readline()\nexcept FileNotFoundError as msg:\n    print("Error:", msg)\nfinally:\n    try: arch.close()\n    except NameError: pass`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"print(linea) sin rstrip('\\n')",correct:true},
+         {text:"Cierra y reabre en mismo modo (usar seek(0))",correct:true},
+         {text:"Falta except OSError",correct:true},
+         {text:"readline() esta mal usado",correct:false},
+         {text:"El while esta mal planteado",correct:false},
+     ]},
+    {id:5,title:"Codigo 5",diff:"m",
+     code:`try:\n    arch = open("alumnos.txt", "rt")\n    datos = list(arch)\n    for linea in datos:\n        lu, nombre = linea.split(';')\n        print(lu, nombre)\nexcept FileNotFoundError as msg:\n    print("Error:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try: arch.close()\n    except NameError: pass`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"list(arch) carga todo en memoria (PROHIBIDO)",correct:true},
+         {text:"Itera sobre lista, no sobre el archivo",correct:true},
+         {text:"Falta rstrip('\\n') en nombre",correct:true},
+         {text:"Falta finally",correct:false},
+         {text:"open() tiene mal los parametros",correct:false},
+     ]},
+    {id:6,title:"Codigo 6",diff:"d",
+     code:`try:\n    arch = open("datos.txt", "wt")\n    for linea in arch:\n        print(linea)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try: arch.close()\n    except NameError: pass`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"Abre en 'wt' (escritura) pero intenta LEER",correct:true},
+         {text:"Modo 'w' destruye el archivo existente",correct:true},
+         {text:"Deberia usar 'rt' para leer",correct:true},
+         {text:"Falta FileNotFoundError",correct:false},
+         {text:"El finally esta mal",correct:false},
+     ]},
+];
+
+function buildErrorFinders(){
+    const box=document.getElementById('errBox');box.innerHTML='';
+    const diffL={f:'Facil',m:'Medio',d:'Dificil'},diffC={f:'diff-f',m:'diff-m',d:'diff-d'};
+    errData.forEach(ef=>{
+        let h=`<div class="oc" id="ef${ef.id}">
+            <h3>${ef.title} <span class="diff ${diffC[ef.diff]}">${diffL[ef.diff]}</span></h3>
+            <pre>${escHtml(ef.code)}</pre>
+            <p style="margin:10px 0;font-weight:bold">${ef.question}</p><div id="efo${ef.id}">`;
+        ef.options.forEach((o,i)=>{h+=`<div class="ef-opt" id="ef${ef.id}o${i}" onclick="toggleEfOpt(this)">${o.text}</div>`;});
+        h+=`</div><button class="btn btn-p" onclick="checkEF(${ef.id})" style="margin-top:10px">Verificar</button>
+            <div class="result" id="efr${ef.id}"></div></div>`;
+        box.innerHTML+=h;
+    });
+}
+function toggleEfOpt(el){
+    if(el.classList.contains('ans-ok')||el.classList.contains('ans-no'))return;
+    el.classList.toggle('selected');
+}
+function checkEF(id){
+    const ef=errData.find(e=>e.id===id);const r=document.getElementById('efr'+id);
+    let allOk=true;
+    ef.options.forEach((o,i)=>{
+        const el=document.getElementById('ef'+id+'o'+i);
+        const sel=el.classList.contains('selected');el.classList.remove('selected');
+        if(o.correct&&sel){el.classList.add('ans-ok');}
+        else if(o.correct&&!sel){el.classList.add('ans-ok');el.innerHTML+=' <span style="color:#fde68a"> &larr; te falto!</span>';allOk=false;}
+        else if(!o.correct&&sel){el.classList.add('ans-no');el.innerHTML+=' <span style="color:#fca5a5"> &larr; no es error</span>';allOk=false;}
+        el.onclick=null;
+    });
+    if(allOk){
+        r.innerHTML='<div style="color:#86efac;font-size:1.1em"><b>Perfecto!</b></div>';
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';addScore('ef'+id);
+    }else{
+        r.innerHTML='<div style="color:#f59e0b">Revisa: verde=error real, rojo=no era error.</div>';
+        r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+    }
+    r.className='result show';
+}
+
+// ===== INIT =====
+init();
+</script>
+</body>
+</html>

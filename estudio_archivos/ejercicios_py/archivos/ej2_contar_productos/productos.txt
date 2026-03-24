@@ -1,0 +1,8 @@
+101;Teclado mecanico;8500.50
+102;Monitor LED 24;45000.00
+103;Mouse inalambrico;3200.75
+104;Auriculares bluetooth;12500.00
+105;Cable HDMI;950.00
+106;Webcam HD;7800.00
+107;Parlante portatil;15600.50
+108;Pendrive 64GB;2100.00

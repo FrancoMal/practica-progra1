@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archivos en Python - v2</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.7}
+        .container{max-width:920px;margin:0 auto;padding:20px}
+        h1{text-align:center;font-size:2.2em;margin:30px 0;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        h2{color:#38bdf8;margin:30px 0 15px;font-size:1.5em;border-bottom:2px solid #1e3a5f;padding-bottom:8px}
+        h3{color:#a78bfa;margin:15px 0 10px}
+        .tabs{display:flex;flex-wrap:wrap;gap:5px;margin:20px 0;justify-content:center}
+        .tab-btn{padding:10px 18px;background:#1e293b;border:2px solid #334155;color:#94a3b8;border-radius:8px;cursor:pointer;font-size:.95em;transition:.3s}
+        .tab-btn:hover{border-color:#38bdf8;color:#38bdf8}
+        .tab-btn.active{background:#1e3a5f;border-color:#38bdf8;color:#38bdf8;font-weight:bold}
+        .section{display:none;animation:fadeIn .4s}.section.active{display:block}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .card{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0;border-left:4px solid #38bdf8}
+        .card.danger{border-left-color:#ef4444;background:#1e1b2e}
+        .card.success{border-left-color:#22c55e;background:#1a2e1a}
+        .card.warning{border-left-color:#f59e0b;background:#2e2a1a}
+        pre{background:#0c1222;border:1px solid #334155;border-radius:8px;padding:15px;overflow-x:auto;font-family:Consolas,'Courier New',monospace;font-size:.9em;margin:10px 0}
+        code{font-family:Consolas,monospace}
+        .kw{color:#c084fc}.str{color:#86efac}.cmt{color:#64748b;font-style:italic}.fn{color:#38bdf8}
+        .err-hl{background:rgba(239,68,68,.2);display:block;padding:2px 0}
+        .ok-hl{background:rgba(34,197,94,.15);display:block;padding:2px 0}
+        .label{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.8em;font-weight:bold;margin:3px}
+        .label-ok{background:#166534;color:#86efac}.label-bad{background:#7f1d1d;color:#fca5a5}.label-info{background:#1e3a5f;color:#93c5fd}
+        .comparison{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
+        @media(max-width:700px){.comparison{grid-template-columns:1fr}}
+        .diagram{display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0;flex-wrap:wrap}
+        .diagram-box{padding:15px 25px;border-radius:10px;font-weight:bold;text-align:center}
+        .diagram-arrow{font-size:1.5em;color:#64748b}
+        .step-number{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:#2563eb;border-radius:50%;color:white;font-weight:bold;margin-right:8px}
+        ul,ol{margin:10px 0 10px 25px}li{margin:5px 0}
+        .diff{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.75em;font-weight:bold;margin-left:10px}
+        .diff-f{background:#166534;color:#86efac}.diff-m{background:#854d0e;color:#fde68a}.diff-d{background:#7f1d1d;color:#fca5a5}
+
+        .progress-bar{width:100%;height:8px;background:#334155;border-radius:4px;margin:10px 0;overflow:hidden}
+        .progress-fill{height:100%;background:linear-gradient(90deg,#38bdf8,#818cf8);border-radius:4px;transition:width .5s}
+        .score-display{text-align:center;padding:15px;background:#1e293b;border-radius:12px;margin:15px 0;font-size:1.2em}
+        .score-num{color:#38bdf8;font-weight:bold;font-size:1.5em}
+
+        /* Buttons */
+        .btn{padding:10px 25px;border:none;border-radius:8px;cursor:pointer;font-size:1em;font-weight:bold;margin:8px 5px 8px 0;transition:.3s}
+        .btn-p{background:#2563eb;color:white}.btn-p:hover{background:#1d4ed8}
+        .btn-s{background:#16a34a;color:white}.btn-s:hover{background:#15803d}
+        .btn-w{background:#d97706;color:white}.btn-w:hover{background:#b45309}
+        .btn-d{background:#dc2626;color:white}.btn-d:hover{background:#b91c1c}
+
+        /* Exercise area */
+        .ex-area{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0}
+        .ex-area textarea{width:100%;min-height:240px;background:#0c1222;color:#e2e8f0;border:2px solid #334155;border-radius:8px;padding:15px;font-family:Consolas,monospace;font-size:.95em;resize:vertical;tab-size:4}
+        .ex-area textarea:focus{outline:none;border-color:#38bdf8}
+
+        .result{margin-top:10px;padding:15px;border-radius:8px;display:none}
+        .result.show{display:block}
+
+        /* Order challenge */
+        .oc{background:#1e293b;border-radius:12px;padding:20px;margin:20px 0;border:2px solid #334155}
+        .oc-pool{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:#0f172a;border-radius:8px;min-height:50px;margin:10px 0}
+        .oc-target{border:2px dashed #475569;border-radius:8px;padding:10px;margin:10px 0;min-height:60px}
+        .oc-target .oc-item{width:100%;margin:3px 0}
+        .oc-item{padding:10px 16px;background:#2563eb;color:white;border-radius:6px;cursor:pointer;user-select:none;font-family:Consolas,monospace;font-size:.9em;transition:.2s;display:flex;align-items:center;gap:8px}
+        .oc-pool .oc-item{display:inline-flex}
+        .oc-item:hover{background:#3b82f6}
+        .oc-item.right{background:#16a34a!important}.oc-item.wrong{background:#dc2626!important}
+        .oc-item .item-text{flex:1}
+        .oc-arrows{display:flex;flex-direction:column;gap:1px;margin-right:4px}
+        .oc-arrows button{background:rgba(255,255,255,.2);border:none;color:white;cursor:pointer;font-size:.7em;padding:1px 5px;border-radius:3px;line-height:1}
+        .oc-arrows button:hover{background:rgba(255,255,255,.4)}
+        .oc-pool .oc-arrows{display:none}
+        .oc-ret{background:rgba(255,255,255,.2);border:none;color:white;cursor:pointer;font-size:.8em;padding:2px 8px;border-radius:3px;margin-left:4px}
+        .oc-ret:hover{background:rgba(239,68,68,.5)}
+        .oc-pool .oc-ret{display:none}
+
+        /* Quiz */
+        .question{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0;border:2px solid #334155}
+        .question>p{margin-bottom:12px;font-weight:bold}
+        .opts{display:flex;flex-direction:column;gap:8px}
+        .opt{padding:12px 15px;background:#0f172a;border:2px solid #334155;border-radius:8px;cursor:pointer;transition:.3s}
+        .opt:hover{border-color:#38bdf8;background:#1e3a5f}
+        .opt.ok{border-color:#22c55e!important;background:#14532d!important;color:#86efac}
+        .opt.no{border-color:#ef4444!important;background:#7f1d1d!important;color:#fca5a5}
+        .opt.dis{pointer-events:none;opacity:.7}
+        .fb{margin-top:10px;padding:10px 15px;border-radius:8px;display:none;font-size:.95em}
+        .fb.show{display:block}
+        .fb.fb-ok{background:#14532d;color:#86efac;border:1px solid #22c55e}
+        .fb.fb-no{background:#7f1d1d;color:#fca5a5;border:1px solid #ef4444}
+
+        /* Error finder - multiple choice style */
+        .ef-block{background:#0c1222;border:1px solid #334155;border-radius:8px;padding:15px;margin:10px 0;font-family:Consolas,monospace;font-size:.9em;line-height:2}
+        .ef-opt{padding:8px 15px;background:#0f172a;border:2px solid #334155;border-radius:8px;cursor:pointer;transition:.3s;margin:5px 0;display:block}
+        .ef-opt:hover{border-color:#38bdf8}
+        .ef-opt.selected{border-color:#f59e0b;background:#2e2a1a}
+        .ef-opt.ans-ok{border-color:#22c55e!important;background:#14532d!important}
+        .ef-opt.ans-no{border-color:#ef4444!important;background:#7f1d1d!important}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Archivos en Python - v2</h1>
+    <p style="text-align:center;color:#94a3b8;margin-bottom:10px;">Guia interactiva - Clase 8</p>
+
+    <div class="progress-bar"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
+    <div class="score-display">Puntaje: <span class="score-num" id="sDisp">0</span> / <span id="sTotal">0</span></div>
+
+    <div class="tabs" id="tabBar"></div>
+
+    <!-- ===== TEORIA ===== -->
+    <div class="section active" id="sec-teoria">
+        <h2>Teoria Completa</h2>
+
+        <div class="card"><h3>Estructura</h3>
+            <div class="diagram">
+                <div class="diagram-box" style="background:#1e3a5f;border:2px solid #38bdf8"><small style="color:#94a3b8">ARCHIVO</small><br>Conjunto de registros</div>
+                <div class="diagram-arrow">&#10132;</div>
+                <div class="diagram-box" style="background:#2d1b69;border:2px solid #a78bfa"><small style="color:#94a3b8">REGISTRO</small><br>Conjunto de campos</div>
+                <div class="diagram-arrow">&#10132;</div>
+                <div class="diagram-box" style="background:#1a3a1a;border:2px solid #22c55e"><small style="color:#94a3b8">CAMPO</small><br>Dato individual</div>
+            </div>
+<pre>1042735;Vignale, Juan Jose       <span class="cmt">&larr; registro (legajo ; nombre)</span>
+1118693;Garay, Mariela Daiana    <span class="cmt">&larr; otro registro</span></pre>
+        </div>
+
+        <div class="card"><h3>3 Etapas</h3>
+            <div class="diagram">
+                <div class="diagram-box" style="background:#1e3a5f;border:2px solid #38bdf8"><span class="step-number">1</span>APERTURA<br><small>open()</small></div>
+                <div class="diagram-arrow">&#10132;</div>
+                <div class="diagram-box" style="background:#2d1b69;border:2px solid #a78bfa"><span class="step-number">2</span>PROCESO<br><small>read/write</small></div>
+                <div class="diagram-arrow">&#10132;</div>
+                <div class="diagram-box" style="background:#1a3a1a;border:2px solid #22c55e"><span class="step-number">3</span>CIERRE<br><small>close()</small></div>
+            </div>
+        </div>
+
+        <div class="card"><h3>Modos de apertura</h3>
+            <table style="width:100%;border-collapse:collapse">
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><span class="label label-info">r</span></td><td style="padding:8px"><b>Read</b> - Solo lectura. Archivo DEBE existir.</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><span class="label label-info">w</span></td><td style="padding:8px"><b>Write</b> - Solo escritura. Si existe lo DESTRUYE.</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><span class="label label-info">a</span></td><td style="padding:8px"><b>Append</b> - Escritura al final. No borra.</td></tr>
+                <tr><td style="padding:8px"><span class="label label-info">t</span></td><td style="padding:8px"><b>Text</b> - Modificador: "rt", "wt", "at". Default: "rt".</td></tr>
+            </table>
+        </div>
+
+        <div class="card warning"><h3>Rutas en Windows</h3>
+<pre><span class="cmt"># MAL - \n es salto de linea:</span>
+<span class="err-hl"><span class="fn">open</span>(<span class="str">"c:\nuevo\datos.txt"</span>, <span class="str">"wt"</span>)</span>
+<span class="cmt"># BIEN:</span>
+<span class="ok-hl"><span class="fn">open</span>(<span class="str">"c:\\nuevo\\datos.txt"</span>, <span class="str">"wt"</span>)  <span class="cmt"># doble barra</span></span>
+<span class="ok-hl"><span class="fn">open</span>(<span class="str">"c:/nuevo/datos.txt"</span>, <span class="str">"wt"</span>)   <span class="cmt"># barra normal</span></span>
+<span class="ok-hl"><span class="fn">open</span>(<span class="kw">r</span><span class="str">"c:\nuevo\datos.txt"</span>, <span class="str">"wt"</span>)  <span class="cmt"># raw string</span></span></pre>
+        </div>
+
+        <div class="card"><h3>Estructura completa obligatoria</h3>
+<pre><span class="kw">try</span>:
+    arch = <span class="fn">open</span>(<span class="str">"datos.txt"</span>, <span class="str">"rt"</span>)
+    <span class="cmt"># procesamiento...</span>
+<span class="kw">except</span> <span class="fn">FileNotFoundError</span> <span class="kw">as</span> msg:
+    <span class="fn">print</span>(<span class="str">"No encontrado:"</span>, msg)
+<span class="kw">except</span> <span class="fn">OSError</span> <span class="kw">as</span> msg:
+    <span class="fn">print</span>(<span class="str">"Error:"</span>, msg)
+<span class="kw">finally</span>:
+    <span class="kw">try</span>:
+        arch.<span class="fn">close</span>()
+    <span class="kw">except</span> <span class="fn">NameError</span>:
+        <span class="kw">pass</span></pre>
+            <p style="color:#f59e0b"><b>FileNotFoundError ANTES de OSError.</b> finally con try/except NameError.</p>
+        </div>
+
+        <h2>Lectura</h2>
+        <div class="comparison">
+            <div class="card success"><h3><span class="label label-ok">OK</span> readline()</h3>
+<pre><span class="ok-hl">linea = arch.<span class="fn">readline</span>()</span>
+<span class="kw">while</span> linea:
+    <span class="cmt"># procesar</span>
+<span class="ok-hl">    linea = arch.<span class="fn">readline</span>()</span></pre>
+            </div>
+            <div class="card danger"><h3><span class="label label-bad">PROHIBIDO</span> readlines()</h3>
+<pre><span class="err-hl">lineas = arch.<span class="fn">readlines</span>()</span></pre>
+                <p style="color:#fca5a5">Carga TODO en lista.</p>
+            </div>
+        </div>
+        <div class="comparison">
+            <div class="card success"><h3><span class="label label-ok">OK</span> for linea in arch</h3>
+<pre><span class="ok-hl"><span class="kw">for</span> linea <span class="kw">in</span> arch:</span>
+    <span class="cmt"># una linea por vez</span></pre>
+            </div>
+            <div class="card danger"><h3><span class="label label-bad">PROHIBIDO</span> read()</h3>
+<pre><span class="err-hl">todo = arch.<span class="fn">read</span>()</span></pre>
+                <p style="color:#fca5a5">Todo en un string.</p>
+            </div>
+        </div>
+        <div class="card warning"><h3>NUNCA cargar archivo completo en memoria</h3>
+            <p><b style="color:#fca5a5">Otros lo hacen. Nosotros NO.</b> Memoria = string, lista, cualquier estructura.</p>
+        </div>
+        <div class="card"><h3>seek(0) para releer</h3>
+<pre><span class="ok-hl">arch.<span class="fn">seek</span>(0)  <span class="cmt"># vuelve al inicio</span></span></pre>
+            <p style="color:#f59e0b">Solo cerrar/reabrir si cambia el modo.</p>
+        </div>
+
+        <h2>Escritura</h2>
+        <div class="card"><h3>write() - \n manual</h3>
+<pre>arch.<span class="fn">write</span>(lu + <span class="str">';'</span> + nombre + <span class="str">'\n'</span>)  <span class="cmt"># un write por registro</span></pre>
+        </div>
+
+        <h2>Los 7 Errores que Desaprueban</h2>
+        <div class="card danger"><h3>1. Cargar todo en memoria</h3><pre><span class="err-hl">arch.read() / arch.readlines() / list(arch)</span></pre></div>
+        <div class="card danger"><h3>2. Mezclar for con readline</h3><pre><span class="err-hl">for linea in arch:
+    x = arch.readline()  # pierde datos</span></pre></div>
+        <div class="card danger"><h3>3. Abrir/cerrar por cada registro</h3><pre><span class="err-hl">for i in range(n):
+    arch = open(...); arch.write(...); arch.close()</span></pre></div>
+        <div class="card danger"><h3>4. Sin try/except/finally</h3></div>
+        <div class="card danger"><h3>5. No sacar \n al leer</h3><pre><span class="err-hl">print(linea)  # doble salto</span>
+<span class="ok-hl">print(linea.rstrip('\n'))  # correcto</span></pre></div>
+        <div class="card danger"><h3>6. Cerrar/reabrir mismo modo en vez de seek(0)</h3></div>
+        <div class="card danger"><h3>7. Grabar campo por campo (varios write por registro)</h3></div>
+    </div>
+
+    <!-- ===== QUIZ ===== -->
+    <div class="section" id="sec-quiz">
+        <h2>Quiz</h2>
+        <div id="quizBox"></div>
+        <div style="text-align:center;margin:20px 0"><button class="btn btn-w" onclick="resetQuiz()">Reiniciar Quiz</button></div>
+    </div>
+
+    <!-- ===== EJERCICIOS ===== -->
+    <div class="section" id="sec-ejercicios">
+        <h2>Ejercicios - Completa el Codigo</h2>
+        <p style="color:#94a3b8">La verificacion revisa la estructura de tu codigo: que uses los patrones correctos, no los prohibidos, y que tenga try/except/finally.</p>
+        <div id="exBox"></div>
+    </div>
+
+    <!-- ===== ORDENAR ===== -->
+    <div class="section" id="sec-ordenar">
+        <h2>Ordena el Codigo</h2>
+        <p style="color:#94a3b8">Haz clic en las lineas del banco para moverlas al destino. Haz clic en una linea del destino para devolverla. Luego verifica.</p>
+        <div id="orderBox"></div>
+    </div>
+
+    <!-- ===== ERRORES ===== -->
+    <div class="section" id="sec-errores">
+        <h2>Encuentra los Errores</h2>
+        <p style="color:#94a3b8">Cada codigo tiene errores. Selecciona de las opciones cual es el problema principal. Puede haber mas de un error.</p>
+        <div id="errBox"></div>
+    </div>
+
+</div>
+
+<script>
+// ===== GLOBALS =====
+let score=0, answered={};
+const TABS=[
+    {id:'teoria',label:'1. Teoria'},
+    {id:'quiz',label:'2. Quiz'},
+    {id:'ejercicios',label:'3. Ejercicios'},
+    {id:'ordenar',label:'4. Ordenar'},
+    {id:'errores',label:'5. Errores'}
+];
+
+function init(){
+    // tabs
+    const tb=document.getElementById('tabBar');
+    TABS.forEach((t,i)=>{
+        const b=document.createElement('button');
+        b.className='tab-btn'+(i===0?' active':'');
+        b.textContent=t.label;
+        b.onclick=()=>{
+            document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+            document.getElementById('sec-'+t.id).classList.add('active');
+            b.classList.add('active');
+        };
+        tb.appendChild(b);
+    });
+    buildQuiz();
+    buildExercises();
+    buildOrderChallenges();
+    buildErrorFinders();
+    updateTotal();
+}
+
+function updateTotal(){
+    const t=quizData.length + exData.length + orderData.length + errData.length;
+    document.getElementById('sTotal').textContent=t;
+}
+function addScore(id){
+    if(answered[id])return;
+    answered[id]=true;
+    score++;
+    document.getElementById('sDisp').textContent=score;
+    const t=parseInt(document.getElementById('sTotal').textContent);
+    document.getElementById('pFill').style.width=(t>0?(score/t)*100:0)+'%';
+}
+
+// ===== QUIZ =====
+const quizData=[
+    {q:"Cual metodo PROHIBIDO carga todo en una lista?",o:["readline()","readlines()","read(1)","for linea in arch"],c:1,e:"readlines() carga TODO en una lista en memoria."},
+    {q:"Que modo DESTRUYE el archivo existente?",o:["r","a","w","t"],c:2,e:"'w' borra el archivo y crea uno nuevo."},
+    {q:"Como volver al inicio sin cerrar?",o:["arch.reset()","arch.seek(0)","arch.rewind()","arch.start()"],c:1,e:"seek(0) mueve el puntero al inicio."},
+    {q:"Que excepcion va ANTES de OSError?",o:["ValueError","TypeError","FileNotFoundError","NameError"],c:2,e:"FileNotFoundError es mas especifica."},
+    {q:"Por que try/except NameError en el finally?",o:["close() siempre falla","Si no se abrio, la variable no existe","finally es opcional","close() necesita parametros"],c:1,e:"Si open() fallo, 'arch' no existe. Cerrarla da NameError."},
+    {q:"Que pasa si mezclas for con readline()?",o:["Funciona bien","Error de sintaxis","Se pierden datos","Se duplican datos"],c:2,e:"for avanza el puntero, readline() lo avanza de nuevo: se saltean registros."},
+    {q:"Modo por defecto si no se especifica?",o:['"wt"','"rt"','"at"','"rb"'],c:1,e:"Default: 'rt' (lectura texto)."},
+    {q:"write() agrega \\n automaticamente?",o:["Si, siempre","No, hay que agregarlo manual","Solo en Windows","Solo con writelines"],c:1,e:"write() NO agrega \\n. Lo pones vos."},
+    {q:"Que hace append ('a')?",o:["Lee desde el final","Borra y escribe","Escribe al final sin borrar","Lee y escribe"],c:2,e:"Append agrega al final sin borrar."},
+    {q:"rstrip('\\n') sirve para?",o:["Agregar salto","Quitar \\n del final","Convertir a mayusc","Separar campos"],c:1,e:"Quita el \\n del final de la cadena."},
+    {q:"Si abris con 'r' un archivo inexistente?",o:["Se crea vacio","FileNotFoundError","Se abre sin datos","Usa modo 'w'"],c:1,e:"Modo 'r' requiere que exista."},
+    {q:"Es correcto hacer varios write() para un registro?",o:["Si","No, un write por registro","Solo si son pocos campos","Depende"],c:1,e:"Un write por registro completo."},
+    {q:"Que es un registro en archivo de texto?",o:["Un caracter","Una palabra","Una linea","Un campo"],c:2,e:"Cada linea es un registro."},
+    {q:"Cuantas veces recorrer un archivo?",o:["Las que quiera","El minimo posible","Exactamente 2","Solo 1"],c:1,e:"Minimizar recorridos. Pueden ser millones."},
+    {q:"encoding='UTF8' se agrega siempre?",o:["Si, siempre","No, solo cuando es necesario","Solo en lectura","Solo en escritura"],c:1,e:"Solo cuando el archivo fue creado en UTF-8 y da error."},
+    // ===== 10 NEW QUIZ QUESTIONS =====
+    {q:"Que pasa si haces open(\"archivo.txt\") sin especificar modo?",o:["Error de sintaxis","Se abre en modo 'wt'","Se abre en modo 'rt' (lectura texto)","Se abre en modo 'at'"],c:2,e:"Sin modo, Python usa 'rt' por defecto (lectura texto)."},
+    {q:"Se puede escribir en un archivo abierto con modo 'r'?",o:["Si, sin problemas","No, da error al intentar write()","Si, pero solo al final","Solo si se usa seek(0) antes"],c:1,e:"Modo 'r' es solo lectura. Intentar write() lanza un error."},
+    {q:"Que hace el bloque 'else' en try/except/else/finally?",o:["Se ejecuta siempre","Se ejecuta solo si hubo excepcion","Se ejecuta solo si NO hubo excepcion","Reemplaza al finally"],c:2,e:"El bloque else se ejecuta unicamente si no se produjo ninguna excepcion en el try."},
+    {q:"Que metodo/modo permite agregar datos al final sin sobreescribir?",o:["write() con modo 'w'","read() con modo 'r'","open() con modo 'a' (append)","writelines() con modo 'w'"],c:2,e:"El modo 'a' (append) agrega al final del archivo sin borrar lo existente."},
+    {q:"Cual es la diferencia entre write() y writelines()?",o:["write() escribe una cadena, writelines() escribe una lista de cadenas","No hay diferencia","write() agrega \\n, writelines() no","writelines() es mas rapido"],c:0,e:"write() recibe un string. writelines() recibe una lista de strings (pero ninguno agrega \\n automaticamente)."},
+    {q:"Que devuelve split(';')?",o:["Un entero","Un string sin punto y coma","Una lista de strings separados por ';'","Un diccionario"],c:2,e:"split(';') separa el string por el delimitador ';' y devuelve una lista de strings."},
+    {q:"Cuando se debe usar encoding='UTF8' al abrir un archivo?",o:["Siempre, en todos los casos","Cuando el archivo tiene caracteres especiales y da error de decodificacion","Solo con archivos CSV","Solo en modo escritura"],c:1,e:"Se usa cuando el archivo fue guardado en UTF-8 y Python no lo decodifica bien por defecto."},
+    {q:"Que es un archivo CSV?",o:["Un archivo binario comprimido","Un archivo de texto con valores separados por un delimitador (coma, punto y coma, etc.)","Un formato exclusivo de Excel","Un archivo de imagen"],c:1,e:"CSV = Comma Separated Values. Es un archivo de texto donde los campos se separan con un delimitador."},
+    {q:"Quien decide el nombre del archivo a abrir en el programa?",o:["El usuario por teclado","El programador en el codigo","El sistema operativo","Python automaticamente"],c:1,e:"El nombre del archivo lo decide el programador. No se pide al usuario por teclado."},
+    {q:"'for linea in arch' carga todo el archivo en memoria?",o:["Si, lo carga completo","No, lee linea por linea","Si, pero solo en Windows","Depende del tamanio del archivo"],c:1,e:"'for linea in arch' lee una linea por vez del archivo, no lo carga completo en memoria."},
+];
+
+function buildQuiz(){
+    const box=document.getElementById('quizBox');
+    box.innerHTML='';
+    quizData.forEach((q,i)=>{
+        let h=`<div class="question" id="q${i}"><p>${i+1}. ${q.q}</p><div class="opts">`;
+        q.o.forEach((o,j)=>{h+=`<div class="opt" id="q${i}o${j}" onclick="ansQ(${i},${j})">${o}</div>`;});
+        h+=`</div><div class="fb" id="qfb${i}"></div></div>`;
+        box.innerHTML+=h;
+    });
+}
+function ansQ(qi,oi){
+    const el=document.getElementById('q'+qi);
+    if(el.dataset.done)return;el.dataset.done='1';
+    el.querySelectorAll('.opt').forEach(o=>o.classList.add('dis'));
+    const fb=document.getElementById('qfb'+qi);
+    if(oi===quizData[qi].c){
+        document.getElementById('q'+qi+'o'+oi).classList.add('ok');
+        fb.className='fb show fb-ok';fb.textContent='Correcto! '+quizData[qi].e;
+        addScore('q'+qi);
+    }else{
+        document.getElementById('q'+qi+'o'+oi).classList.add('no');
+        document.getElementById('q'+qi+'o'+quizData[qi].c).classList.add('ok');
+        fb.className='fb show fb-no';fb.textContent='Incorrecto. '+quizData[qi].e;
+    }
+}
+function resetQuiz(){
+    quizData.forEach((_,i)=>delete answered['q'+i]);
+    score=Object.keys(answered).length;
+    document.getElementById('sDisp').textContent=score;
+    const t=parseInt(document.getElementById('sTotal').textContent);
+    document.getElementById('pFill').style.width=(t>0?(score/t)*100:0)+'%';
+    buildQuiz();
+}
+
+// ===== EXERCISES =====
+const exData=[
+    {id:1,title:"Imprimir lineas con 'a'",diff:"f",
+     desc:'Lee "texto.txt" e imprime solo lineas que contengan "a".',
+     template:`try:\n    arch = open("texto.txt", "rt")\n    # COMPLETA: recorrer e imprimir si tiene 'a'\n\n\nexcept FileNotFoundError as msg:\n    print("No se puede abrir:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     solution:`try:\n    arch = open("texto.txt", "rt")\n    for linea in arch:\n        linea = linea.rstrip('\\n')\n        if 'a' in linea:\n            print(linea)\nexcept FileNotFoundError as msg:\n    print("No se puede abrir:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     checks:[
+         {type:'bad',re:/\.readlines\s*\(/,msg:'Usas readlines() - PROHIBIDO'},
+         {type:'bad',re:/\.read\s*\(\s*\)/,msg:'Usas read() sin param - PROHIBIDO'},
+         {type:'need',re:/for\s+\w+\s+in\s+\w+|\.readline\s*\(/,msg:'Falta lectura linea por linea (for o readline)'},
+         {type:'need',re:/try\s*:/,msg:'Falta try'},
+         {type:'need',re:/finally\s*:/,msg:'Falta finally'},
+         {type:'need',re:/\.close\s*\(/,msg:'Falta close()'},
+         {type:'need',re:/except\s+NameError/,msg:'Falta except NameError en finally'},
+         {type:'need',re:/rstrip|strip/,msg:'Falta quitar \\n (rstrip)'},
+         {type:'need',re:/['"]a['"]\s+in\s+|in\s+linea|'a'\s+in|"a"\s+in/,msg:'Falta condicion para filtrar por "a"'},
+     ]},
+    {id:2,title:"Contar productos caros",diff:"f",
+     desc:'"productos.txt": codigo;descripcion;precio. Contar precio > 1000.',
+     template:`try:\n    arch = open("productos.txt", "rt")\n    # COMPLETA: contador, recorrer, split, comparar\n\n\nexcept FileNotFoundError as msg:\n    print("No encontrado:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     solution:`try:\n    arch = open("productos.txt", "rt")\n    contador = 0\n    for linea in arch:\n        linea = linea.rstrip('\\n')\n        campos = linea.split(';')\n        precio = float(campos[2])\n        if precio > 1000:\n            contador += 1\n    print("Productos caros:", contador)\nexcept FileNotFoundError as msg:\n    print("No encontrado:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     checks:[
+         {type:'bad',re:/\.readlines\s*\(/,msg:'readlines() PROHIBIDO'},
+         {type:'bad',re:/\.read\s*\(\s*\)/,msg:'read() PROHIBIDO'},
+         {type:'need',re:/for\s+\w+\s+in\s+\w+|\.readline\s*\(/,msg:'Falta lectura linea por linea'},
+         {type:'need',re:/\.split\s*\(/,msg:'Falta split() para separar campos'},
+         {type:'need',re:/float|int/,msg:'Falta convertir precio a numero'},
+         {type:'need',re:/1000/,msg:'Falta comparar con 1000'},
+         {type:'need',re:/try\s*:/,msg:'Falta try'},
+         {type:'need',re:/finally\s*:/,msg:'Falta finally'},
+         {type:'need',re:/\.close\s*\(/,msg:'Falta close()'},
+     ]},
+    {id:3,title:"Copiar registros filtrados",diff:"m",
+     desc:'Lee "alumnos.txt" (legajo;nombre), copia a "filtrados.txt" solo legajos < 1100000.',
+     template:`# COMPLETA TODO desde cero\n# 2 archivos: entrada "rt", salida "wt"\n# Leer con for, filtrar, escribir con write`,
+     solution:`try:\n    entrada = open("alumnos.txt", "rt")\n    salida = open("filtrados.txt", "wt")\n    for linea in entrada:\n        lu, nombre = linea.split(';')\n        if int(lu) < 1100000:\n            salida.write(linea)\n    print("Filtrado completo.")\nexcept FileNotFoundError as msg:\n    print("No encontrado:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        entrada.close()\n        salida.close()\n    except NameError:\n        pass`,
+     checks:[
+         {type:'bad',re:/\.readlines\s*\(/,msg:'readlines() PROHIBIDO'},
+         {type:'bad',re:/\.read\s*\(\s*\)/,msg:'read() PROHIBIDO'},
+         {type:'need',re:/for\s+\w+\s+in\s+\w+|\.readline\s*\(/,msg:'Falta lectura linea por linea'},
+         {type:'need',re:/open.*rt|open.*"r"/,msg:'Falta abrir archivo de entrada en "rt"'},
+         {type:'need',re:/open.*wt|open.*"w"/,msg:'Falta abrir archivo de salida en "wt"'},
+         {type:'need',re:/\.write\s*\(/,msg:'Falta write() para grabar'},
+         {type:'need',re:/\.split\s*\(/,msg:'Falta split()'},
+         {type:'need',re:/1100000/,msg:'Falta comparar con 1100000'},
+         {type:'need',re:/try\s*:/,msg:'Falta try'},
+         {type:'need',re:/finally\s*:/,msg:'Falta finally'},
+         {type:'need',re:/\.close\s*\(/,msg:'Falta close()'},
+     ]},
+    {id:4,title:"Mayor precio",diff:"m",
+     desc:'"ventas.txt": producto;cantidad;precio. Encontrar el producto mas caro.',
+     template:`# COMPLETA TODO\n# Variables para max_precio y producto_max\n# Recorrer, split, comparar, actualizar maximo`,
+     solution:`try:\n    arch = open("ventas.txt", "rt")\n    max_precio = -1\n    prod_max = ""\n    for linea in arch:\n        linea = linea.rstrip('\\n')\n        prod, cant, precio = linea.split(';')\n        precio = float(precio)\n        if precio > max_precio:\n            max_precio = precio\n            prod_max = prod\n    print("Mas caro:", prod_max, "Precio:", max_precio)\nexcept FileNotFoundError as msg:\n    print("No encontrado:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     checks:[
+         {type:'bad',re:/\.readlines\s*\(/,msg:'readlines() PROHIBIDO'},
+         {type:'need',re:/for\s+\w+\s+in\s+\w+|\.readline\s*\(/,msg:'Falta lectura linea por linea'},
+         {type:'need',re:/\.split\s*\(/,msg:'Falta split()'},
+         {type:'need',re:/float/,msg:'Falta convertir precio a float'},
+         {type:'need',re:/try\s*:/,msg:'Falta try'},
+         {type:'need',re:/finally\s*:/,msg:'Falta finally'},
+         {type:'need',re:/\.close\s*\(/,msg:'Falta close()'},
+     ]},
+    {id:5,title:"Calcular sueldos",diff:"m",
+     desc:'"empleados.txt": nombre;basico;antiguedad. Crear "sueldos.txt" con nombre;sueldo_final (basico*(1+ant*0.03)).',
+     template:`# COMPLETA TODO\n# Entrada: "empleados.txt" rt\n# Salida: "sueldos.txt" wt\n# Calcular sueldo_final = basico * (1 + antiguedad * 0.03)`,
+     solution:`try:\n    ent = open("empleados.txt", "rt")\n    sal = open("sueldos.txt", "wt")\n    for linea in ent:\n        linea = linea.rstrip('\\n')\n        nombre, basico, ant = linea.split(';')\n        sueldo = float(basico) * (1 + int(ant) * 0.03)\n        sal.write(nombre + ';' + str(round(sueldo, 2)) + '\\n')\n    print("Archivo creado.")\nexcept FileNotFoundError as msg:\n    print("No encontrado:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        ent.close()\n        sal.close()\n    except NameError:\n        pass`,
+     checks:[
+         {type:'bad',re:/\.readlines\s*\(/,msg:'readlines() PROHIBIDO'},
+         {type:'need',re:/for\s+\w+\s+in\s+\w+|\.readline\s*\(/,msg:'Falta lectura linea por linea'},
+         {type:'need',re:/open.*rt|open.*"r"/,msg:'Falta abrir entrada'},
+         {type:'need',re:/open.*wt|open.*"w"/,msg:'Falta abrir salida'},
+         {type:'need',re:/\.write\s*\(/,msg:'Falta write()'},
+         {type:'need',re:/0\.03/,msg:'Falta el calculo con 0.03'},
+         {type:'need',re:/try\s*:/,msg:'Falta try'},
+         {type:'need',re:/finally\s*:/,msg:'Falta finally'},
+     ]},
+    {id:6,title:"Contar palabras",diff:"f",
+     desc:'Lee "texto.txt" y cuenta el total de palabras.',
+     template:`# COMPLETA TODO\n# split() sin parametro separa por espacios\n# len() cuenta elementos de una lista`,
+     solution:`try:\n    arch = open("texto.txt", "rt")\n    total = 0\n    for linea in arch:\n        palabras = linea.split()\n        total += len(palabras)\n    print("Total palabras:", total)\nexcept FileNotFoundError as msg:\n    print("No encontrado:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     checks:[
+         {type:'bad',re:/\.readlines\s*\(/,msg:'readlines() PROHIBIDO'},
+         {type:'bad',re:/\.read\s*\(\s*\)/,msg:'read() PROHIBIDO'},
+         {type:'need',re:/for\s+\w+\s+in\s+\w+|\.readline\s*\(/,msg:'Falta lectura linea por linea'},
+         {type:'need',re:/\.split\s*\(/,msg:'Falta split()'},
+         {type:'need',re:/len\s*\(/,msg:'Falta len() para contar palabras'},
+         {type:'need',re:/try\s*:/,msg:'Falta try'},
+         {type:'need',re:/finally\s*:/,msg:'Falta finally'},
+         {type:'need',re:/\.close\s*\(/,msg:'Falta close()'},
+     ]},
+    {id:7,title:"Buscar un legajo",diff:"m",
+     desc:'Pedir legajo por teclado, buscarlo en "alumnos.txt" (legajo;nombre). Imprimir si se encontro o no.',
+     template:`# COMPLETA TODO\n# Pedir legajo con input\n# Usar booleano "encontrado"\n# Recorrer archivo comparando`,
+     solution:`buscar = input("Legajo: ")\ntry:\n    arch = open("alumnos.txt", "rt")\n    encontrado = False\n    for linea in arch:\n        linea = linea.rstrip('\\n')\n        lu, nombre = linea.split(';')\n        if lu == buscar:\n            print("Encontrado:", nombre)\n            encontrado = True\n    if not encontrado:\n        print("No encontrado.")\nexcept FileNotFoundError as msg:\n    print("Error:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     checks:[
+         {type:'bad',re:/\.readlines\s*\(/,msg:'readlines() PROHIBIDO'},
+         {type:'need',re:/for\s+\w+\s+in\s+\w+|\.readline\s*\(/,msg:'Falta lectura linea por linea'},
+         {type:'need',re:/input\s*\(/,msg:'Falta input() para pedir legajo'},
+         {type:'need',re:/encontr|found|hallado|flag|bool/i,msg:'Falta variable booleana para saber si se encontro'},
+         {type:'need',re:/try\s*:/,msg:'Falta try'},
+         {type:'need',re:/finally\s*:/,msg:'Falta finally'},
+     ]},
+    {id:8,title:"Agregar con append",diff:"m",
+     desc:'Agregar alumnos al final de "alumnos.txt" sin perder datos. Pedir hasta legajo vacio.',
+     template:`# COMPLETA TODO\n# Modo "at" (append text)\n# while con input para pedir datos`,
+     solution:`try:\n    arch = open("alumnos.txt", "at")\n    lu = input("LU? (Enter=fin): ")\n    while lu != "":\n        nombre = input("Nombre? ")\n        arch.write(lu + ';' + nombre + '\\n')\n        lu = input("LU? (Enter=fin): ")\n    print("Registros agregados.")\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     checks:[
+         {type:'need',re:/["']at["']/,msg:'Falta modo "at" (append text)'},
+         {type:'need',re:/\.write\s*\(/,msg:'Falta write()'},
+         {type:'need',re:/while/,msg:'Falta while para ciclo de entrada'},
+         {type:'need',re:/input\s*\(/,msg:'Falta input()'},
+         {type:'need',re:/try\s*:/,msg:'Falta try'},
+         {type:'need',re:/finally\s*:/,msg:'Falta finally'},
+         {type:'need',re:/\.close\s*\(/,msg:'Falta close()'},
+         {type:'bad',re:/["']wt["']/,msg:'Usas "wt" pero deberias usar "at" (append). "wt" BORRA el archivo!'},
+     ]},
+    {id:9,title:"Totales y promedio",diff:"d",
+     desc:'"ventas.txt": producto;cantidad;precio. Calcular: total registros, monto total (cant*precio), promedio por venta.',
+     template:`# COMPLETA TODO\n# Necesitas: contador y acumulador\n# monto = int(cant) * float(precio)\n# promedio = total / contador`,
+     solution:`try:\n    arch = open("ventas.txt", "rt")\n    cont = 0\n    total = 0\n    for linea in arch:\n        linea = linea.rstrip('\\n')\n        prod, cant, precio = linea.split(';')\n        total += int(cant) * float(precio)\n        cont += 1\n    print("Registros:", cont)\n    print("Monto total:", total)\n    if cont > 0:\n        print("Promedio:", round(total/cont, 2))\nexcept FileNotFoundError as msg:\n    print("No encontrado:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     checks:[
+         {type:'bad',re:/\.readlines\s*\(/,msg:'readlines() PROHIBIDO'},
+         {type:'need',re:/for\s+\w+\s+in\s+\w+|\.readline\s*\(/,msg:'Falta lectura linea por linea'},
+         {type:'need',re:/\.split\s*\(/,msg:'Falta split()'},
+         {type:'need',re:/int\s*\(|float\s*\(/,msg:'Falta conversion numerica'},
+         {type:'need',re:/\+=/,msg:'Falta acumular (+=)'},
+         {type:'need',re:/try\s*:/,msg:'Falta try'},
+         {type:'need',re:/finally\s*:/,msg:'Falta finally'},
+     ]},
+    {id:10,title:"Doble recorrido con seek",diff:"d",
+     desc:'"numeros.txt" (un numero por linea). 1er recorrido: calcular promedio. seek(0). 2do recorrido: imprimir mayores al promedio.',
+     template:`# COMPLETA TODO\n# 1er recorrido: sumar y contar\n# promedio = suma / cantidad\n# arch.seek(0)\n# 2do recorrido: imprimir si > promedio`,
+     solution:`try:\n    arch = open("numeros.txt", "rt")\n    suma = 0\n    cant = 0\n    for linea in arch:\n        suma += float(linea.rstrip('\\n'))\n        cant += 1\n    promedio = suma / cant\n    print("Promedio:", promedio)\n    arch.seek(0)\n    print("Mayores al promedio:")\n    for linea in arch:\n        num = float(linea.rstrip('\\n'))\n        if num > promedio:\n            print(num)\nexcept FileNotFoundError as msg:\n    print("No encontrado:", msg)\nexcept OSError as msg:\n    print("Error:", msg)\nfinally:\n    try:\n        arch.close()\n    except NameError:\n        pass`,
+     checks:[
+         {type:'bad',re:/\.readlines\s*\(/,msg:'readlines() PROHIBIDO'},
+         {type:'bad',re:/\.read\s*\(\s*\)/,msg:'read() PROHIBIDO'},
+         {type:'need',re:/for\s+\w+\s+in\s+\w+|\.readline\s*\(/,msg:'Falta lectura linea por linea'},
+         {type:'need',re:/\.seek\s*\(\s*0\s*\)/,msg:'Falta seek(0) para segundo recorrido'},
+         {type:'need',re:/float/,msg:'Falta convertir a float'},
+         {type:'need',re:/promedio|prom/i,msg:'Falta calcular promedio'},
+         {type:'need',re:/try\s*:/,msg:'Falta try'},
+         {type:'need',re:/finally\s*:/,msg:'Falta finally'},
+     ]},
+];
+
+function buildExercises(){
+    const box=document.getElementById('exBox');
+    box.innerHTML='';
+    const diffLabels={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffClass={f:'diff-f',m:'diff-m',d:'diff-d'};
+    exData.forEach(ex=>{
+        box.innerHTML+=`
+        <div class="ex-area">
+            <h3>Ejercicio ${ex.id}: ${ex.title} <span class="diff ${diffClass[ex.diff]}">${diffLabels[ex.diff]}</span></h3>
+            <p style="color:#94a3b8;margin:10px 0">${ex.desc}</p>
+            <textarea id="ext${ex.id}" spellcheck="false">${ex.template}</textarea>
+            <button class="btn btn-p" onclick="checkEx(${ex.id})">Verificar</button>
+            <button class="btn btn-s" onclick="showSol(${ex.id})">Ver Solucion</button>
+            <div class="result" id="exr${ex.id}"></div>
+        </div>`;
+    });
+}
+
+function checkEx(id){
+    const ex=exData.find(e=>e.id===id);
+    const code=document.getElementById('ext'+id).value;
+    const r=document.getElementById('exr'+id);
+    let errors=[],goods=[];
+
+    // check for COMPLETA still in code
+    if(/COMPLETA/.test(code)){
+        r.innerHTML='<div style="color:#f59e0b">Todavia no completaste el codigo. Reemplaza los comentarios con tu solucion.</div>';
+        r.className='result show';r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+        return;
+    }
+
+    // also check for mixed for+readline
+    if(/for\s+\w+\s+in\s+\w+/.test(code) && /\.readline\s*\(/.test(code) && !/while/.test(code)){
+        errors.push('Mezclas for con readline() - PROHIBIDO, se pierden datos');
+    }
+
+    ex.checks.forEach(ch=>{
+        if(ch.type==='bad' && ch.re.test(code)) errors.push(ch.msg);
+        if(ch.type==='need' && !ch.re.test(code)) errors.push(ch.msg);
+    });
+
+    // good things found
+    if(/for\s+\w+\s+in\s+\w+/.test(code)||/\.readline\s*\(/.test(code)) goods.push('Lectura registro por registro');
+    if(/try\s*:/.test(code)) goods.push('Usa try/except');
+    if(/finally\s*:/.test(code)) goods.push('Usa finally');
+    if(/\.close\s*\(/.test(code)) goods.push('Cierra archivo(s)');
+    if(/except\s+NameError/.test(code)) goods.push('Protege close()');
+    if(/rstrip|strip/.test(code)) goods.push('Limpia \\n');
+    if(/\.split\s*\(/.test(code)) goods.push('Usa split()');
+    if(/\.write\s*\(/.test(code)) goods.push('Usa write()');
+
+    let h='';
+    if(goods.length){h+='<div style="color:#86efac"><b>Bien hecho:</b><ul>';goods.forEach(g=>h+='<li>'+g+'</li>');h+='</ul></div>';}
+    if(errors.length){h+='<div style="color:#fca5a5;margin-top:8px"><b>Problemas:</b><ul>';errors.forEach(e=>h+='<li>'+e+'</li>');h+='</ul></div>';}
+
+    if(!errors.length){
+        h+='<div style="color:#86efac;font-size:1.1em;margin-top:8px"><b>Excelente! Sigue las buenas practicas del curso.</b></div>';
+        addScore('ex'+id);
+    }
+    r.innerHTML=h;r.className='result show';
+    r.style.background=errors.length?'#1e1b2e':'#1a2e1a';
+    r.style.border='1px solid '+(errors.length?'#a78bfa':'#22c55e');
+}
+
+function showSol(id){
+    const ex=exData.find(e=>e.id===id);
+    document.getElementById('ext'+id).value=ex.solution;
+    const r=document.getElementById('exr'+id);
+    r.innerHTML='<div style="color:#93c5fd">Solucion mostrada. Estudiala y trata de hacerla sin mirar!</div>';
+    r.className='result show';r.style.background='#1e3a5f';r.style.border='1px solid #38bdf8';
+}
+
+// ===== ORDER CHALLENGES =====
+const orderData=[
+    {id:1,title:"Leer e imprimir archivo",diff:"f",lines:[
+        "try:",
+        "    arch = open(\"datos.txt\", \"rt\")",
+        "    for linea in arch:",
+        "        print(linea.rstrip('\\n'))",
+        "except FileNotFoundError as msg:",
+        "    print(\"No encontrado:\", msg)",
+        "finally:",
+        "    try: arch.close()",
+        "    except NameError: pass"
+    ]},
+    {id:2,title:"Crear archivo desde teclado",diff:"f",lines:[
+        "try:",
+        "    arch = open(\"datos.txt\", \"wt\")",
+        "    dato = input(\"Dato? \")",
+        "    while dato != \"\":",
+        "        arch.write(dato + '\\n')",
+        "        dato = input(\"Dato? \")",
+        "    print(\"Creado.\")",
+        "except OSError as msg:",
+        "    print(\"Error:\", msg)",
+        "finally:",
+        "    try: arch.close()",
+        "    except NameError: pass"
+    ]},
+    {id:3,title:"Filtrar CSV por condicion",diff:"m",lines:[
+        "try:",
+        "    arch = open(\"alumnos.txt\", \"rt\")",
+        "    for linea in arch:",
+        "        lu, nombre = linea.split(';')",
+        "        nombre = nombre.rstrip('\\n')",
+        "        if int(lu) < 1000000:",
+        "            print(f\"LU: {lu} - {nombre}\")",
+        "except FileNotFoundError as msg:",
+        "    print(\"No encontrado:\", msg)",
+        "except OSError as msg:",
+        "    print(\"Error:\", msg)",
+        "finally:",
+        "    try: arch.close()",
+        "    except NameError: pass"
+    ]},
+    {id:4,title:"Copiar a mayusculas (2 archivos)",diff:"m",lines:[
+        "try:",
+        "    entrada = open(\"notas.txt\", \"rt\")",
+        "    salida = open(\"notas2.txt\", \"wt\")",
+        "    for linea in entrada:",
+        "        salida.write(linea.upper())",
+        "except FileNotFoundError as msg:",
+        "    print(\"No encontrado:\", msg)",
+        "except OSError as msg:",
+        "    print(\"Error:\", msg)",
+        "finally:",
+        "    try:",
+        "        entrada.close()",
+        "        salida.close()",
+        "    except NameError: pass"
+    ]},
+    {id:5,title:"Lectura con readline y while",diff:"m",lines:[
+        "try:",
+        "    arch = open(\"datos.txt\", \"rt\")",
+        "    linea = arch.readline()",
+        "    while linea:",
+        "        linea = linea.rstrip('\\n')",
+        "        print(linea)",
+        "        linea = arch.readline()",
+        "except FileNotFoundError as msg:",
+        "    print(\"No encontrado:\", msg)",
+        "finally:",
+        "    try: arch.close()",
+        "    except NameError: pass"
+    ]},
+    {id:6,title:"Buscar dato con booleano",diff:"d",lines:[
+        "buscar = input(\"Legajo: \")",
+        "try:",
+        "    arch = open(\"alumnos.txt\", \"rt\")",
+        "    encontrado = False",
+        "    for linea in arch:",
+        "        lu, nombre = linea.rstrip('\\n').split(';')",
+        "        if lu == buscar:",
+        "            print(\"Encontrado:\", nombre)",
+        "            encontrado = True",
+        "    if not encontrado:",
+        "        print(\"No encontrado.\")",
+        "except FileNotFoundError as msg:",
+        "    print(\"Error:\", msg)",
+        "finally:",
+        "    try: arch.close()",
+        "    except NameError: pass"
+    ]},
+    {id:7,title:"Doble recorrido con seek",diff:"d",lines:[
+        "try:",
+        "    arch = open(\"numeros.txt\", \"rt\")",
+        "    suma = 0",
+        "    cant = 0",
+        "    for linea in arch:",
+        "        suma += float(linea.rstrip('\\n'))",
+        "        cant += 1",
+        "    promedio = suma / cant",
+        "    arch.seek(0)",
+        "    for linea in arch:",
+        "        n = float(linea.rstrip('\\n'))",
+        "        if n > promedio:",
+        "            print(n)",
+        "finally:",
+        "    try: arch.close()",
+        "    except NameError: pass"
+    ]},
+    // ===== 5 NEW ORDER CHALLENGES =====
+    {id:8,title:"Contar registros con readline",diff:"f",lines:[
+        "try:",
+        "    arch = open(\"datos.txt\", \"rt\")",
+        "    cont = 0",
+        "    linea = arch.readline()",
+        "    while linea:",
+        "        cont += 1",
+        "        linea = arch.readline()",
+        "    print(\"Total registros:\", cont)",
+        "except FileNotFoundError as msg:",
+        "    print(\"No encontrado:\", msg)",
+        "finally:",
+        "    try: arch.close()",
+        "    except NameError: pass"
+    ]},
+    {id:9,title:"Agregar datos con append",diff:"m",lines:[
+        "try:",
+        "    arch = open(\"alumnos.txt\", \"at\")",
+        "    lu = input(\"LU? (Enter=fin): \")",
+        "    while lu != \"\":",
+        "        nombre = input(\"Nombre? \")",
+        "        arch.write(lu + ';' + nombre + '\\n')",
+        "        lu = input(\"LU? (Enter=fin): \")",
+        "    print(\"Registros agregados.\")",
+        "except OSError as msg:",
+        "    print(\"Error:\", msg)",
+        "finally:",
+        "    try: arch.close()",
+        "    except NameError: pass"
+    ]},
+    {id:10,title:"Archivo entrada y salida con calculo",diff:"d",lines:[
+        "try:",
+        "    entrada = open(\"productos.txt\", \"rt\")",
+        "    salida = open(\"totales.txt\", \"wt\")",
+        "    for linea in entrada:",
+        "        linea = linea.rstrip('\\n')",
+        "        prod, cant, precio = linea.split(';')",
+        "        total = int(cant) * float(precio)",
+        "        salida.write(prod + ';' + str(total) + '\\n')",
+        "    print(\"Archivo creado.\")",
+        "except FileNotFoundError as msg:",
+        "    print(\"No encontrado:\", msg)",
+        "except OSError as msg:",
+        "    print(\"Error:\", msg)",
+        "finally:",
+        "    try:",
+        "        entrada.close()",
+        "        salida.close()",
+        "    except NameError: pass"
+    ]},
+    {id:11,title:"Encontrar maximo en archivo",diff:"m",lines:[
+        "try:",
+        "    arch = open(\"numeros.txt\", \"rt\")",
+        "    maximo = None",
+        "    for linea in arch:",
+        "        num = float(linea.rstrip('\\n'))",
+        "        if maximo is None or num > maximo:",
+        "            maximo = num",
+        "    print(\"Maximo:\", maximo)",
+        "except FileNotFoundError as msg:",
+        "    print(\"No encontrado:\", msg)",
+        "finally:",
+        "    try: arch.close()",
+        "    except NameError: pass"
+    ]},
+    {id:12,title:"Contar palabras de un archivo",diff:"f",lines:[
+        "try:",
+        "    arch = open(\"texto.txt\", \"rt\")",
+        "    total = 0",
+        "    for linea in arch:",
+        "        palabras = linea.split()",
+        "        total += len(palabras)",
+        "    print(\"Total palabras:\", total)",
+        "except FileNotFoundError as msg:",
+        "    print(\"No encontrado:\", msg)",
+        "finally:",
+        "    try: arch.close()",
+        "    except NameError: pass"
+    ]},
+];
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+function buildOrderChallenges(){
+    const box=document.getElementById('orderBox');
+    box.innerHTML='';
+    const diffL={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffC={f:'diff-f',m:'diff-m',d:'diff-d'};
+    let allHTML='';
+    orderData.forEach(ch=>{
+        allHTML+=`
+        <div class="oc" id="oc${ch.id}">
+            <h3>Desafio ${ch.id}: ${ch.title} <span class="diff ${diffC[ch.diff]}">${diffL[ch.diff]}</span></h3>
+            <p style="color:#94a3b8;margin:8px 0">Banco (clic para enviar al destino):</p>
+            <div class="oc-pool" id="ocp${ch.id}"></div>
+            <p style="color:#94a3b8;margin:8px 0">Destino (usa &#9650;&#9660; para reordenar, &#10005; para devolver):</p>
+            <div class="oc-target" id="oct${ch.id}"></div>
+            <button class="btn btn-p" onclick="checkOC(${ch.id})">Verificar</button>
+            <button class="btn btn-w" onclick="resetOC(${ch.id})">Reiniciar</button>
+            <div class="result" id="ocr${ch.id}"></div>
+        </div>`;
+    });
+    box.innerHTML=allHTML;
+    orderData.forEach(ch=>resetOC(ch.id));
+}
+
+function makeOCItem(id, item){
+    const pool=document.getElementById('ocp'+id);
+    const tgt=document.getElementById('oct'+id);
+
+    const d=document.createElement('div');
+    d.className='oc-item';
+    d.dataset.idx=item.idx;
+
+    // arrows (only visible in target)
+    const arrows=document.createElement('span');
+    arrows.className='oc-arrows';
+    arrows.innerHTML='<button onclick="event.stopPropagation();moveOC(this.closest(\'.oc-item\'),-1)">&#9650;</button><button onclick="event.stopPropagation();moveOC(this.closest(\'.oc-item\'),1)">&#9660;</button>';
+    d.appendChild(arrows);
+
+    // text
+    const span=document.createElement('span');
+    span.className='item-text';
+    span.textContent=item.text;
+    d.appendChild(span);
+
+    // return button (only visible in target)
+    const ret=document.createElement('button');
+    ret.className='oc-ret';
+    ret.textContent='\u2715';
+    ret.onclick=function(e){e.stopPropagation();pool.appendChild(d);d.classList.remove('right','wrong');};
+    d.appendChild(ret);
+
+    // click on item in pool -> send to target
+    d.onclick=function(){
+        if(this.parentElement===pool){
+            tgt.appendChild(this);
+            this.classList.remove('right','wrong');
+        }
+    };
+    return d;
+}
+
+function moveOC(el, dir){
+    const parent=el.parentElement;
+    if(dir===-1 && el.previousElementSibling){
+        parent.insertBefore(el, el.previousElementSibling);
+    }else if(dir===1 && el.nextElementSibling){
+        parent.insertBefore(el.nextElementSibling, el);
+    }
+    el.classList.remove('right','wrong');
+}
+
+function resetOC(id){
+    const ch=orderData.find(c=>c.id===id);
+    const pool=document.getElementById('ocp'+id);
+    const tgt=document.getElementById('oct'+id);
+    pool.innerHTML='';tgt.innerHTML='';
+    document.getElementById('ocr'+id).className='result';
+
+    const shuffled=shuffle(ch.lines.map((l,i)=>({text:l,idx:i})));
+    shuffled.forEach(item=>{
+        pool.appendChild(makeOCItem(id, item));
+    });
+}
+
+function checkOC(id){
+    const ch=orderData.find(c=>c.id===id);
+    const tgt=document.getElementById('oct'+id);
+    const items=tgt.querySelectorAll('.oc-item');
+    const r=document.getElementById('ocr'+id);
+
+    if(items.length<ch.lines.length){
+        r.innerHTML='<div style="color:#f59e0b">Faltan lineas. Haz clic en cada una del banco para moverla.</div>';
+        r.className='result show';r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+        return;
+    }
+
+    let allOk=true;
+    items.forEach((item,i)=>{
+        if(parseInt(item.dataset.idx)===i){
+            item.classList.add('right');item.classList.remove('wrong');
+        }else{
+            item.classList.add('wrong');item.classList.remove('right');
+            allOk=false;
+        }
+    });
+
+    if(allOk){
+        r.innerHTML='<div style="color:#86efac;font-size:1.1em"><b>Perfecto! Orden correcto.</b></div>';
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';
+        addScore('oc'+id);
+    }else{
+        r.innerHTML='<div style="color:#fca5a5"><b>Hay errores.</b> Verde = posicion correcta. Rojo = posicion incorrecta. Haz clic en las rojas para devolverlas y reintenta.</div>';
+        r.style.background='#1e1b2e';r.style.border='1px solid #ef4444';
+    }
+    r.className='result show';
+}
+
+// ===== ERROR FINDERS (multiple choice) =====
+const errData=[
+    {id:1,title:"Codigo 1",diff:"f",
+     consigna:"Se pide leer un archivo de texto e imprimir su contenido por pantalla.",
+     code:`arch = open("datos.txt", "rt")
+contenido = arch.read()
+lineas = contenido.split('\\n')
+for linea in lineas:
+    print(linea)
+arch.close()`,
+     question:"Cuales son los errores de este codigo? (selecciona todos los que apliquen)",
+     options:[
+         {text:"read() carga todo el archivo en memoria (PROHIBIDO)",correct:true},
+         {text:"split() crea otra copia completa en memoria",correct:true},
+         {text:"No tiene try/except/finally",correct:true},
+         {text:"Falta rstrip('\\n') en el print",correct:false},
+         {text:"close() esta fuera de un finally",correct:true},
+         {text:"open() tiene mal el modo",correct:false},
+     ]},
+    {id:2,title:"Codigo 2",diff:"m",
+     consigna:"Se pide leer un archivo de texto e imprimir cada linea.",
+     code:`try:
+    arch = open("datos.txt", "rt")
+    for linea in arch:
+        datos = arch.readline()
+        print(linea)
+except OSError as msg:
+    print("Error:", msg)
+finally:
+    try: arch.close()
+    except NameError: pass`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"Mezcla for con readline() (pierde datos)",correct:true},
+         {text:"Falta FileNotFoundError antes de OSError",correct:true},
+         {text:"Falta rstrip('\\n')",correct:true},
+         {text:"El modo de apertura esta mal",correct:false},
+         {text:"Falta finally",correct:false},
+         {text:"write() esta mal usado",correct:false},
+     ]},
+    {id:3,title:"Codigo 3",diff:"m",
+     consigna:"Se pide leer un archivo CSV de ventas (producto;cantidad;precio) y calcular el total vendido.",
+     code:`try:
+    arch = open("ventas.txt", "rt")
+    total = 0
+    for linea in arch:
+        prod, cant, precio = linea.split(';')
+        total += int(cant) * float(precio)
+    print("Total:", total)
+except OSError as msg:
+    print("Error:", msg)
+finally:
+    try: arch.close()
+    except NameError: pass`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"El ultimo campo (precio) trae \\n, falta rstrip antes de split o en precio",correct:true},
+         {text:"Falta FileNotFoundError antes de OSError",correct:true},
+         {text:"Usa readlines()",correct:false},
+         {text:"Falta finally",correct:false},
+         {text:"No cierra el archivo",correct:false},
+         {text:"split deberia usar coma, no punto y coma",correct:false},
+     ]},
+    {id:4,title:"Codigo 4",diff:"d",
+     consigna:"Se pide leer un archivo de texto dos veces e imprimir su contenido ambas veces.",
+     code:`try:
+    arch = open("notas.txt", "rt")
+    linea = arch.readline()
+    while linea:
+        print(linea)
+        linea = arch.readline()
+    arch.close()
+    arch = open("notas.txt", "rt")
+    linea = arch.readline()
+    while linea:
+        print(linea)
+        linea = arch.readline()
+except FileNotFoundError as msg:
+    print("No encontrado:", msg)
+finally:
+    try: arch.close()
+    except NameError: pass`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"print(linea) sin rstrip('\\n') - doble salto de linea",correct:true},
+         {text:"Cierra y reabre en el MISMO modo en vez de seek(0)",correct:true},
+         {text:"Falta except OSError (solo tiene FileNotFoundError)",correct:true},
+         {text:"Usa readline() incorrectamente",correct:false},
+         {text:"Falta finally",correct:false},
+         {text:"El while esta mal planteado",correct:false},
+     ]},
+    {id:5,title:"Codigo 5",diff:"m",
+     consigna:"Se pide leer un archivo de alumnos (legajo;nombre) e imprimir cada registro.",
+     code:`try:
+    arch = open("alumnos.txt", "rt")
+    datos = list(arch)
+    for linea in datos:
+        lu, nombre = linea.split(';')
+        print(lu, nombre)
+except FileNotFoundError as msg:
+    print("Error:", msg)
+except OSError as msg:
+    print("Error:", msg)
+finally:
+    try: arch.close()
+    except NameError: pass`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"list(arch) carga todo el archivo en memoria (PROHIBIDO)",correct:true},
+         {text:"Itera sobre la lista en memoria, no sobre el archivo",correct:true},
+         {text:"Falta rstrip('\\n') en nombre",correct:true},
+         {text:"El split esta mal",correct:false},
+         {text:"Falta finally",correct:false},
+         {text:"open() tiene mal los parametros",correct:false},
+     ]},
+    {id:6,title:"Codigo 6",diff:"d",
+     consigna:"Se pide leer un archivo de texto e imprimir cada linea.",
+     code:`try:
+    arch = open("datos.txt", "wt")
+    for linea in arch:
+        print(linea)
+except OSError as msg:
+    print("Error:", msg)
+finally:
+    try: arch.close()
+    except NameError: pass`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"Abre en modo 'wt' (escritura) pero intenta LEER con for",correct:true},
+         {text:"Modo 'w' destruye el archivo existente",correct:true},
+         {text:"Falta FileNotFoundError",correct:false},
+         {text:"Falta rstrip",correct:true},
+         {text:"Deberia usar modo 'rt' para leer",correct:true},
+         {text:"El finally esta mal",correct:false},
+     ]},
+    // ===== 6 NEW ERROR FINDERS =====
+    {id:7,title:"Codigo 7",diff:"f",
+     consigna:"Se pide leer un archivo de texto e imprimir su contenido linea por linea.",
+     code:`try:
+    arch = open("datos.txt", "wt")
+    linea = arch.readline()
+    while linea:
+        print(linea.rstrip('\\n'))
+        linea = arch.readline()
+except FileNotFoundError as msg:
+    print("No encontrado:", msg)
+except OSError as msg:
+    print("Error:", msg)
+finally:
+    try: arch.close()
+    except NameError: pass`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"Abre en modo 'wt' (escritura) pero intenta leer con readline()",correct:true},
+         {text:"Deberia usar modo 'rt' para leer",correct:true},
+         {text:"Modo 'w' destruye el contenido del archivo",correct:true},
+         {text:"readline() esta mal usado",correct:false},
+         {text:"Falta finally",correct:false},
+         {text:"El rstrip esta mal",correct:false},
+     ]},
+    {id:8,title:"Codigo 8",diff:"m",
+     consigna:"Se pide crear un archivo de alumnos (legajo;nombre) pidiendo datos por teclado hasta legajo vacio.",
+     code:`try:
+    arch = open("alumnos.txt", "wt")
+    lu = input("LU? ")
+    while lu != "":
+        nombre = input("Nombre? ")
+        arch.write(lu)
+        arch.write(";")
+        arch.write(nombre)
+        arch.write("\\n")
+        lu = input("LU? ")
+except OSError as msg:
+    print("Error:", msg)
+finally:
+    try: arch.close()
+    except NameError: pass`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"Hace multiples write() por registro (campo por campo) en vez de un solo write()",correct:true},
+         {text:"Deberia ser: arch.write(lu + ';' + nombre + '\\n')",correct:true},
+         {text:"Falta FileNotFoundError antes de OSError",correct:false},
+         {text:"El modo de apertura esta mal",correct:false},
+         {text:"Falta finally",correct:false},
+         {text:"El while esta mal planteado",correct:false},
+     ]},
+    {id:9,title:"Codigo 9",diff:"m",
+     consigna:"Se pide crear un archivo con 5 numeros ingresados por teclado.",
+     code:`try:
+    for i in range(5):
+        arch = open("numeros.txt", "wt")
+        num = input("Numero? ")
+        arch.write(num + '\\n')
+        arch.close()
+    print("Archivo creado.")
+except OSError as msg:
+    print("Error:", msg)`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"Abre y cierra el archivo dentro del loop (por cada registro)",correct:true},
+         {text:"Modo 'wt' destruye el archivo en cada iteracion, solo queda el ultimo numero",correct:true},
+         {text:"Falta finally con try/except NameError para el close()",correct:true},
+         {text:"Deberia abrir antes del loop y cerrar despues",correct:true},
+         {text:"input() esta mal usado",correct:false},
+         {text:"El for esta mal planteado",correct:false},
+     ]},
+    {id:10,title:"Codigo 10",diff:"d",
+     consigna:"Se pide leer un archivo de productos (codigo;descripcion;precio) e imprimir los que cuestan mas de 500.",
+     code:`try:
+    arch = open("productos.txt", "rt")
+    lineas = arch.readlines()
+    for linea in lineas:
+        campos = linea.rstrip('\\n').split(';')
+        if float(campos[2]) > 500:
+            print(campos[1], "-", campos[2])
+except FileNotFoundError as msg:
+    print("No encontrado:", msg)
+except OSError as msg:
+    print("Error:", msg)
+finally:
+    try: arch.close()
+    except NameError: pass`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"readlines() carga TODO el archivo en una lista en memoria (PROHIBIDO)",correct:true},
+         {text:"Itera sobre la lista en memoria en vez de iterar sobre el archivo directamente",correct:true},
+         {text:"Deberia usar 'for linea in arch:' directamente",correct:true},
+         {text:"El split esta mal",correct:false},
+         {text:"Falta finally",correct:false},
+         {text:"float() esta mal usado",correct:false},
+     ]},
+    {id:11,title:"Codigo 11",diff:"d",
+     consigna:"Se pide leer un archivo de texto con manejo de excepciones correcto.",
+     code:`try:
+    arch = open("datos.txt", "rt")
+    for linea in arch:
+        print(linea.rstrip('\\n'))
+except OSError as msg:
+    print("Error general:", msg)
+except FileNotFoundError as msg:
+    print("No encontrado:", msg)
+finally:
+    try: arch.close()
+    except NameError: pass`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"OSError esta ANTES de FileNotFoundError (orden incorrecto)",correct:true},
+         {text:"FileNotFoundError nunca se ejecuta porque OSError la atrapa primero",correct:true},
+         {text:"FileNotFoundError debe ir ANTES de OSError (de mas especifica a mas general)",correct:true},
+         {text:"Falta finally",correct:false},
+         {text:"El for esta mal",correct:false},
+         {text:"rstrip esta mal usado",correct:false},
+     ]},
+    {id:12,title:"Codigo 12",diff:"d",
+     consigna:"Se pide leer un archivo de texto dos veces: primero contar lineas, luego imprimir cada linea.",
+     code:`try:
+    arch = open("datos.txt", "rt")
+    cont = 0
+    for linea in arch:
+        cont += 1
+    print("Total lineas:", cont)
+    arch.close()
+    arch = open("datos.txt", "rt")
+    for linea in arch:
+        print(linea)
+except FileNotFoundError as msg:
+    print("No encontrado:", msg)
+except OSError as msg:
+    print("Error:", msg)
+finally:
+    try: arch.close()
+    except NameError: pass`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"Cierra y reabre en el MISMO modo en vez de usar seek(0)",correct:true},
+         {text:"Deberia usar arch.seek(0) en vez de cerrar y reabrir",correct:true},
+         {text:"Falta rstrip('\\n') en el print del segundo recorrido",correct:true},
+         {text:"El primer recorrido esta mal",correct:false},
+         {text:"Falta finally",correct:false},
+         {text:"El modo de apertura esta mal",correct:false},
+     ]},
+];
+
+function buildErrorFinders(){
+    const box=document.getElementById('errBox');
+    box.innerHTML='';
+    const diffL={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffC={f:'diff-f',m:'diff-m',d:'diff-d'};
+    errData.forEach(ef=>{
+        let h=`<div class="oc" id="ef${ef.id}">
+            <h3>${ef.title} <span class="diff ${diffC[ef.diff]}">${diffL[ef.diff]}</span></h3>
+            <p style="color:#93c5fd;margin:8px 0"><b>Consigna:</b> ${ef.consigna}</p>
+            <pre>${ef.code}</pre>
+            <p style="margin:10px 0;font-weight:bold">${ef.question}</p>
+            <div id="efo${ef.id}">`;
+        ef.options.forEach((o,i)=>{
+            h+=`<div class="ef-opt" id="ef${ef.id}o${i}" onclick="toggleEfOpt(this)">${o.text}</div>`;
+        });
+        h+=`</div>
+            <button class="btn btn-p" onclick="checkEF(${ef.id})" style="margin-top:10px">Verificar</button>
+            <div class="result" id="efr${ef.id}"></div>
+        </div>`;
+        box.innerHTML+=h;
+    });
+}
+
+function toggleEfOpt(el){
+    if(el.classList.contains('ans-ok')||el.classList.contains('ans-no'))return;
+    el.classList.toggle('selected');
+}
+
+function checkEF(id){
+    const ef=errData.find(e=>e.id===id);
+    const r=document.getElementById('efr'+id);
+    let allCorrect=true;
+
+    ef.options.forEach((o,i)=>{
+        const el=document.getElementById('ef'+id+'o'+i);
+        const selected=el.classList.contains('selected');
+        el.classList.remove('selected');
+        if(o.correct && selected){
+            el.classList.add('ans-ok');
+        }else if(o.correct && !selected){
+            el.classList.add('ans-ok');
+            el.innerHTML+=' <span style="color:#fde68a"> &larr; te falto este!</span>';
+            allCorrect=false;
+        }else if(!o.correct && selected){
+            el.classList.add('ans-no');
+            el.innerHTML+=' <span style="color:#fca5a5"> &larr; esto NO es un error</span>';
+            allCorrect=false;
+        }
+        el.onclick=null;
+    });
+
+    if(allCorrect){
+        r.innerHTML='<div style="color:#86efac;font-size:1.1em"><b>Perfecto! Identificaste todos los errores correctamente.</b></div>';
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';
+        addScore('ef'+id);
+    }else{
+        r.innerHTML='<div style="color:#f59e0b">Revisa las marcas. Verde = error real. Rojo = no era un error.</div>';
+        r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+    }
+    r.className='result show';
+}
+
+// ===== INIT =====
+init();
+</script>
+</body>
+</html>

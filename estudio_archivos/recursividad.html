@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursividad en Python - Clase 9</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.7}
+        .container{max-width:920px;margin:0 auto;padding:20px}
+        h1{text-align:center;font-size:2.2em;margin:30px 0;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        h2{color:#38bdf8;margin:30px 0 15px;font-size:1.5em;border-bottom:2px solid #1e3a5f;padding-bottom:8px}
+        h3{color:#a78bfa;margin:15px 0 10px}
+        .tabs{display:flex;flex-wrap:wrap;gap:5px;margin:20px 0;justify-content:center}
+        .tab-btn{padding:10px 18px;background:#1e293b;border:2px solid #334155;color:#94a3b8;border-radius:8px;cursor:pointer;font-size:.95em;transition:.3s}
+        .tab-btn:hover{border-color:#38bdf8;color:#38bdf8}
+        .tab-btn.active{background:#1e3a5f;border-color:#38bdf8;color:#38bdf8;font-weight:bold}
+        .section{display:none;animation:fadeIn .4s}.section.active{display:block}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .card{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0;border-left:4px solid #38bdf8}
+        .card.danger{border-left-color:#ef4444;background:#1e1b2e}
+        .card.success{border-left-color:#22c55e;background:#1a2e1a}
+        .card.warning{border-left-color:#f59e0b;background:#2e2a1a}
+        pre{background:#0c1222;border:1px solid #334155;border-radius:8px;padding:15px;overflow-x:auto;font-family:Consolas,'Courier New',monospace;font-size:.9em;margin:10px 0}
+        code{font-family:Consolas,monospace}
+        .kw{color:#c084fc}.str{color:#86efac}.cmt{color:#64748b;font-style:italic}.fn{color:#38bdf8}
+        .err-hl{background:rgba(239,68,68,.2);display:block;padding:2px 0}
+        .ok-hl{background:rgba(34,197,94,.15);display:block;padding:2px 0}
+        .label{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.8em;font-weight:bold;margin:3px}
+        .label-ok{background:#166534;color:#86efac}.label-bad{background:#7f1d1d;color:#fca5a5}.label-info{background:#1e3a5f;color:#93c5fd}
+        .comparison{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
+        @media(max-width:700px){.comparison{grid-template-columns:1fr}}
+        .diagram{display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0;flex-wrap:wrap}
+        .diagram-box{padding:15px 25px;border-radius:10px;font-weight:bold;text-align:center}
+        .diagram-arrow{font-size:1.5em;color:#64748b}
+        .step-number{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:#2563eb;border-radius:50%;color:white;font-weight:bold;margin-right:8px}
+        ul,ol{margin:10px 0 10px 25px}li{margin:5px 0}
+        .diff{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.75em;font-weight:bold;margin-left:10px}
+        .diff-f{background:#166534;color:#86efac}.diff-m{background:#854d0e;color:#fde68a}.diff-d{background:#7f1d1d;color:#fca5a5}
+
+        .progress-bar{width:100%;height:8px;background:#334155;border-radius:4px;margin:10px 0;overflow:hidden}
+        .progress-fill{height:100%;background:linear-gradient(90deg,#38bdf8,#818cf8);border-radius:4px;transition:width .5s}
+        .score-display{text-align:center;padding:15px;background:#1e293b;border-radius:12px;margin:15px 0;font-size:1.2em}
+        .score-num{color:#38bdf8;font-weight:bold;font-size:1.5em}
+
+        /* Buttons */
+        .btn{padding:10px 25px;border:none;border-radius:8px;cursor:pointer;font-size:1em;font-weight:bold;margin:8px 5px 8px 0;transition:.3s}
+        .btn-p{background:#2563eb;color:white}.btn-p:hover{background:#1d4ed8}
+        .btn-s{background:#16a34a;color:white}.btn-s:hover{background:#15803d}
+        .btn-w{background:#d97706;color:white}.btn-w:hover{background:#b45309}
+        .btn-d{background:#dc2626;color:white}.btn-d:hover{background:#b91c1c}
+
+        /* Exercise area */
+        .ex-area{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0}
+        .ex-area textarea{width:100%;min-height:240px;background:#0c1222;color:#e2e8f0;border:2px solid #334155;border-radius:8px;padding:15px;font-family:Consolas,monospace;font-size:.95em;resize:vertical;tab-size:4}
+        .ex-area textarea:focus{outline:none;border-color:#38bdf8}
+
+        .result{margin-top:10px;padding:15px;border-radius:8px;display:none}
+        .result.show{display:block}
+
+        /* Order challenge */
+        .oc{background:#1e293b;border-radius:12px;padding:20px;margin:20px 0;border:2px solid #334155}
+        .oc-pool{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:#0f172a;border-radius:8px;min-height:50px;margin:10px 0}
+        .oc-target{border:2px dashed #475569;border-radius:8px;padding:10px;margin:10px 0;min-height:60px}
+        .oc-target .oc-item{width:100%;margin:3px 0}
+        .oc-item{padding:10px 16px;background:#2563eb;color:white;border-radius:6px;cursor:pointer;user-select:none;font-family:Consolas,monospace;font-size:.9em;transition:.2s;display:flex;align-items:center;gap:8px}
+        .oc-pool .oc-item{display:inline-flex}
+        .oc-item:hover{background:#3b82f6}
+        .oc-item.right{background:#16a34a!important}.oc-item.wrong{background:#dc2626!important}
+        .oc-item .item-text{flex:1}
+        .oc-arrows{display:flex;flex-direction:column;gap:1px;margin-right:4px}
+        .oc-arrows button{background:rgba(255,255,255,.2);border:none;color:white;cursor:pointer;font-size:.7em;padding:1px 5px;border-radius:3px;line-height:1}
+        .oc-arrows button:hover{background:rgba(255,255,255,.4)}
+        .oc-pool .oc-arrows{display:none}
+        .oc-ret{background:rgba(255,255,255,.2);border:none;color:white;cursor:pointer;font-size:.8em;padding:2px 8px;border-radius:3px;margin-left:4px}
+        .oc-ret:hover{background:rgba(239,68,68,.5)}
+        .oc-pool .oc-ret{display:none}
+
+        /* Quiz */
+        .question{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0;border:2px solid #334155}
+        .question>p{margin-bottom:12px;font-weight:bold}
+        .opts{display:flex;flex-direction:column;gap:8px}
+        .opt{padding:12px 15px;background:#0f172a;border:2px solid #334155;border-radius:8px;cursor:pointer;transition:.3s}
+        .opt:hover{border-color:#38bdf8;background:#1e3a5f}
+        .opt.ok{border-color:#22c55e!important;background:#14532d!important;color:#86efac}
+        .opt.no{border-color:#ef4444!important;background:#7f1d1d!important;color:#fca5a5}
+        .opt.dis{pointer-events:none;opacity:.7}
+        .fb{margin-top:10px;padding:10px 15px;border-radius:8px;display:none;font-size:.95em}
+        .fb.show{display:block}
+        .fb.fb-ok{background:#14532d;color:#86efac;border:1px solid #22c55e}
+        .fb.fb-no{background:#7f1d1d;color:#fca5a5;border:1px solid #ef4444}
+
+        /* Error finder - multiple choice style */
+        .ef-block{background:#0c1222;border:1px solid #334155;border-radius:8px;padding:15px;margin:10px 0;font-family:Consolas,monospace;font-size:.9em;line-height:2}
+        .ef-opt{padding:8px 15px;background:#0f172a;border:2px solid #334155;border-radius:8px;cursor:pointer;transition:.3s;margin:5px 0;display:block}
+        .ef-opt:hover{border-color:#38bdf8}
+        .ef-opt.selected{border-color:#f59e0b;background:#2e2a1a}
+        .ef-opt.ans-ok{border-color:#22c55e!important;background:#14532d!important}
+        .ef-opt.ans-no{border-color:#ef4444!important;background:#7f1d1d!important}
+
+        /* Trace section */
+        .trace-card{background:#1e293b;border-radius:12px;padding:20px;margin:20px 0;border:2px solid #334155}
+        .trace-input{width:120px;padding:10px;background:#0c1222;color:#e2e8f0;border:2px solid #334155;border-radius:8px;font-family:Consolas,monospace;font-size:1.1em;text-align:center}
+        .trace-input:focus{outline:none;border-color:#38bdf8}
+        .trace-steps{margin-top:15px;padding:15px;background:#0c1222;border-radius:8px;border:1px solid #334155;display:none}
+        .trace-steps.show{display:block}
+        .trace-step{padding:6px 0;border-bottom:1px solid #1e293b;font-family:Consolas,monospace;font-size:.9em}
+        .trace-step:last-child{border-bottom:none}
+        .trace-step .ret{color:#86efac;font-weight:bold}
+        .trace-step .call{color:#38bdf8}
+        .trace-step .base{color:#f59e0b}
+        .trace-step .indent{color:#475569}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Recursividad en Python</h1>
+    <p style="text-align:center;color:#94a3b8;margin-bottom:10px;">Guia interactiva - Clase 9</p>
+
+    <div class="progress-bar"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
+    <div class="score-display">Puntaje: <span class="score-num" id="sDisp">0</span> / <span id="sTotal">0</span></div>
+
+    <div class="tabs" id="tabBar"></div>
+
+    <!-- ===== TEORIA ===== -->
+    <div class="section active" id="sec-teoria">
+        <h2>Teoria Completa</h2>
+
+        <div class="card"><h3>Que es la Recursividad?</h3>
+            <p>Un <b>objeto recursivo</b> es aquel que se define en terminos de si mismo. Una <b>funcion recursiva</b> es una funcion que se llama a si misma.</p>
+            <div class="diagram">
+                <div class="diagram-box" style="background:#1e3a5f;border:2px solid #38bdf8"><small style="color:#94a3b8">FUNCION</small><br>Se llama a si misma</div>
+                <div class="diagram-arrow">&#10132;</div>
+                <div class="diagram-box" style="background:#2d1b69;border:2px solid #a78bfa"><small style="color:#94a3b8">CASO BASE</small><br>Condicion de frenado</div>
+                <div class="diagram-arrow">&#10132;</div>
+                <div class="diagram-box" style="background:#1a3a1a;border:2px solid #22c55e"><small style="color:#94a3b8">CASO RECURSIVO</small><br>Reduce el problema</div>
+            </div>
+        </div>
+
+        <div class="card"><h3>Estructura de una funcion recursiva</h3>
+<pre><span class="kw">def</span> <span class="fn">funcion_recursiva</span>(parametros):
+    <span class="kw">if</span> condicion_base:        <span class="cmt"># Caso base: FRENA la recursion</span>
+        <span class="kw">return</span> valor_base
+    <span class="kw">else</span>:                      <span class="cmt"># Caso recursivo: SE LLAMA a si misma</span>
+        <span class="kw">return</span> ... <span class="fn">funcion_recursiva</span>(parametros_reducidos)</pre>
+            <p style="color:#f59e0b"><b>Siempre debe haber un caso base!</b> Sin el, la recursion es infinita.</p>
+        </div>
+
+        <div class="card"><h3>Factorial - El ejemplo clasico</h3>
+            <p><b>Definicion matematica:</b> n! = n * (n-1)! con 0! = 1</p>
+<pre><span class="kw">def</span> <span class="fn">fact</span>(n):
+    <span class="kw">if</span> n == <span class="str">0</span>:          <span class="cmt"># Caso base</span>
+        <span class="kw">return</span> <span class="str">1</span>
+    <span class="kw">else</span>:                <span class="cmt"># Caso recursivo</span>
+        <span class="kw">return</span> n * <span class="fn">fact</span>(n - <span class="str">1</span>)
+
+<span class="cmt"># fact(4) = 4 * fact(3) = 4 * 3 * fact(2) = 4 * 3 * 2 * fact(1) = 4 * 3 * 2 * 1 * fact(0) = 24</span></pre>
+        </div>
+
+        <div class="card danger"><h3>RecursionError - Sin caso base</h3>
+<pre><span class="kw">def</span> <span class="fn">fact</span>(n):
+    <span class="kw">return</span> n * <span class="fn">fact</span>(n - <span class="str">1</span>)  <span class="cmt"># SIN caso base!</span>
+
+<span class="err-hl"><span class="fn">fact</span>(<span class="str">5</span>)   <span class="cmt"># RecursionError: maximum recursion depth exceeded</span></span>
+<span class="cmt"># fact(5) &rarr; fact(4) &rarr; ... &rarr; fact(0) &rarr; fact(-1) &rarr; fact(-2) &rarr; INFINITO!</span></pre>
+            <p style="color:#fca5a5">Python tiene un limite de ~1000 llamadas recursivas. Sin caso base, se alcanza ese limite.</p>
+        </div>
+
+        <h2>Divide y Venceras</h2>
+        <div class="card"><h3>Tecnica "Divide y Venceras"</h3>
+            <p>La recursion aplica la estrategia de <b>dividir un problema grande en subproblemas mas pequenos</b> hasta llegar a un caso trivial (caso base).</p>
+            <div class="diagram">
+                <div class="diagram-box" style="background:#7f1d1d;border:2px solid #ef4444"><span class="step-number">1</span>Problema<br><small>Grande</small></div>
+                <div class="diagram-arrow">&#10132;</div>
+                <div class="diagram-box" style="background:#854d0e;border:2px solid #f59e0b"><span class="step-number">2</span>Subproblema<br><small>Mas chico</small></div>
+                <div class="diagram-arrow">&#10132;</div>
+                <div class="diagram-box" style="background:#1a3a1a;border:2px solid #22c55e"><span class="step-number">3</span>Caso base<br><small>Trivial</small></div>
+            </div>
+        </div>
+
+        <div class="card"><h3>Potencia: a<sup>b</sup></h3>
+            <p><b>Definicion:</b> a<sup>b</sup> = a * a<sup>(b-1)</sup> con a<sup>0</sup> = 1</p>
+<pre><span class="kw">def</span> <span class="fn">potencia</span>(a, b):
+    <span class="kw">if</span> b == <span class="str">0</span>:          <span class="cmt"># Caso base: a^0 = 1</span>
+        <span class="kw">return</span> <span class="str">1</span>
+    <span class="kw">else</span>:                <span class="cmt"># Caso recursivo: a^b = a * a^(b-1)</span>
+        <span class="kw">return</span> a * <span class="fn">potencia</span>(a, b - <span class="str">1</span>)
+
+<span class="cmt"># potencia(2, 3) = 2 * potencia(2, 2) = 2 * 2 * potencia(2, 1) = 2 * 2 * 2 * potencia(2, 0) = 8</span></pre>
+        </div>
+
+        <h2>Teorema Fundamental</h2>
+        <div class="card success"><h3>Toda solucion iterativa tiene una equivalente recursiva y viceversa</h3>
+            <div class="comparison">
+                <div class="card" style="border-left-color:#38bdf8">
+                    <h3>Iterativo</h3>
+<pre><span class="kw">def</span> <span class="fn">fact_iter</span>(n):
+    r = <span class="str">1</span>
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="str">1</span>, n+<span class="str">1</span>):
+        r *= i
+    <span class="kw">return</span> r</pre>
+                </div>
+                <div class="card" style="border-left-color:#a78bfa">
+                    <h3>Recursivo</h3>
+<pre><span class="kw">def</span> <span class="fn">fact_rec</span>(n):
+    <span class="kw">if</span> n == <span class="str">0</span>:
+        <span class="kw">return</span> <span class="str">1</span>
+    <span class="kw">return</span> n * <span class="fn">fact_rec</span>(n-<span class="str">1</span>)</pre>
+                </div>
+            </div>
+        </div>
+
+        <h2>Imprimir del 1 al 100 recursivamente</h2>
+        <div class="card warning"><h3>El orden del print importa!</h3>
+            <div class="comparison">
+                <div class="card" style="border-left-color:#22c55e">
+                    <h3><span class="label label-ok">Imprime 1 a 100</span></h3>
+<pre><span class="kw">def</span> <span class="fn">imprimir</span>(n):
+    <span class="kw">if</span> n &lt;= <span class="str">100</span>:
+        <span class="fn">print</span>(n)        <span class="cmt"># PRIMERO print</span>
+        <span class="fn">imprimir</span>(n+<span class="str">1</span>)  <span class="cmt"># DESPUES recursion</span>
+
+<span class="fn">imprimir</span>(<span class="str">1</span>)</pre>
+                </div>
+                <div class="card" style="border-left-color:#f59e0b">
+                    <h3><span class="label label-bad">Imprime 100 a 1</span></h3>
+<pre><span class="kw">def</span> <span class="fn">imprimir</span>(n):
+    <span class="kw">if</span> n &lt;= <span class="str">100</span>:
+        <span class="fn">imprimir</span>(n+<span class="str">1</span>)  <span class="cmt"># PRIMERO recursion</span>
+        <span class="fn">print</span>(n)        <span class="cmt"># DESPUES print</span>
+
+<span class="fn">imprimir</span>(<span class="str">1</span>)</pre>
+                </div>
+            </div>
+            <p style="color:#f59e0b">Si el <b>print va antes</b> de la llamada recursiva, imprime en orden ascendente. Si va <b>despues</b>, imprime en orden descendente (porque espera a que termine la recursion).</p>
+        </div>
+
+        <h2>Ventajas y Desventajas</h2>
+        <div class="comparison">
+            <div class="card success"><h3>Ventajas</h3>
+                <ul>
+                    <li><b>Elegancia:</b> codigo mas limpio y claro</li>
+                    <li><b>Simplicidad:</b> problemas complejos se expresan de forma natural</li>
+                    <li>Ideal para estructuras recursivas (arboles, fractales)</li>
+                </ul>
+            </div>
+            <div class="card danger"><h3>Desventajas</h3>
+                <ul>
+                    <li><b>Lentitud:</b> overhead de llamadas a funcion</li>
+                    <li><b>Memoria:</b> cada llamada usa espacio en el call stack</li>
+                    <li>Riesgo de <code>RecursionError</code> con datos grandes</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>Fibonacci</h2>
+        <div class="card"><h3>Serie de Fibonacci</h3>
+            <p><b>Definicion:</b> fib(n) = fib(n-1) + fib(n-2), con fib(0) = 0, fib(1) = 1</p>
+            <p style="color:#94a3b8">Serie: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ...</p>
+<pre><span class="kw">def</span> <span class="fn">fib</span>(n):
+    <span class="kw">if</span> n == <span class="str">0</span>:          <span class="cmt"># Caso base 1</span>
+        <span class="kw">return</span> <span class="str">0</span>
+    <span class="kw">elif</span> n == <span class="str">1</span>:        <span class="cmt"># Caso base 2</span>
+        <span class="kw">return</span> <span class="str">1</span>
+    <span class="kw">else</span>:                <span class="cmt"># Caso recursivo: DOS llamadas!</span>
+        <span class="kw">return</span> <span class="fn">fib</span>(n-<span class="str">1</span>) + <span class="fn">fib</span>(n-<span class="str">2</span>)</pre>
+            <p style="color:#fca5a5"><b>Cuidado:</b> Fibonacci recursivo puro es MUY ineficiente (complejidad exponencial). Cada llamada genera dos mas.</p>
+        </div>
+
+        <h2>Listas y Recursion</h2>
+        <div class="card"><h3>Imprimir lista recursivamente</h3>
+<pre><span class="kw">def</span> <span class="fn">imprimir_lista</span>(lista, i=<span class="str">0</span>):
+    <span class="kw">if</span> i &lt; <span class="fn">len</span>(lista):
+        <span class="fn">print</span>(lista[i])
+        <span class="fn">imprimir_lista</span>(lista, i+<span class="str">1</span>)</pre>
+        </div>
+
+        <div class="card"><h3>Maximo de lista - Version con indice</h3>
+<pre><span class="kw">def</span> <span class="fn">maximo</span>(lista, i=<span class="str">0</span>):
+    <span class="kw">if</span> i == <span class="fn">len</span>(lista) - <span class="str">1</span>:   <span class="cmt"># Caso base: ultimo elemento</span>
+        <span class="kw">return</span> lista[i]
+    <span class="kw">else</span>:
+        m = <span class="fn">maximo</span>(lista, i+<span class="str">1</span>)  <span class="cmt"># Maximo del resto</span>
+        <span class="kw">if</span> lista[i] &gt; m:
+            <span class="kw">return</span> lista[i]
+        <span class="kw">else</span>:
+            <span class="kw">return</span> m</pre>
+        </div>
+
+        <div class="card"><h3>Maximo de lista - Version con slicing</h3>
+<pre><span class="kw">def</span> <span class="fn">maximo</span>(lista):
+    <span class="kw">if</span> <span class="fn">len</span>(lista) == <span class="str">1</span>:       <span class="cmt"># Caso base: un solo elemento</span>
+        <span class="kw">return</span> lista[<span class="str">0</span>]
+    <span class="kw">else</span>:
+        m = <span class="fn">maximo</span>(lista[<span class="str">1</span>:])    <span class="cmt"># Maximo de la sublista sin el primero</span>
+        <span class="kw">if</span> lista[<span class="str">0</span>] &gt; m:
+            <span class="kw">return</span> lista[<span class="str">0</span>]
+        <span class="kw">else</span>:
+            <span class="kw">return</span> m</pre>
+        </div>
+
+        <h2>Torres de Hanoi</h2>
+        <div class="card"><h3>El problema clasico</h3>
+            <p>Mover N discos del poste origen al destino, usando un auxiliar. Reglas: solo un disco a la vez, nunca un disco grande sobre uno chico.</p>
+<pre><span class="kw">def</span> <span class="fn">hanoi</span>(n, origen, destino, auxiliar):
+    <span class="kw">if</span> n == <span class="str">1</span>:
+        <span class="fn">print</span>(<span class="str">f"Mover disco 1 de </span>{origen}<span class="str"> a </span>{destino}<span class="str">"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">hanoi</span>(n-<span class="str">1</span>, origen, auxiliar, destino)   <span class="cmt"># Mover n-1 discos a auxiliar</span>
+        <span class="fn">print</span>(<span class="str">f"Mover disco </span>{n}<span class="str"> de </span>{origen}<span class="str"> a </span>{destino}<span class="str">"</span>)
+        <span class="fn">hanoi</span>(n-<span class="str">1</span>, auxiliar, destino, origen)   <span class="cmt"># Mover n-1 discos a destino</span>
+
+<span class="fn">hanoi</span>(<span class="str">3</span>, <span class="str">"A"</span>, <span class="str">"C"</span>, <span class="str">"B"</span>)  <span class="cmt"># 2^3 - 1 = 7 movimientos</span></pre>
+        </div>
+
+        <h2>Reglas de Oro</h2>
+        <div class="card danger"><h3>Reglas para funciones recursivas</h3>
+            <ul>
+                <li><b>NUNCA usar while/for</b> para determinar el caso base</li>
+                <li>Usar <b>parametros</b> para pasar datos hacia abajo</li>
+                <li>Usar <b>return</b> para devolver resultados hacia arriba</li>
+                <li>Toda comunicacion entre llamadas es via parametros y return</li>
+                <li>Siempre debe haber <b>al menos un caso base</b></li>
+                <li>El caso recursivo debe <b>acercarse al caso base</b></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ===== QUIZ ===== -->
+    <div class="section" id="sec-quiz">
+        <h2>Quiz</h2>
+        <div id="quizBox"></div>
+        <div style="text-align:center;margin:20px 0"><button class="btn btn-w" onclick="resetQuiz()">Reiniciar Quiz</button></div>
+    </div>
+
+    <!-- ===== EJERCICIOS ===== -->
+    <div class="section" id="sec-ejercicios">
+        <h2>Ejercicios - Completa el Codigo</h2>
+        <p style="color:#94a3b8">Escribe funciones recursivas. La verificacion revisa que uses recursion correctamente: caso base, llamada recursiva, sin loops.</p>
+        <div id="exBox"></div>
+    </div>
+
+    <!-- ===== ORDENAR ===== -->
+    <div class="section" id="sec-ordenar">
+        <h2>Ordena el Codigo</h2>
+        <p style="color:#94a3b8">Haz clic en las lineas del banco para moverlas al destino. Haz clic en una linea del destino para devolverla. Luego verifica.</p>
+        <div id="orderBox"></div>
+    </div>
+
+    <!-- ===== ERRORES ===== -->
+    <div class="section" id="sec-errores">
+        <h2>Encuentra los Errores</h2>
+        <p style="color:#94a3b8">Cada codigo tiene errores. Selecciona de las opciones cual es el problema principal. Puede haber mas de un error.</p>
+        <div id="errBox"></div>
+    </div>
+
+    <!-- ===== TRAZA ===== -->
+    <div class="section" id="sec-traza">
+        <h2>Traza la Recursion</h2>
+        <p style="color:#94a3b8">Dada una funcion recursiva y una llamada, determina el valor de retorno. Despues de responder, se muestra la traza paso a paso.</p>
+        <div id="traceBox"></div>
+    </div>
+
+</div>
+
+<script>
+// ===== GLOBALS =====
+let score=0, answered={};
+const TABS=[
+    {id:'teoria',label:'1. Teoria'},
+    {id:'quiz',label:'2. Quiz'},
+    {id:'ejercicios',label:'3. Ejercicios'},
+    {id:'ordenar',label:'4. Ordenar'},
+    {id:'errores',label:'5. Errores'},
+    {id:'traza',label:'6. Traza'}
+];
+
+function init(){
+    const tb=document.getElementById('tabBar');
+    TABS.forEach((t,i)=>{
+        const b=document.createElement('button');
+        b.className='tab-btn'+(i===0?' active':'');
+        b.textContent=t.label;
+        b.onclick=()=>{
+            document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+            document.getElementById('sec-'+t.id).classList.add('active');
+            b.classList.add('active');
+        };
+        tb.appendChild(b);
+    });
+    buildQuiz();
+    buildExercises();
+    buildOrderChallenges();
+    buildErrorFinders();
+    buildTraceChallenges();
+    updateTotal();
+}
+
+function updateTotal(){
+    const t=quizData.length + exData.length + orderData.length + errData.length + traceData.length;
+    document.getElementById('sTotal').textContent=t;
+}
+function addScore(id){
+    if(answered[id])return;
+    answered[id]=true;
+    score++;
+    document.getElementById('sDisp').textContent=score;
+    const t=parseInt(document.getElementById('sTotal').textContent);
+    document.getElementById('pFill').style.width=(t>0?(score/t)*100:0)+'%';
+}
+
+// ===== QUIZ =====
+const quizData=[
+    {q:"Que es una funcion recursiva?",o:["Una funcion que usa for","Una funcion que se llama a si misma","Una funcion con muchos parametros","Una funcion que no retorna nada"],c:1,e:"Una funcion recursiva es aquella que se llama a si misma dentro de su propio cuerpo."},
+    {q:"Que pasa si una funcion recursiva no tiene caso base?",o:["Funciona igual","Retorna None","RecursionError (recursion infinita)","Se ejecuta una sola vez"],c:2,e:"Sin caso base la recursion nunca termina, Python lanza RecursionError al superar el limite de profundidad (~1000)."},
+    {q:"En factorial recursivo, cual es el caso base?",o:["fact(1) = 0","fact(0) = 1","fact(n) = n * fact(n-1)","fact(n) = n!"],c:1,e:"El caso base es fact(0) = 1. Es la condicion que frena la recursion."},
+    {q:"Cual es el resultado de fact(5)?",o:["25","120","60","720"],c:1,e:"fact(5) = 5 * 4 * 3 * 2 * 1 = 120."},
+    {q:"En potencia(a, b), cual es el caso base?",o:["b == 1, retorna a","b == 0, retorna 1","a == 0, retorna 0","a == 1, retorna 1"],c:1,e:"El caso base es b == 0 que retorna 1, porque a^0 = 1 para todo a."},
+    {q:"Que imprime primero: imprimir(1) si el print va ANTES de la llamada recursiva?",o:["100","1","50","Nada"],c:1,e:"Si print va antes de la llamada recursiva, imprime en orden ascendente, empezando por 1."},
+    {q:"Que establece el Teorema Fundamental de la recursion?",o:["La recursion es siempre mejor","Toda solucion iterativa tiene equivalente recursiva y viceversa","Solo los problemas matematicos se resuelven recursivamente","La recursion siempre es mas rapida"],c:1,e:"El teorema fundamental dice que todo lo que se resuelve iterativamente se puede resolver recursivamente, y viceversa."},
+    {q:"Cual es la desventaja principal de Fibonacci recursivo puro?",o:["No calcula bien","Es muy lento (complejidad exponencial)","No tiene caso base","Solo funciona con numeros pares"],c:1,e:"Fibonacci recursivo puro recalcula los mismos valores muchas veces, generando una complejidad exponencial O(2^n)."},
+    {q:"Cuantos movimientos necesitan las Torres de Hanoi con 4 discos?",o:["4","8","15","16"],c:2,e:"Las Torres de Hanoi necesitan 2^n - 1 movimientos. Con 4 discos: 2^4 - 1 = 15."},
+    {q:"Es correcto usar un for/while para determinar el caso base de una recursion?",o:["Si, siempre","No, esta prohibido","Solo con while","Solo con for"],c:1,e:"NUNCA se debe usar for/while para el caso base. Los casos base se determinan con if/elif."},
+    {q:"En la recursion, como se comunican las llamadas entre si?",o:["Variables globales","Parametros (hacia abajo) y return (hacia arriba)","Listas compartidas","print()"],c:1,e:"La comunicacion es mediante parametros (para enviar datos a la siguiente llamada) y return (para devolver resultados)."},
+    {q:"Que valor retorna fib(6)?",o:["6","8","13","5"],c:1,e:"fib(6) = fib(5) + fib(4) = 5 + 3 = 8. Serie: 0,1,1,2,3,5,8."},
+];
+
+function buildQuiz(){
+    const box=document.getElementById('quizBox');
+    box.innerHTML='';
+    quizData.forEach((q,i)=>{
+        let h=`<div class="question" id="q${i}"><p>${i+1}. ${q.q}</p><div class="opts">`;
+        q.o.forEach((o,j)=>{h+=`<div class="opt" id="q${i}o${j}" onclick="ansQ(${i},${j})">${o}</div>`;});
+        h+=`</div><div class="fb" id="qfb${i}"></div></div>`;
+        box.innerHTML+=h;
+    });
+}
+function ansQ(qi,oi){
+    const el=document.getElementById('q'+qi);
+    if(el.dataset.done)return;el.dataset.done='1';
+    el.querySelectorAll('.opt').forEach(o=>o.classList.add('dis'));
+    const fb=document.getElementById('qfb'+qi);
+    if(oi===quizData[qi].c){
+        document.getElementById('q'+qi+'o'+oi).classList.add('ok');
+        fb.className='fb show fb-ok';fb.textContent='Correcto! '+quizData[qi].e;
+        addScore('q'+qi);
+    }else{
+        document.getElementById('q'+qi+'o'+oi).classList.add('no');
+        document.getElementById('q'+qi+'o'+quizData[qi].c).classList.add('ok');
+        fb.className='fb show fb-no';fb.textContent='Incorrecto. '+quizData[qi].e;
+    }
+}
+function resetQuiz(){
+    quizData.forEach((_,i)=>delete answered['q'+i]);
+    score=Object.keys(answered).length;
+    document.getElementById('sDisp').textContent=score;
+    const t=parseInt(document.getElementById('sTotal').textContent);
+    document.getElementById('pFill').style.width=(t>0?(score/t)*100:0)+'%';
+    buildQuiz();
+}
+
+// ===== EXERCISES =====
+const exData=[
+    {id:1,title:"Factorial recursivo",diff:"f",
+     desc:'Implementa la funcion fact(n) que calcula el factorial de n recursivamente. fact(0) = 1, fact(n) = n * fact(n-1).',
+     template:`def fact(n):\n    # COMPLETA: caso base y caso recursivo\n    pass\n\n# Test:\nprint(fact(5))  # 120\nprint(fact(0))  # 1`,
+     solution:`def fact(n):\n    if n == 0:\n        return 1\n    else:\n        return n * fact(n - 1)\n\n# Test:\nprint(fact(5))  # 120\nprint(fact(0))  # 1`,
+     checks:[
+         {type:'bad',re:/\bfor\b/,msg:'No uses for - debe ser recursivo'},
+         {type:'bad',re:/\bwhile\b/,msg:'No uses while - debe ser recursivo'},
+         {type:'need',re:/def\s+fact/,msg:'Falta definir la funcion fact'},
+         {type:'need',re:/if\s+.*==\s*0|if\s+n\s*==\s*0/,msg:'Falta caso base (n == 0)'},
+         {type:'need',re:/return\s+1/,msg:'Falta retornar 1 en el caso base'},
+         {type:'need',re:/fact\s*\(\s*n\s*-\s*1\s*\)/,msg:'Falta llamada recursiva fact(n-1)'},
+         {type:'need',re:/return\s+n\s*\*\s*fact/,msg:'Falta retornar n * fact(n-1)'},
+     ]},
+    {id:2,title:"Potencia recursiva",diff:"f",
+     desc:'Implementa potencia(a, b) que calcula a^b recursivamente. a^0 = 1, a^b = a * a^(b-1).',
+     template:`def potencia(a, b):\n    # COMPLETA: caso base y caso recursivo\n    pass\n\n# Test:\nprint(potencia(2, 3))  # 8\nprint(potencia(5, 0))  # 1`,
+     solution:`def potencia(a, b):\n    if b == 0:\n        return 1\n    else:\n        return a * potencia(a, b - 1)\n\n# Test:\nprint(potencia(2, 3))  # 8\nprint(potencia(5, 0))  # 1`,
+     checks:[
+         {type:'bad',re:/\bfor\b/,msg:'No uses for - debe ser recursivo'},
+         {type:'bad',re:/\bwhile\b/,msg:'No uses while - debe ser recursivo'},
+         {type:'need',re:/def\s+potencia/,msg:'Falta definir la funcion potencia'},
+         {type:'need',re:/if\s+.*==\s*0|if\s+b\s*==\s*0/,msg:'Falta caso base (b == 0)'},
+         {type:'need',re:/return\s+1/,msg:'Falta retornar 1 en el caso base'},
+         {type:'need',re:/potencia\s*\(/,msg:'Falta llamada recursiva a potencia()'},
+         {type:'need',re:/return\s+a\s*\*\s*potencia/,msg:'Falta retornar a * potencia(a, b-1)'},
+     ]},
+    {id:3,title:"Fibonacci recursivo",diff:"m",
+     desc:'Implementa fib(n) que retorna el n-esimo numero de Fibonacci. fib(0)=0, fib(1)=1, fib(n)=fib(n-1)+fib(n-2).',
+     template:`def fib(n):\n    # COMPLETA: dos casos base y caso recursivo\n    pass\n\n# Test:\nprint(fib(0))  # 0\nprint(fib(1))  # 1\nprint(fib(6))  # 8`,
+     solution:`def fib(n):\n    if n == 0:\n        return 0\n    elif n == 1:\n        return 1\n    else:\n        return fib(n - 1) + fib(n - 2)\n\n# Test:\nprint(fib(0))  # 0\nprint(fib(1))  # 1\nprint(fib(6))  # 8`,
+     checks:[
+         {type:'bad',re:/\bfor\b/,msg:'No uses for - debe ser recursivo'},
+         {type:'bad',re:/\bwhile\b/,msg:'No uses while - debe ser recursivo'},
+         {type:'need',re:/def\s+fib/,msg:'Falta definir la funcion fib'},
+         {type:'need',re:/if\s+.*==\s*0/,msg:'Falta caso base n == 0'},
+         {type:'need',re:/return\s+0/,msg:'Falta retornar 0 para fib(0)'},
+         {type:'need',re:/==\s*1/,msg:'Falta caso base n == 1'},
+         {type:'need',re:/fib\s*\(\s*n\s*-\s*1\s*\)/,msg:'Falta llamada fib(n-1)'},
+         {type:'need',re:/fib\s*\(\s*n\s*-\s*2\s*\)/,msg:'Falta llamada fib(n-2)'},
+     ]},
+    {id:4,title:"Suma de lista recursiva",diff:"m",
+     desc:'Implementa suma_lista(lista, i=0) que suma todos los elementos de una lista recursivamente usando un indice.',
+     template:`def suma_lista(lista, i=0):\n    # COMPLETA: caso base cuando i llega al final\n    # caso recursivo: lista[i] + suma del resto\n    pass\n\n# Test:\nprint(suma_lista([1, 2, 3, 4, 5]))  # 15`,
+     solution:`def suma_lista(lista, i=0):\n    if i == len(lista):\n        return 0\n    else:\n        return lista[i] + suma_lista(lista, i + 1)\n\n# Test:\nprint(suma_lista([1, 2, 3, 4, 5]))  # 15`,
+     checks:[
+         {type:'bad',re:/\bfor\b/,msg:'No uses for - debe ser recursivo'},
+         {type:'bad',re:/\bwhile\b/,msg:'No uses while - debe ser recursivo'},
+         {type:'need',re:/def\s+suma_lista/,msg:'Falta definir la funcion suma_lista'},
+         {type:'need',re:/len\s*\(/,msg:'Falta usar len() para el caso base'},
+         {type:'need',re:/return\s+0/,msg:'Falta retornar 0 en el caso base'},
+         {type:'need',re:/suma_lista\s*\(/,msg:'Falta llamada recursiva a suma_lista'},
+         {type:'need',re:/lista\s*\[\s*i\s*\]/,msg:'Falta acceder a lista[i]'},
+     ]},
+    {id:5,title:"Torres de Hanoi",diff:"d",
+     desc:'Implementa hanoi(n, origen, destino, auxiliar) que imprime los movimientos para resolver las Torres de Hanoi.',
+     template:`def hanoi(n, origen, destino, auxiliar):\n    # COMPLETA: caso base n==1: mover disco\n    # caso recursivo: mover n-1 a auxiliar, mover disco n, mover n-1 a destino\n    pass\n\n# Test:\nhanoi(3, "A", "C", "B")`,
+     solution:`def hanoi(n, origen, destino, auxiliar):\n    if n == 1:\n        print(f"Mover disco 1 de {origen} a {destino}")\n    else:\n        hanoi(n - 1, origen, auxiliar, destino)\n        print(f"Mover disco {n} de {origen} a {destino}")\n        hanoi(n - 1, auxiliar, destino, origen)\n\n# Test:\nhanoi(3, "A", "C", "B")`,
+     checks:[
+         {type:'bad',re:/\bfor\b/,msg:'No uses for - debe ser recursivo'},
+         {type:'bad',re:/\bwhile\b/,msg:'No uses while - debe ser recursivo'},
+         {type:'need',re:/def\s+hanoi/,msg:'Falta definir la funcion hanoi'},
+         {type:'need',re:/if\s+n\s*==\s*1/,msg:'Falta caso base (n == 1)'},
+         {type:'need',re:/print/,msg:'Falta print para mostrar movimientos'},
+         {type:'need',re:/hanoi\s*\(\s*n\s*-\s*1/,msg:'Falta llamada recursiva hanoi(n-1, ...)'},
+     ]},
+];
+
+function buildExercises(){
+    const box=document.getElementById('exBox');
+    box.innerHTML='';
+    const diffLabels={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffClass={f:'diff-f',m:'diff-m',d:'diff-d'};
+    exData.forEach(ex=>{
+        box.innerHTML+=`
+        <div class="ex-area">
+            <h3>Ejercicio ${ex.id}: ${ex.title} <span class="diff ${diffClass[ex.diff]}">${diffLabels[ex.diff]}</span></h3>
+            <p style="color:#94a3b8;margin:10px 0">${ex.desc}</p>
+            <textarea id="ext${ex.id}" spellcheck="false">${ex.template}</textarea>
+            <button class="btn btn-p" onclick="checkEx(${ex.id})">Verificar</button>
+            <button class="btn btn-s" onclick="showSol(${ex.id})">Ver Solucion</button>
+            <div class="result" id="exr${ex.id}"></div>
+        </div>`;
+    });
+}
+
+function checkEx(id){
+    const ex=exData.find(e=>e.id===id);
+    const code=document.getElementById('ext'+id).value;
+    const r=document.getElementById('exr'+id);
+    let errors=[],goods=[];
+
+    if(/COMPLETA/.test(code)){
+        r.innerHTML='<div style="color:#f59e0b">Todavia no completaste el codigo. Reemplaza los comentarios con tu solucion.</div>';
+        r.className='result show';r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+        return;
+    }
+
+    ex.checks.forEach(ch=>{
+        if(ch.type==='bad' && ch.re.test(code)) errors.push(ch.msg);
+        if(ch.type==='need' && !ch.re.test(code)) errors.push(ch.msg);
+    });
+
+    if(/def\s+\w+/.test(code)) goods.push('Define la funcion');
+    if(/if\s+/.test(code)) goods.push('Tiene caso base');
+    if(/return/.test(code)) goods.push('Usa return');
+    if(!/\bfor\b/.test(code) && !/\bwhile\b/.test(code)) goods.push('No usa loops (correcto para recursion)');
+
+    let h='';
+    if(goods.length){h+='<div style="color:#86efac"><b>Bien hecho:</b><ul>';goods.forEach(g=>h+='<li>'+g+'</li>');h+='</ul></div>';}
+    if(errors.length){h+='<div style="color:#fca5a5;margin-top:8px"><b>Problemas:</b><ul>';errors.forEach(e=>h+='<li>'+e+'</li>');h+='</ul></div>';}
+
+    if(!errors.length){
+        h+='<div style="color:#86efac;font-size:1.1em;margin-top:8px"><b>Excelente! Funcion recursiva correcta.</b></div>';
+        addScore('ex'+id);
+    }
+    r.innerHTML=h;r.className='result show';
+    r.style.background=errors.length?'#1e1b2e':'#1a2e1a';
+    r.style.border='1px solid '+(errors.length?'#a78bfa':'#22c55e');
+}
+
+function showSol(id){
+    const ex=exData.find(e=>e.id===id);
+    document.getElementById('ext'+id).value=ex.solution;
+    const r=document.getElementById('exr'+id);
+    r.innerHTML='<div style="color:#93c5fd">Solucion mostrada. Estudiala y trata de hacerla sin mirar!</div>';
+    r.className='result show';r.style.background='#1e3a5f';r.style.border='1px solid #38bdf8';
+}
+
+// ===== ORDER CHALLENGES =====
+const orderData=[
+    {id:1,title:"Factorial recursivo",diff:"f",lines:[
+        "def fact(n):",
+        "    if n == 0:",
+        "        return 1",
+        "    else:",
+        "        return n * fact(n - 1)"
+    ]},
+    {id:2,title:"Potencia recursiva",diff:"f",lines:[
+        "def potencia(a, b):",
+        "    if b == 0:",
+        "        return 1",
+        "    else:",
+        "        return a * potencia(a, b - 1)"
+    ]},
+    {id:3,title:"Fibonacci recursivo",diff:"m",lines:[
+        "def fib(n):",
+        "    if n == 0:",
+        "        return 0",
+        "    elif n == 1:",
+        "        return 1",
+        "    else:",
+        "        return fib(n-1) + fib(n-2)"
+    ]},
+    {id:4,title:"Maximo de lista con slicing",diff:"d",lines:[
+        "def maximo(lista):",
+        "    if len(lista) == 1:",
+        "        return lista[0]",
+        "    else:",
+        "        m = maximo(lista[1:])",
+        "        if lista[0] > m:",
+        "            return lista[0]",
+        "        else:",
+        "            return m"
+    ]},
+];
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+function buildOrderChallenges(){
+    const box=document.getElementById('orderBox');
+    box.innerHTML='';
+    const diffL={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffC={f:'diff-f',m:'diff-m',d:'diff-d'};
+    let allHTML='';
+    orderData.forEach(ch=>{
+        allHTML+=`
+        <div class="oc" id="oc${ch.id}">
+            <h3>Desafio ${ch.id}: ${ch.title} <span class="diff ${diffC[ch.diff]}">${diffL[ch.diff]}</span></h3>
+            <p style="color:#94a3b8;margin:8px 0">Banco (clic para enviar al destino):</p>
+            <div class="oc-pool" id="ocp${ch.id}"></div>
+            <p style="color:#94a3b8;margin:8px 0">Destino (usa &#9650;&#9660; para reordenar, &#10005; para devolver):</p>
+            <div class="oc-target" id="oct${ch.id}"></div>
+            <button class="btn btn-p" onclick="checkOC(${ch.id})">Verificar</button>
+            <button class="btn btn-w" onclick="resetOC(${ch.id})">Reiniciar</button>
+            <div class="result" id="ocr${ch.id}"></div>
+        </div>`;
+    });
+    box.innerHTML=allHTML;
+    orderData.forEach(ch=>resetOC(ch.id));
+}
+
+function makeOCItem(id, item){
+    const pool=document.getElementById('ocp'+id);
+    const tgt=document.getElementById('oct'+id);
+
+    const d=document.createElement('div');
+    d.className='oc-item';
+    d.dataset.idx=item.idx;
+
+    const arrows=document.createElement('span');
+    arrows.className='oc-arrows';
+    arrows.innerHTML='<button onclick="event.stopPropagation();moveOC(this.closest(\'.oc-item\'),-1)">&#9650;</button><button onclick="event.stopPropagation();moveOC(this.closest(\'.oc-item\'),1)">&#9660;</button>';
+    d.appendChild(arrows);
+
+    const span=document.createElement('span');
+    span.className='item-text';
+    span.textContent=item.text;
+    d.appendChild(span);
+
+    const ret=document.createElement('button');
+    ret.className='oc-ret';
+    ret.textContent='\u2715';
+    ret.onclick=function(e){e.stopPropagation();pool.appendChild(d);d.classList.remove('right','wrong');};
+    d.appendChild(ret);
+
+    d.onclick=function(){
+        if(this.parentElement===pool){
+            tgt.appendChild(this);
+            this.classList.remove('right','wrong');
+        }
+    };
+    return d;
+}
+
+function moveOC(el, dir){
+    const parent=el.parentElement;
+    if(dir===-1 && el.previousElementSibling){
+        parent.insertBefore(el, el.previousElementSibling);
+    }else if(dir===1 && el.nextElementSibling){
+        parent.insertBefore(el.nextElementSibling, el);
+    }
+    el.classList.remove('right','wrong');
+}
+
+function resetOC(id){
+    const ch=orderData.find(c=>c.id===id);
+    const pool=document.getElementById('ocp'+id);
+    const tgt=document.getElementById('oct'+id);
+    pool.innerHTML='';tgt.innerHTML='';
+    document.getElementById('ocr'+id).className='result';
+
+    const shuffled=shuffle(ch.lines.map((l,i)=>({text:l,idx:i})));
+    shuffled.forEach(item=>{
+        pool.appendChild(makeOCItem(id, item));
+    });
+}
+
+function checkOC(id){
+    const ch=orderData.find(c=>c.id===id);
+    const tgt=document.getElementById('oct'+id);
+    const items=tgt.querySelectorAll('.oc-item');
+    const r=document.getElementById('ocr'+id);
+
+    if(items.length<ch.lines.length){
+        r.innerHTML='<div style="color:#f59e0b">Faltan lineas. Haz clic en cada una del banco para moverla.</div>';
+        r.className='result show';r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+        return;
+    }
+
+    let allOk=true;
+    items.forEach((item,i)=>{
+        if(parseInt(item.dataset.idx)===i){
+            item.classList.add('right');item.classList.remove('wrong');
+        }else{
+            item.classList.add('wrong');item.classList.remove('right');
+            allOk=false;
+        }
+    });
+
+    if(allOk){
+        r.innerHTML='<div style="color:#86efac;font-size:1.1em"><b>Perfecto! Orden correcto.</b></div>';
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';
+        addScore('oc'+id);
+    }else{
+        r.innerHTML='<div style="color:#fca5a5"><b>Hay errores.</b> Verde = posicion correcta. Rojo = posicion incorrecta. Haz clic en las rojas para devolverlas y reintenta.</div>';
+        r.style.background='#1e1b2e';r.style.border='1px solid #ef4444';
+    }
+    r.className='result show';
+}
+
+// ===== ERROR FINDERS (multiple choice) =====
+const errData=[
+    {id:1,title:"Codigo 1 - Factorial sin base",diff:"f",
+     consigna:"Se pide calcular el factorial de n recursivamente.",
+     code:`def fact(n):
+    return n * fact(n - 1)
+
+print(fact(5))`,
+     question:"Cuales son los errores de este codigo?",
+     options:[
+         {text:"Falta el caso base (if n == 0: return 1)",correct:true},
+         {text:"La recursion es infinita, causara RecursionError",correct:true},
+         {text:"fact(0) llamara a fact(-1) y seguira infinitamente",correct:true},
+         {text:"La multiplicacion esta mal",correct:false},
+         {text:"Falta el else",correct:false},
+         {text:"print() esta mal usado",correct:false},
+     ]},
+    {id:2,title:"Codigo 2 - Potencia con loop",diff:"m",
+     consigna:"Se pide calcular a^b recursivamente.",
+     code:`def potencia(a, b):
+    resultado = 1
+    while b > 0:
+        resultado *= a
+        b -= 1
+    return resultado`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"Usa while en vez de recursion (no es recursivo)",correct:true},
+         {text:"No tiene llamada recursiva a si mismo",correct:true},
+         {text:"El resultado es incorrecto",correct:false},
+         {text:"Falta caso base",correct:false},
+         {text:"Falta return",correct:false},
+         {text:"La variable resultado no deberia existir",correct:false},
+     ]},
+    {id:3,title:"Codigo 3 - Fibonacci incompleto",diff:"m",
+     consigna:"Se pide calcular el n-esimo Fibonacci recursivamente.",
+     code:`def fib(n):
+    if n == 0:
+        return 0
+    else:
+        return fib(n - 1) + fib(n - 2)
+
+print(fib(5))`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"Falta el caso base para n == 1 (debe retornar 1)",correct:true},
+         {text:"fib(1) llamara a fib(0) + fib(-1), entrando en recursion infinita con negativos",correct:true},
+         {text:"El caso recursivo esta mal",correct:false},
+         {text:"fib(0) esta mal",correct:false},
+         {text:"Deberia usar while",correct:false},
+         {text:"Falta parametro extra",correct:false},
+     ]},
+    {id:4,title:"Codigo 4 - Suma lista con global",diff:"d",
+     consigna:"Se pide sumar los elementos de una lista recursivamente.",
+     code:`total = 0
+
+def suma_lista(lista, i=0):
+    global total
+    if i < len(lista):
+        total += lista[i]
+        suma_lista(lista, i + 1)
+
+suma_lista([1, 2, 3, 4, 5])
+print(total)`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"Usa variable global en vez de return (comunicacion incorrecta)",correct:true},
+         {text:"No usa return para devolver el resultado",correct:true},
+         {text:"La comunicacion debe ser por parametros y return, no variables globales",correct:true},
+         {text:"El caso base esta mal",correct:false},
+         {text:"La llamada recursiva no reduce el problema",correct:false},
+         {text:"len() no deberia usarse",correct:false},
+     ]},
+];
+
+function buildErrorFinders(){
+    const box=document.getElementById('errBox');
+    box.innerHTML='';
+    const diffL={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffC={f:'diff-f',m:'diff-m',d:'diff-d'};
+    errData.forEach(ef=>{
+        let h=`<div class="oc" id="ef${ef.id}">
+            <h3>${ef.title} <span class="diff ${diffC[ef.diff]}">${diffL[ef.diff]}</span></h3>
+            <p style="color:#93c5fd;margin:8px 0"><b>Consigna:</b> ${ef.consigna}</p>
+            <pre>${ef.code}</pre>
+            <p style="margin:10px 0;font-weight:bold">${ef.question}</p>
+            <div id="efo${ef.id}">`;
+        ef.options.forEach((o,i)=>{
+            h+=`<div class="ef-opt" id="ef${ef.id}o${i}" onclick="toggleEfOpt(this)">${o.text}</div>`;
+        });
+        h+=`</div>
+            <button class="btn btn-p" onclick="checkEF(${ef.id})" style="margin-top:10px">Verificar</button>
+            <div class="result" id="efr${ef.id}"></div>
+        </div>`;
+        box.innerHTML+=h;
+    });
+}
+
+function toggleEfOpt(el){
+    if(el.classList.contains('ans-ok')||el.classList.contains('ans-no'))return;
+    el.classList.toggle('selected');
+}
+
+function checkEF(id){
+    const ef=errData.find(e=>e.id===id);
+    const r=document.getElementById('efr'+id);
+    let allCorrect=true;
+
+    ef.options.forEach((o,i)=>{
+        const el=document.getElementById('ef'+id+'o'+i);
+        const selected=el.classList.contains('selected');
+        el.classList.remove('selected');
+        if(o.correct && selected){
+            el.classList.add('ans-ok');
+        }else if(o.correct && !selected){
+            el.classList.add('ans-ok');
+            el.innerHTML+=' <span style="color:#fde68a"> &larr; te falto este!</span>';
+            allCorrect=false;
+        }else if(!o.correct && selected){
+            el.classList.add('ans-no');
+            el.innerHTML+=' <span style="color:#fca5a5"> &larr; esto NO es un error</span>';
+            allCorrect=false;
+        }
+        el.onclick=null;
+    });
+
+    if(allCorrect){
+        r.innerHTML='<div style="color:#86efac;font-size:1.1em"><b>Perfecto! Identificaste todos los errores correctamente.</b></div>';
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';
+        addScore('ef'+id);
+    }else{
+        r.innerHTML='<div style="color:#f59e0b">Revisa las marcas. Verde = error real. Rojo = no era un error.</div>';
+        r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+    }
+    r.className='result show';
+}
+
+// ===== TRACE CHALLENGES =====
+const traceData=[
+    {id:1,title:"Factorial de 4",diff:"f",
+     code:`def fact(n):
+    if n == 0:
+        return 1
+    else:
+        return n * fact(n - 1)`,
+     call:"fact(4)",
+     answer:24,
+     trace:[
+         {depth:0,text:"fact(4)",type:"call"},
+         {depth:1,text:"fact(3)",type:"call"},
+         {depth:2,text:"fact(2)",type:"call"},
+         {depth:3,text:"fact(1)",type:"call"},
+         {depth:4,text:"fact(0)",type:"base"},
+         {depth:4,text:"return 1",type:"ret"},
+         {depth:3,text:"return 1 * 1 = 1",type:"ret"},
+         {depth:2,text:"return 2 * 1 = 2",type:"ret"},
+         {depth:1,text:"return 3 * 2 = 6",type:"ret"},
+         {depth:0,text:"return 4 * 6 = 24",type:"ret"},
+     ]},
+    {id:2,title:"Potencia 3^3",diff:"f",
+     code:`def potencia(a, b):
+    if b == 0:
+        return 1
+    else:
+        return a * potencia(a, b - 1)`,
+     call:"potencia(3, 3)",
+     answer:27,
+     trace:[
+         {depth:0,text:"potencia(3, 3)",type:"call"},
+         {depth:1,text:"potencia(3, 2)",type:"call"},
+         {depth:2,text:"potencia(3, 1)",type:"call"},
+         {depth:3,text:"potencia(3, 0)",type:"base"},
+         {depth:3,text:"return 1",type:"ret"},
+         {depth:2,text:"return 3 * 1 = 3",type:"ret"},
+         {depth:1,text:"return 3 * 3 = 9",type:"ret"},
+         {depth:0,text:"return 3 * 9 = 27",type:"ret"},
+     ]},
+    {id:3,title:"Fibonacci de 5",diff:"m",
+     code:`def fib(n):
+    if n == 0:
+        return 0
+    elif n == 1:
+        return 1
+    else:
+        return fib(n-1) + fib(n-2)`,
+     call:"fib(5)",
+     answer:5,
+     trace:[
+         {depth:0,text:"fib(5)",type:"call"},
+         {depth:1,text:"fib(4) + fib(3)",type:"call"},
+         {depth:2,text:"fib(4) = fib(3) + fib(2)",type:"call"},
+         {depth:3,text:"fib(3) = fib(2) + fib(1) = 1 + 1 = 2",type:"call"},
+         {depth:3,text:"fib(2) = fib(1) + fib(0) = 1 + 0 = 1",type:"call"},
+         {depth:2,text:"fib(4) = 2 + 1 = 3",type:"ret"},
+         {depth:2,text:"fib(3) = fib(2) + fib(1) = 1 + 1 = 2",type:"call"},
+         {depth:1,text:"fib(5) = fib(4) + fib(3) = 3 + 2",type:"ret"},
+         {depth:0,text:"return 5",type:"ret"},
+     ]},
+    {id:4,title:"Suma de lista [2, 7, 3]",diff:"m",
+     code:`def suma(lista, i=0):
+    if i == len(lista):
+        return 0
+    else:
+        return lista[i] + suma(lista, i+1)`,
+     call:"suma([2, 7, 3])",
+     answer:12,
+     trace:[
+         {depth:0,text:"suma([2,7,3], 0)",type:"call"},
+         {depth:1,text:"lista[0]=2, llama suma([2,7,3], 1)",type:"call"},
+         {depth:2,text:"lista[1]=7, llama suma([2,7,3], 2)",type:"call"},
+         {depth:3,text:"lista[2]=3, llama suma([2,7,3], 3)",type:"call"},
+         {depth:4,text:"i==3 == len(lista) -> caso base",type:"base"},
+         {depth:4,text:"return 0",type:"ret"},
+         {depth:3,text:"return 3 + 0 = 3",type:"ret"},
+         {depth:2,text:"return 7 + 3 = 10",type:"ret"},
+         {depth:1,text:"return 2 + 10 = 12",type:"ret"},
+     ]},
+    {id:5,title:"Contar digitos de 4521",diff:"m",
+     code:`def contar_digitos(n):
+    if n < 10:
+        return 1
+    else:
+        return 1 + contar_digitos(n // 10)`,
+     call:"contar_digitos(4521)",
+     answer:4,
+     trace:[
+         {depth:0,text:"contar_digitos(4521)",type:"call"},
+         {depth:1,text:"4521 >= 10, llama 1 + contar_digitos(452)",type:"call"},
+         {depth:2,text:"452 >= 10, llama 1 + contar_digitos(45)",type:"call"},
+         {depth:3,text:"45 >= 10, llama 1 + contar_digitos(4)",type:"call"},
+         {depth:4,text:"4 < 10 -> caso base",type:"base"},
+         {depth:4,text:"return 1",type:"ret"},
+         {depth:3,text:"return 1 + 1 = 2",type:"ret"},
+         {depth:2,text:"return 1 + 2 = 3",type:"ret"},
+         {depth:1,text:"return 1 + 3 = 4",type:"ret"},
+     ]},
+    {id:6,title:"Invertir string 'hola'",diff:"m",
+     code:`def invertir(s):
+    if len(s) <= 1:
+        return s
+    else:
+        return invertir(s[1:]) + s[0]`,
+     call:'invertir("hola")',
+     answer:"aloh",
+     answerIsString:true,
+     trace:[
+         {depth:0,text:'invertir("hola")',type:"call"},
+         {depth:1,text:'invertir("ola") + "h"',type:"call"},
+         {depth:2,text:'invertir("la") + "o"',type:"call"},
+         {depth:3,text:'invertir("a") + "l"',type:"call"},
+         {depth:4,text:'len("a")<=1 -> caso base',type:"base"},
+         {depth:4,text:'return "a"',type:"ret"},
+         {depth:3,text:'return "a" + "l" = "al"',type:"ret"},
+         {depth:2,text:'return "al" + "o" = "alo"',type:"ret"},
+         {depth:1,text:'return "alo" + "h" = "aloh"',type:"ret"},
+     ]},
+    {id:7,title:"Potencia 2^5",diff:"f",
+     code:`def potencia(a, b):
+    if b == 0:
+        return 1
+    else:
+        return a * potencia(a, b - 1)`,
+     call:"potencia(2, 5)",
+     answer:32,
+     trace:[
+         {depth:0,text:"potencia(2, 5)",type:"call"},
+         {depth:1,text:"potencia(2, 4)",type:"call"},
+         {depth:2,text:"potencia(2, 3)",type:"call"},
+         {depth:3,text:"potencia(2, 2)",type:"call"},
+         {depth:4,text:"potencia(2, 1)",type:"call"},
+         {depth:5,text:"potencia(2, 0)",type:"base"},
+         {depth:5,text:"return 1",type:"ret"},
+         {depth:4,text:"return 2 * 1 = 2",type:"ret"},
+         {depth:3,text:"return 2 * 2 = 4",type:"ret"},
+         {depth:2,text:"return 2 * 4 = 8",type:"ret"},
+         {depth:1,text:"return 2 * 8 = 16",type:"ret"},
+         {depth:0,text:"return 2 * 16 = 32",type:"ret"},
+     ]},
+    {id:8,title:"Suma recursiva 1 a 5",diff:"m",
+     code:`def suma_hasta(n):
+    if n == 1:
+        return 1
+    else:
+        return n + suma_hasta(n - 1)`,
+     call:"suma_hasta(5)",
+     answer:15,
+     trace:[
+         {depth:0,text:"suma_hasta(5)",type:"call"},
+         {depth:1,text:"5 + suma_hasta(4)",type:"call"},
+         {depth:2,text:"4 + suma_hasta(3)",type:"call"},
+         {depth:3,text:"3 + suma_hasta(2)",type:"call"},
+         {depth:4,text:"2 + suma_hasta(1)",type:"call"},
+         {depth:5,text:"n == 1 -> caso base",type:"base"},
+         {depth:5,text:"return 1",type:"ret"},
+         {depth:4,text:"return 2 + 1 = 3",type:"ret"},
+         {depth:3,text:"return 3 + 3 = 6",type:"ret"},
+         {depth:2,text:"return 4 + 6 = 10",type:"ret"},
+         {depth:1,text:"return 5 + 10 = 15",type:"ret"},
+     ]},
+];
+
+function buildTraceChallenges(){
+    const box=document.getElementById('traceBox');
+    box.innerHTML='';
+    const diffL={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffC={f:'diff-f',m:'diff-m',d:'diff-d'};
+    traceData.forEach(tr=>{
+        box.innerHTML+=`
+        <div class="trace-card" id="tr${tr.id}">
+            <h3>Traza ${tr.id}: ${tr.title} <span class="diff ${diffC[tr.diff]}">${diffL[tr.diff]}</span></h3>
+            <pre>${tr.code}</pre>
+            <p style="margin:12px 0"><b>Llamada:</b> <code style="color:#38bdf8;font-size:1.1em">${tr.call}</code></p>
+            <p style="margin:8px 0">Que valor retorna? Escribe tu respuesta:</p>
+            <div style="display:flex;align-items:center;gap:10px;margin:10px 0">
+                <input type="text" class="trace-input" id="tri${tr.id}" placeholder="?">
+                <button class="btn btn-p" onclick="checkTrace(${tr.id})">Verificar</button>
+                <button class="btn btn-s" onclick="showTrace(${tr.id})">Ver Traza</button>
+            </div>
+            <div class="result" id="trr${tr.id}"></div>
+            <div class="trace-steps" id="trs${tr.id}"></div>
+        </div>`;
+    });
+}
+
+function checkTrace(id){
+    const tr=traceData.find(t=>t.id===id);
+    const input=document.getElementById('tri'+id).value.trim();
+    const r=document.getElementById('trr'+id);
+
+    if(!input){
+        r.innerHTML='<div style="color:#f59e0b">Escribe tu respuesta antes de verificar.</div>';
+        r.className='result show';r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+        return;
+    }
+
+    let correct=false;
+    if(tr.answerIsString){
+        correct=(input===String(tr.answer) || input==='"'+tr.answer+'"' || input==="'"+tr.answer+"'");
+    }else{
+        correct=(parseFloat(input)===tr.answer);
+    }
+
+    if(correct){
+        r.innerHTML=`<div style="color:#86efac;font-size:1.1em"><b>Correcto! El resultado es ${tr.answer}.</b></div>`;
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';
+        addScore('tr'+id);
+    }else{
+        r.innerHTML=`<div style="color:#fca5a5"><b>Incorrecto.</b> El resultado correcto es <span style="color:#38bdf8;font-weight:bold">${tr.answer}</span>. Mira la traza para entender por que.</div>`;
+        r.style.background='#1e1b2e';r.style.border='1px solid #ef4444';
+    }
+    r.className='result show';
+    showTrace(id);
+}
+
+function showTrace(id){
+    const tr=traceData.find(t=>t.id===id);
+    const box=document.getElementById('trs'+id);
+    let h='<h3 style="color:#a78bfa;margin-bottom:10px">Traza paso a paso:</h3>';
+    tr.trace.forEach(step=>{
+        const indent='&nbsp;&nbsp;'.repeat(step.depth);
+        let cls='call';
+        let arrow='&#8627;';
+        if(step.type==='base'){cls='base';arrow='&#9632;';}
+        if(step.type==='ret'){cls='ret';arrow='&#8592;';}
+        h+=`<div class="trace-step"><span class="indent">${indent}</span><span class="${cls}">${arrow} ${step.text}</span></div>`;
+    });
+    box.innerHTML=h;
+    box.classList.add('show');
+}
+
+// ===== INIT =====
+init();
+</script>
+</body>
+</html>

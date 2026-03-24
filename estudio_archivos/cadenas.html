@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadenas en Python - Clases 5 y 6</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.7}
+        .container{max-width:920px;margin:0 auto;padding:20px}
+        h1{text-align:center;font-size:2.2em;margin:30px 0;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        h2{color:#38bdf8;margin:30px 0 15px;font-size:1.5em;border-bottom:2px solid #1e3a5f;padding-bottom:8px}
+        h3{color:#a78bfa;margin:15px 0 10px}
+        .tabs{display:flex;flex-wrap:wrap;gap:5px;margin:20px 0;justify-content:center}
+        .tab-btn{padding:10px 18px;background:#1e293b;border:2px solid #334155;color:#94a3b8;border-radius:8px;cursor:pointer;font-size:.95em;transition:.3s}
+        .tab-btn:hover{border-color:#38bdf8;color:#38bdf8}
+        .tab-btn.active{background:#1e3a5f;border-color:#38bdf8;color:#38bdf8;font-weight:bold}
+        .section{display:none;animation:fadeIn .4s}.section.active{display:block}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .card{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0;border-left:4px solid #38bdf8}
+        .card.danger{border-left-color:#ef4444;background:#1e1b2e}
+        .card.success{border-left-color:#22c55e;background:#1a2e1a}
+        .card.warning{border-left-color:#f59e0b;background:#2e2a1a}
+        pre{background:#0c1222;border:1px solid #334155;border-radius:8px;padding:15px;overflow-x:auto;font-family:Consolas,'Courier New',monospace;font-size:.9em;margin:10px 0}
+        code{font-family:Consolas,monospace}
+        .kw{color:#c084fc}.str{color:#86efac}.cmt{color:#64748b;font-style:italic}.fn{color:#38bdf8}
+        .err-hl{background:rgba(239,68,68,.2);display:block;padding:2px 0}
+        .ok-hl{background:rgba(34,197,94,.15);display:block;padding:2px 0}
+        .label{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.8em;font-weight:bold;margin:3px}
+        .label-ok{background:#166534;color:#86efac}.label-bad{background:#7f1d1d;color:#fca5a5}.label-info{background:#1e3a5f;color:#93c5fd}
+        .comparison{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
+        @media(max-width:700px){.comparison{grid-template-columns:1fr}}
+        .diagram{display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0;flex-wrap:wrap}
+        .diagram-box{padding:15px 25px;border-radius:10px;font-weight:bold;text-align:center}
+        .diagram-arrow{font-size:1.5em;color:#64748b}
+        .step-number{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:#2563eb;border-radius:50%;color:white;font-weight:bold;margin-right:8px}
+        ul,ol{margin:10px 0 10px 25px}li{margin:5px 0}
+        .diff{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.75em;font-weight:bold;margin-left:10px}
+        .diff-f{background:#166534;color:#86efac}.diff-m{background:#854d0e;color:#fde68a}.diff-d{background:#7f1d1d;color:#fca5a5}
+
+        .progress-bar{width:100%;height:8px;background:#334155;border-radius:4px;margin:10px 0;overflow:hidden}
+        .progress-fill{height:100%;background:linear-gradient(90deg,#38bdf8,#818cf8);border-radius:4px;transition:width .5s}
+        .score-display{text-align:center;padding:15px;background:#1e293b;border-radius:12px;margin:15px 0;font-size:1.2em}
+        .score-num{color:#38bdf8;font-weight:bold;font-size:1.5em}
+
+        .btn{padding:10px 25px;border:none;border-radius:8px;cursor:pointer;font-size:1em;font-weight:bold;margin:8px 5px 8px 0;transition:.3s}
+        .btn-p{background:#2563eb;color:white}.btn-p:hover{background:#1d4ed8}
+        .btn-s{background:#16a34a;color:white}.btn-s:hover{background:#15803d}
+        .btn-w{background:#d97706;color:white}.btn-w:hover{background:#b45309}
+        .btn-d{background:#dc2626;color:white}.btn-d:hover{background:#b91c1c}
+
+        .ex-area{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0}
+        .ex-area textarea{width:100%;min-height:240px;background:#0c1222;color:#e2e8f0;border:2px solid #334155;border-radius:8px;padding:15px;font-family:Consolas,monospace;font-size:.95em;resize:vertical;tab-size:4}
+        .ex-area textarea:focus{outline:none;border-color:#38bdf8}
+
+        .result{margin-top:10px;padding:15px;border-radius:8px;display:none}
+        .result.show{display:block}
+
+        .oc{background:#1e293b;border-radius:12px;padding:20px;margin:20px 0;border:2px solid #334155}
+        .oc-pool{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:#0f172a;border-radius:8px;min-height:50px;margin:10px 0}
+        .oc-target{border:2px dashed #475569;border-radius:8px;padding:10px;margin:10px 0;min-height:60px}
+        .oc-target .oc-item{width:100%;margin:3px 0}
+        .oc-item{padding:10px 16px;background:#2563eb;color:white;border-radius:6px;cursor:pointer;user-select:none;font-family:Consolas,monospace;font-size:.9em;transition:.2s;display:flex;align-items:center;gap:8px}
+        .oc-pool .oc-item{display:inline-flex}
+        .oc-item:hover{background:#3b82f6}
+        .oc-item.right{background:#16a34a!important}.oc-item.wrong{background:#dc2626!important}
+        .oc-item .item-text{flex:1}
+        .oc-arrows{display:flex;flex-direction:column;gap:1px;margin-right:4px}
+        .oc-arrows button{background:rgba(255,255,255,.2);border:none;color:white;cursor:pointer;font-size:.7em;padding:1px 5px;border-radius:3px;line-height:1}
+        .oc-arrows button:hover{background:rgba(255,255,255,.4)}
+        .oc-pool .oc-arrows{display:none}
+        .oc-ret{background:rgba(255,255,255,.2);border:none;color:white;cursor:pointer;font-size:.8em;padding:2px 8px;border-radius:3px;margin-left:4px}
+        .oc-ret:hover{background:rgba(239,68,68,.5)}
+        .oc-pool .oc-ret{display:none}
+
+        .question{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0;border:2px solid #334155}
+        .question>p{margin-bottom:12px;font-weight:bold}
+        .opts{display:flex;flex-direction:column;gap:8px}
+        .opt{padding:12px 15px;background:#0f172a;border:2px solid #334155;border-radius:8px;cursor:pointer;transition:.3s}
+        .opt:hover{border-color:#38bdf8;background:#1e3a5f}
+        .opt.ok{border-color:#22c55e!important;background:#14532d!important;color:#86efac}
+        .opt.no{border-color:#ef4444!important;background:#7f1d1d!important;color:#fca5a5}
+        .opt.dis{pointer-events:none;opacity:.7}
+        .fb{margin-top:10px;padding:10px 15px;border-radius:8px;display:none;font-size:.95em}
+        .fb.show{display:block}
+        .fb.fb-ok{background:#14532d;color:#86efac;border:1px solid #22c55e}
+        .fb.fb-no{background:#7f1d1d;color:#fca5a5;border:1px solid #ef4444}
+
+        .ef-block{background:#0c1222;border:1px solid #334155;border-radius:8px;padding:15px;margin:10px 0;font-family:Consolas,monospace;font-size:.9em;line-height:2}
+        .ef-opt{padding:8px 15px;background:#0f172a;border:2px solid #334155;border-radius:8px;cursor:pointer;transition:.3s;margin:5px 0;display:block}
+        .ef-opt:hover{border-color:#38bdf8}
+        .ef-opt.selected{border-color:#f59e0b;background:#2e2a1a}
+        .ef-opt.ans-ok{border-color:#22c55e!important;background:#14532d!important}
+        .ef-opt.ans-no{border-color:#ef4444!important;background:#7f1d1d!important}
+
+        /* Que devuelve section */
+        .qd-input{width:100%;background:#0c1222;color:#e2e8f0;border:2px solid #334155;border-radius:8px;padding:12px 15px;font-family:Consolas,monospace;font-size:1em;margin:8px 0}
+        .qd-input:focus{outline:none;border-color:#38bdf8}
+
+        table.method-table{width:100%;border-collapse:collapse;margin:10px 0}
+        table.method-table td,table.method-table th{padding:8px 12px;border-bottom:1px solid #334155;text-align:left}
+        table.method-table th{color:#38bdf8;font-size:.9em}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Cadenas en Python - Clases 5 y 6</h1>
+    <p style="text-align:center;color:#94a3b8;margin-bottom:10px;">Guia interactiva - Strings (Primera y Segunda Parte)</p>
+
+    <div class="progress-bar"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
+    <div class="score-display">Puntaje: <span class="score-num" id="sDisp">0</span> / <span id="sTotal">0</span></div>
+
+    <div class="tabs" id="tabBar"></div>
+
+    <!-- ===== TEORIA ===== -->
+    <div class="section active" id="sec-teoria">
+        <h2>Teoria Completa</h2>
+
+        <!-- Concepto -->
+        <div class="card"><h3>Concepto de Cadena</h3>
+            <ul>
+                <li>Una <b>cadena de caracteres (string)</b> es un conjunto de 0 o mas caracteres.</li>
+                <li>Python 3 usa codificacion <b>UTF-8</b>, que soporta caracteres regionales (enie, tildes, etc).</li>
+                <li>Las cadenas son <b>secuencias inmutables</b> de caracteres.</li>
+            </ul>
+        </div>
+
+        <!-- Constantes de cadena -->
+        <div class="card"><h3>Constantes de cadena</h3>
+<pre>cad1 = <span class="str">"Lunes"</span>           <span class="cmt"># comillas dobles</span>
+cad2 = <span class="str">'Martes'</span>          <span class="cmt"># comillas simples</span>
+marca = <span class="str">"Mc. Donald's"</span>   <span class="cmt"># dobles permiten simple adentro</span>
+frase = <span class="str">'Dijo "Ya voy"'</span>  <span class="cmt"># simples permiten dobles adentro</span></pre>
+        </div>
+
+        <div class="card"><h3>Cadenas multilinea y continuacion</h3>
+<pre><span class="cmt"># Continuacion con barra invertida:</span>
+zen = <span class="str">"Hermoso es mejor que feo. \
+Explicito es mejor que implicito."</span>
+
+<span class="cmt"># Triple comillas (retiene formato):</span>
+cancion = <span class="str">'''Primera linea
+Segunda linea
+Tercera linea'''</span></pre>
+        </div>
+
+        <!-- Secuencias de escape -->
+        <div class="card warning"><h3>Secuencias de escape</h3>
+            <table class="method-table">
+                <tr><th>Secuencia</th><th>Significado</th></tr>
+                <tr><td><code>\n</code></td><td>Salto de linea</td></tr>
+                <tr><td><code>\t</code></td><td>Tabulador</td></tr>
+                <tr><td><code>\'</code></td><td>Comilla simple</td></tr>
+                <tr><td><code>\"</code></td><td>Comilla doble</td></tr>
+                <tr><td><code>\\</code></td><td>Barra invertida</td></tr>
+            </table>
+<pre><span class="fn">print</span>(<span class="str">"Lunes \nMartes \nMiercoles"</span>)
+<span class="cmt"># Imprime cada dia en una linea separada</span></pre>
+        </div>
+
+        <!-- Raw strings -->
+        <div class="card"><h3>Cadenas crudas (raw)</h3>
+<pre>ruta = <span class="kw">r</span><span class="str">"c:\nuevo\datos.txt"</span>
+<span class="cmt"># La r antes de las comillas evita interpretar \n como salto</span></pre>
+        </div>
+
+        <!-- Similitudes con listas -->
+        <h2>Similitudes con Listas</h2>
+        <div class="card success"><h3>Indexacion y Slicing</h3>
+<pre>cad = <span class="str">"Lunes"</span>
+<span class="fn">print</span>(cad[<span class="str">2</span>])     <span class="cmt"># n  (indice base 0)</span>
+<span class="fn">print</span>(cad[<span class="str">1:3</span>])   <span class="cmt"># un (rebanada)</span></pre>
+        </div>
+
+        <div class="card success"><h3>Concatenacion (+) y Replicacion (*)</h3>
+<pre>saludo = <span class="str">"Hola "</span> + <span class="str">"Mundo"</span>   <span class="cmt"># "Hola Mundo"</span>
+risa = <span class="str">"ja"</span> * <span class="str">5</span>              <span class="cmt"># "jajajajaja"</span>
+sep = <span class="str">"-"</span> * <span class="str">80</span>               <span class="cmt"># 80 guiones</span></pre>
+        </div>
+
+        <div class="card success"><h3>Funciones compartidas</h3>
+            <table class="method-table">
+                <tr><th>Funcion/Operador</th><th>Ejemplo</th><th>Resultado</th></tr>
+                <tr><td><code>len()</code></td><td><code>len("Lunes")</code></td><td>5</td></tr>
+                <tr><td><code>in</code></td><td><code>"es" in "Lunes"</code></td><td>True</td></tr>
+                <tr><td><code>not in</code></td><td><code>"x" not in "Lunes"</code></td><td>True</td></tr>
+                <tr><td><code>max()</code></td><td><code>max("Lunes")</code></td><td>"u"</td></tr>
+                <tr><td><code>min()</code></td><td><code>min("Lunes")</code></td><td>"L"</td></tr>
+                <tr><td><code>index()</code></td><td><code>"Lunes".index("es")</code></td><td>3</td></tr>
+                <tr><td><code>count()</code></td><td><code>"Lunes".count("es")</code></td><td>1</td></tr>
+            </table>
+        </div>
+
+        <!-- Diferencia clave: inmutabilidad -->
+        <div class="card danger"><h3>Diferencia clave: INMUTABILIDAD</h3>
+            <p>Las listas son <b>mutables</b>, las cadenas son <b>inmutables</b>. No se pueden modificar directamente.</p>
+<pre><span class="err-hl">cad = <span class="str">"Hola"</span>
+cad[<span class="str">0</span>] = <span class="str">"h"</span>   <span class="cmt"># ERROR! TypeError</span></span>
+<span class="ok-hl">cad = <span class="str">"h"</span> + cad[<span class="str">1:</span>]  <span class="cmt"># Se crea una NUEVA cadena: "hola"</span></span></pre>
+            <p style="color:#fca5a5;margin-top:10px">Los metodos de cadenas <b>devuelven una nueva cadena</b>, sin alterar la original.</p>
+        </div>
+
+        <div class="card warning"><h3>No existe reverse() - Usar [::-1]</h3>
+<pre>original = <span class="str">"Hola"</span>
+invertida = original[<span class="str">::-1</span>]  <span class="cmt"># "aloH"</span></pre>
+        </div>
+
+        <!-- Comparacion y conversion -->
+        <div class="card"><h3>Comparacion</h3>
+            <p>Se comparan <b>alfabeticamente</b> (como en un diccionario). Mayusculas van antes que minusculas.</p>
+<pre><span class="str">"Ana"</span> &lt; <span class="str">"Beto"</span>    <span class="cmt"># True</span>
+<span class="str">"ana"</span> &gt; <span class="str">"Ana"</span>     <span class="cmt"># True (minusc > mayusc en UTF-8)</span></pre>
+        </div>
+
+        <div class="card"><h3>Conversion: str(), int(), float()</h3>
+<pre>c = <span class="str">75</span>
+msg = <span class="str">"Precio: "</span> + <span class="fn">str</span>(c) + <span class="str">" dolares"</span>  <span class="cmt"># concatenar numero</span>
+
+dato = <span class="str">"25"</span>
+n = <span class="fn">int</span>(dato)       <span class="cmt"># 25 (entero)</span>
+
+valor = <span class="str">"3.1416"</span>
+pi = <span class="fn">float</span>(valor)   <span class="cmt"># 3.1416 (real)</span></pre>
+        </div>
+
+        <!-- Metodos Clase 5: split, join, replace -->
+        <h2>Metodos - Clase 5</h2>
+        <div class="card"><h3>split([sep])</h3>
+            <p>Divide la cadena en una lista. Si se omite sep, separa por espacios (multiples espacios = uno).</p>
+<pre>frase = <span class="str">"Hola Mundo"</span>
+lista = frase.<span class="fn">split</span>()        <span class="cmt"># ['Hola', 'Mundo']</span>
+
+fecha = <span class="str">"21/9/2020"</span>
+d, m, a = fecha.<span class="fn">split</span>(<span class="str">'/'</span>)  <span class="cmt"># d='21', m='9', a='2020'</span>
+
+<span class="cmt"># Diferencia importante:</span>
+cad = <span class="str">"Hola   Mundo"</span>   <span class="cmt"># 3 espacios</span>
+cad.<span class="fn">split</span>()          <span class="cmt"># ['Hola', 'Mundo']           (sin param)</span>
+cad.<span class="fn">split</span>(<span class="str">' '</span>)       <span class="cmt"># ['Hola', '', '', 'Mundo']   (con ' ')</span></pre>
+        </div>
+
+        <div class="card"><h3>sep.join(secuencia)</h3>
+            <p>Une los elementos de una secuencia con el separador.</p>
+<pre>dias = [<span class="str">"lunes"</span>, <span class="str">"martes"</span>, <span class="str">"jueves"</span>]
+cad = <span class="str">' - '</span>.<span class="fn">join</span>(dias)
+<span class="fn">print</span>(cad)  <span class="cmt"># lunes - martes - jueves</span></pre>
+        </div>
+
+        <div class="card"><h3>replace(viejo, nuevo [, max])</h3>
+            <p>Devuelve una cadena nueva con reemplazos. No da error si no encuentra.</p>
+<pre>a = <span class="str">"Hoy es un dia frio, que frio esta!"</span>
+b = a.<span class="fn">replace</span>(<span class="str">"frio"</span>, <span class="str">"humedo"</span>)
+<span class="cmt"># "Hoy es un dia humedo, que humedo esta!"</span>
+
+c = a.<span class="fn">replace</span>(<span class="str">"frio"</span>, <span class="str">"humedo"</span>, <span class="str">1</span>)
+<span class="cmt"># "Hoy es un dia humedo, que frio esta!"  (solo 1 reemplazo)</span></pre>
+        </div>
+
+        <!-- Metodos Clase 6 -->
+        <h2>Metodos - Clase 6</h2>
+
+        <div class="card"><h3>Metodos is... (devuelven True/False)</h3>
+            <table class="method-table">
+                <tr><th>Metodo</th><th>Descripcion</th><th>Ejemplo</th></tr>
+                <tr><td><code>isalpha()</code></td><td>True si todos son letras</td><td><code>"Hola".isalpha()</code> &rarr; True</td></tr>
+                <tr><td><code>isdigit()</code></td><td>True si todos son digitos</td><td><code>"1234".isdigit()</code> &rarr; True<br><code>"3.14".isdigit()</code> &rarr; False</td></tr>
+                <tr><td><code>isalnum()</code></td><td>True si todos son letras o digitos</td><td><code>"XR150".isalnum()</code> &rarr; True<br><code>"-1234".isalnum()</code> &rarr; False</td></tr>
+                <tr><td><code>isupper()</code></td><td>True si todas las letras son mayusculas</td><td><code>"LIMA 717".isupper()</code> &rarr; True</td></tr>
+                <tr><td><code>islower()</code></td><td>True si todas las letras son minusculas</td><td><code>"azucar: 150".islower()</code> &rarr; True</td></tr>
+            </table>
+            <p style="color:#f59e0b;margin-top:8px"><b>isupper() e islower() ignoran caracteres no alfabeticos.</b></p>
+        </div>
+
+        <div class="card"><h3>upper(), lower(), capitalize(), title()</h3>
+<pre><span class="str">'hola 123'</span>.<span class="fn">upper</span>()         <span class="cmt"># 'HOLA 123'</span>
+<span class="str">'HOLA 123'</span>.<span class="fn">lower</span>()         <span class="cmt"># 'hola 123'</span>
+<span class="str">'lunes MARTES'</span>.<span class="fn">capitalize</span>() <span class="cmt"># 'Lunes martes' (solo 1ra letra mayusc)</span>
+<span class="str">'lunes MARTES'</span>.<span class="fn">title</span>()      <span class="cmt"># 'Lunes Martes' (1ra de cada palabra)</span></pre>
+        </div>
+
+        <div class="card"><h3>center(), ljust(), rjust(), zfill()</h3>
+<pre><span class="str">'Hola'</span>.<span class="fn">center</span>(<span class="str">10</span>, <span class="str">'-'</span>)   <span class="cmt"># '---Hola---'</span>
+<span class="str">'Hola'</span>.<span class="fn">ljust</span>(<span class="str">10</span>, <span class="str">'-'</span>)    <span class="cmt"># 'Hola------'</span>
+<span class="str">'Hola'</span>.<span class="fn">rjust</span>(<span class="str">10</span>, <span class="str">'-'</span>)    <span class="cmt"># '------Hola'</span>
+<span class="fn">str</span>(<span class="str">3</span>).<span class="fn">zfill</span>(<span class="str">5</span>)            <span class="cmt"># '00003'</span></pre>
+        </div>
+
+        <div class="card"><h3>strip(), lstrip(), rstrip()</h3>
+            <p>Eliminan caracteres de los extremos. Sin parametro, eliminan espacios.</p>
+<pre><span class="str">'--> Salida -->'</span>.<span class="fn">lstrip</span>(<span class="str">'->'</span>)   <span class="cmt"># ' Salida -->'</span>
+<span class="str">'Continuara...'</span>.<span class="fn">rstrip</span>(<span class="str">'.'</span>)    <span class="cmt"># 'Continuara'</span>
+<span class="str">'  Hola  '</span>.<span class="fn">strip</span>()              <span class="cmt"># 'Hola'</span>
+
+lista = [<span class="str">1</span>, <span class="str">2</span>, <span class="str">3</span>, <span class="str">4</span>]
+cad1 = <span class="fn">str</span>(lista)                 <span class="cmt"># '[1, 2, 3, 4]'</span>
+cad2 = cad1.<span class="fn">strip</span>(<span class="str">"[ ]"</span>)          <span class="cmt"># '1, 2, 3, 4'</span></pre>
+            <p style="color:#f59e0b"><b>strip elimina CUALQUIERA de los caracteres dados, no la subcadena completa.</b></p>
+        </div>
+
+        <div class="card"><h3>find() y rfind()</h3>
+            <p><code>find()</code> busca la primera aparicion. <code>rfind()</code> busca la ultima. Devuelven <b>-1</b> si no encuentran (a diferencia de <code>index()</code> que da error).</p>
+<pre>cad = <span class="str">"Hola Mundo Hola"</span>
+cad.<span class="fn">find</span>(<span class="str">"Hola"</span>)      <span class="cmt"># 0  (primera aparicion)</span>
+cad.<span class="fn">rfind</span>(<span class="str">"Hola"</span>)     <span class="cmt"># 11 (ultima aparicion)</span>
+cad.<span class="fn">find</span>(<span class="str">"xyz"</span>)       <span class="cmt"># -1 (no encontrado, sin error)</span></pre>
+        </div>
+
+        <div class="card"><h3>startswith() y endswith()</h3>
+<pre>cad = <span class="str">"archivo.txt"</span>
+cad.<span class="fn">startswith</span>(<span class="str">"arch"</span>)  <span class="cmt"># True</span>
+cad.<span class="fn">endswith</span>(<span class="str">".txt"</span>)     <span class="cmt"># True</span>
+cad.<span class="fn">endswith</span>(<span class="str">".pdf"</span>)     <span class="cmt"># False</span></pre>
+        </div>
+
+        <!-- f-strings -->
+        <h2>f-strings (Cadenas formateadas)</h2>
+        <div class="card"><h3>Sintaxis basica</h3>
+<pre>dia = <span class="str">16</span>
+mes = <span class="str">"Enero"</span>
+cad = <span class="kw">f</span><span class="str">"Sucedio el {dia} de {mes}."</span>
+<span class="cmt"># "Sucedio el 16 de Enero."</span>
+
+<span class="cmt"># Expresiones y metodos dentro de {}:</span>
+<span class="fn">print</span>(<span class="kw">f</span><span class="str">"{2 * 37}"</span>)              <span class="cmt"># 74</span>
+<span class="fn">print</span>(<span class="kw">f</span><span class="str">"{'Lunes'.lower()}"</span>)     <span class="cmt"># lunes</span></pre>
+        </div>
+
+        <div class="card"><h3>Alineacion y formato</h3>
+<pre>num = <span class="str">15</span>
+pal = <span class="str">"Hola"</span>
+
+<span class="cmt"># Ancho:</span>
+<span class="kw">f</span><span class="str">"*{num:5}*"</span>       <span class="cmt"># '*   15*'  (numeros a la derecha)</span>
+<span class="kw">f</span><span class="str">"*{pal:8}*"</span>       <span class="cmt"># '*Hola    *'  (strings a la izquierda)</span>
+
+<span class="cmt"># Relleno con ceros:</span>
+<span class="kw">f</span><span class="str">"*{num:05}*"</span>      <span class="cmt"># '*00015*'</span>
+
+<span class="cmt"># Alineacion explicita: &lt; izquierda, &gt; derecha, ^ centro</span>
+<span class="kw">f</span><span class="str">"*{num:&lt;8}*"</span>      <span class="cmt"># '*15      *'</span>
+<span class="kw">f</span><span class="str">"*{pal:&gt;8}*"</span>      <span class="cmt"># '*    Hola*'</span>
+<span class="kw">f</span><span class="str">"*{pal:^8}*"</span>      <span class="cmt"># '*  Hola  *'</span>
+
+<span class="cmt"># Caracter de relleno personalizado:</span>
+<span class="kw">f</span><span class="str">"*{pal:=^8}*"</span>     <span class="cmt"># '*==Hola==*'</span>
+
+<span class="cmt"># Decimales:</span>
+pi = <span class="str">3.1416</span>
+<span class="kw">f</span><span class="str">"{pi:.2f}"</span>        <span class="cmt"># '3.14'</span></pre>
+        </div>
+
+        <!-- Copia de cadenas -->
+        <div class="card warning"><h3>Copia de cadenas</h3>
+            <p>Copiar una cadena siempre copia su <b>referencia</b> (direccion de memoria). Todas apuntan al mismo objeto porque son inmutables.</p>
+<pre>a = <span class="str">"Hola"</span>
+b = a
+c = a[:]
+d = <span class="fn">str</span>(a)
+<span class="cmt"># Todas tienen el MISMO id() - misma direccion de memoria</span></pre>
+        </div>
+    </div>
+
+    <!-- ===== QUIZ ===== -->
+    <div class="section" id="sec-quiz">
+        <h2>Quiz</h2>
+        <div id="quizBox"></div>
+        <div style="text-align:center;margin:20px 0"><button class="btn btn-w" onclick="resetQuiz()">Reiniciar Quiz</button></div>
+    </div>
+
+    <!-- ===== EJERCICIOS ===== -->
+    <div class="section" id="sec-ejercicios">
+        <h2>Ejercicios - Completa el Codigo</h2>
+        <p style="color:#94a3b8">La verificacion revisa la estructura de tu codigo: que uses los metodos correctos y la logica adecuada.</p>
+        <div id="exBox"></div>
+    </div>
+
+    <!-- ===== ORDENAR ===== -->
+    <div class="section" id="sec-ordenar">
+        <h2>Ordena el Codigo</h2>
+        <p style="color:#94a3b8">Haz clic en las lineas del banco para moverlas al destino. Usa &#9650;&#9660; para reordenar, &#10005; para devolver. Luego verifica.</p>
+        <div id="orderBox"></div>
+    </div>
+
+    <!-- ===== ERRORES ===== -->
+    <div class="section" id="sec-errores">
+        <h2>Encuentra los Errores</h2>
+        <p style="color:#94a3b8">Cada codigo tiene errores. Selecciona de las opciones cual es el problema principal.</p>
+        <div id="errBox"></div>
+    </div>
+
+    <!-- ===== QUE DEVUELVE ===== -->
+    <div class="section" id="sec-quedevuelve">
+        <h2>Que devuelve?</h2>
+        <p style="color:#94a3b8">Analiza cada fragmento de codigo y escribe exactamente lo que devuelve o imprime Python. Respeta mayusculas, espacios y comillas si corresponde.</p>
+        <div id="qdBox"></div>
+    </div>
+
+</div>
+
+<script>
+// ===== GLOBALS =====
+let score=0, answered={};
+const TABS=[
+    {id:'teoria',label:'1. Teoria'},
+    {id:'quiz',label:'2. Quiz'},
+    {id:'ejercicios',label:'3. Ejercicios'},
+    {id:'ordenar',label:'4. Ordenar'},
+    {id:'errores',label:'5. Errores'},
+    {id:'quedevuelve',label:'6. Que devuelve?'}
+];
+
+function init(){
+    const tb=document.getElementById('tabBar');
+    TABS.forEach((t,i)=>{
+        const b=document.createElement('button');
+        b.className='tab-btn'+(i===0?' active':'');
+        b.textContent=t.label;
+        b.onclick=()=>{
+            document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+            document.getElementById('sec-'+t.id).classList.add('active');
+            b.classList.add('active');
+        };
+        tb.appendChild(b);
+    });
+    buildQuiz();
+    buildExercises();
+    buildOrderChallenges();
+    buildErrorFinders();
+    buildQueDevuelve();
+    updateTotal();
+}
+
+function updateTotal(){
+    const t=quizData.length + exData.length + orderData.length + errData.length + qdData.length;
+    document.getElementById('sTotal').textContent=t;
+}
+function addScore(id){
+    if(answered[id])return;
+    answered[id]=true;
+    score++;
+    document.getElementById('sDisp').textContent=score;
+    const t=parseInt(document.getElementById('sTotal').textContent);
+    document.getElementById('pFill').style.width=(t>0?(score/t)*100:0)+'%';
+}
+
+// ===== QUIZ =====
+const quizData=[
+    {q:"Las cadenas en Python son...",o:["Mutables como las listas","Inmutables (no se pueden modificar)","Mutables solo si son cortas","Inmutables solo si usan comillas dobles"],c:1,e:"Las cadenas son INMUTABLES. Los metodos devuelven una nueva cadena sin alterar la original."},
+    {q:"Que hace cad[::-1]?",o:["Elimina el ultimo caracter","Invierte la cadena","Crea una copia normal","Da error"],c:1,e:"[::-1] recorre la cadena de atras hacia adelante, invirtiendola."},
+    {q:'Que devuelve "Hola".upper()?',o:['"hola"','"HOLA"','"Hola"','Error, upper no existe'],c:1,e:"upper() convierte TODOS los caracteres alfabeticos a mayusculas."},
+    {q:'Que devuelve "3.14".isdigit()?',o:["True","False","3.14","Error"],c:1,e:"El punto NO es un digito. isdigit() requiere que TODOS los caracteres sean digitos."},
+    {q:'Cual es la diferencia entre find() e index()?',o:["No hay diferencia","find() devuelve -1 si no encuentra, index() da error","find() es mas rapido","index() devuelve -1, find() da error"],c:1,e:"find() devuelve -1 si no encuentra. index() lanza ValueError."},
+    {q:'Que hace split() SIN parametro?',o:["Separa por comas","Separa por cada caracter","Separa por espacios (multiples espacios = uno)","Da error"],c:2,e:"Sin parametro, split() separa por espacios y trata multiples espacios como uno solo."},
+    {q:'Que devuelve " Hola ".strip()?',o:['" Hola"','"Hola "','"Hola"','" Hola "'],c:2,e:"strip() elimina espacios de AMBOS extremos."},
+    {q:"Se puede hacer cad[0] = 'x' en una cadena?",o:["Si, igual que una lista","No, las cadenas son inmutables","Solo si la cadena tiene un caracter","Solo con comillas dobles"],c:1,e:"Las cadenas son inmutables. Asignar a un indice da TypeError."},
+    {q:'Que devuelve "XR150".isalnum()?',o:["True","False","Error","None"],c:0,e:"Todos los caracteres son letras o digitos, asi que isalnum() devuelve True."},
+    {q:'Como se alinea un numero a la izquierda en un f-string de ancho 8?',o:['f"{num:8}"','f"{num:>8}"','f"{num:<8}"','f"{num:^8}"'],c:2,e:"< fuerza alineacion a la izquierda. Por defecto los numeros van a la derecha."},
+    {q:'Que hace "sep".join(lista)?',o:["Separa la lista","Une los elementos de la lista con 'sep' como separador","Agrega 'sep' al final","Busca 'sep' en la lista"],c:1,e:"join() une todos los elementos de la secuencia separandolos con la cadena dada."},
+    {q:'Que devuelve "LIMA 717".isupper()?',o:["False, tiene numeros","True, ignora los no alfabeticos","Error","None"],c:1,e:"isupper() ignora caracteres no alfabeticos. Solo verifica que las letras esten en mayuscula."},
+    {q:'Que hace replace() si el texto buscado no existe?',o:["Da error ValueError","Devuelve la cadena original sin cambios","Devuelve None","Devuelve cadena vacia"],c:1,e:"replace() no da error si no encuentra. Devuelve la cadena original."},
+    {q:'Para que sirve zfill(5)?',o:["Rellena con espacios a la izquierda","Rellena con ceros a la izquierda hasta ancho 5","Elimina los primeros 5 caracteres","Agrega 5 ceros al final"],c:1,e:'zfill() rellena con ceros a la izquierda. str(3).zfill(5) da "00003".'},
+    {q:'Que devuelve f"{3.1416:.2f}"?',o:['"3.1416"','"3.14"','"3.1"','"3"'],c:1,e:":.2f formatea con 2 decimales: 3.14."},
+];
+
+function buildQuiz(){
+    const box=document.getElementById('quizBox');
+    box.innerHTML='';
+    quizData.forEach((q,i)=>{
+        let h=`<div class="question" id="q${i}"><p>${i+1}. ${q.q}</p><div class="opts">`;
+        q.o.forEach((o,j)=>{h+=`<div class="opt" id="q${i}o${j}" onclick="ansQ(${i},${j})">${o}</div>`;});
+        h+=`</div><div class="fb" id="qfb${i}"></div></div>`;
+        box.innerHTML+=h;
+    });
+}
+function ansQ(qi,oi){
+    const el=document.getElementById('q'+qi);
+    if(el.dataset.done)return;el.dataset.done='1';
+    el.querySelectorAll('.opt').forEach(o=>o.classList.add('dis'));
+    const fb=document.getElementById('qfb'+qi);
+    if(oi===quizData[qi].c){
+        document.getElementById('q'+qi+'o'+oi).classList.add('ok');
+        fb.className='fb show fb-ok';fb.textContent='Correcto! '+quizData[qi].e;
+        addScore('q'+qi);
+    }else{
+        document.getElementById('q'+qi+'o'+oi).classList.add('no');
+        document.getElementById('q'+qi+'o'+quizData[qi].c).classList.add('ok');
+        fb.className='fb show fb-no';fb.textContent='Incorrecto. '+quizData[qi].e;
+    }
+}
+function resetQuiz(){
+    quizData.forEach((_,i)=>delete answered['q'+i]);
+    score=Object.keys(answered).length;
+    document.getElementById('sDisp').textContent=score;
+    const t=parseInt(document.getElementById('sTotal').textContent);
+    document.getElementById('pFill').style.width=(t>0?(score/t)*100:0)+'%';
+    buildQuiz();
+}
+
+// ===== EXERCISES =====
+const exData=[
+    {id:1,title:"Invertir palabras de una frase",diff:"f",
+     desc:'Leer una frase, invertir el orden de las palabras (sin invertir letras) y mostrar el resultado.',
+     template:`frase = input("Ingrese una frase: ")\n# COMPLETA: usar split, reverse (o [::-1]), join\n\n\nprint(resultado)`,
+     solution:`frase = input("Ingrese una frase: ")\npalabras = frase.split()\npalabras.reverse()\nresultado = " ".join(palabras)\nprint(resultado)`,
+     checks:[
+         {type:'need',re:/\.split\s*\(/,msg:'Falta split() para separar palabras'},
+         {type:'need',re:/\.join\s*\(|\.reverse\s*\(|::-1/,msg:'Falta reverse() o [::-1] o join() para reconstruir'},
+         {type:'need',re:/print\s*\(/,msg:'Falta print() para mostrar resultado'},
+     ]},
+    {id:2,title:"Generar sigla",diff:"f",
+     desc:'Ingresar nombre de institucion y generar sigla con las iniciales en mayuscula. Ej: "Automovil Club Argentino" -> "ACA".',
+     template:`cad = input("Ingrese una cadena: ")\n# COMPLETA: split, recorrer, tomar primera letra, upper\n\n\nprint(sigla)`,
+     solution:`cad = input("Ingrese una cadena: ")\npalabras = cad.split()\nsigla = ""\nfor palabra in palabras:\n    sigla = sigla + palabra[0].upper()\nprint(sigla)`,
+     checks:[
+         {type:'need',re:/\.split\s*\(/,msg:'Falta split() para separar palabras'},
+         {type:'need',re:/\.upper\s*\(/,msg:'Falta upper() para convertir a mayuscula'},
+         {type:'need',re:/\[0\]/,msg:'Falta [0] para tomar la primera letra'},
+         {type:'need',re:/print\s*\(/,msg:'Falta print()'},
+     ]},
+    {id:3,title:"Reemplazar vocales con tilde",diff:"m",
+     desc:'Leer una frase y reemplazar vocales con tilde por sus equivalentes sin tilde.',
+     template:`contilde = "aeiouAEIOU"\nsintilde = "aeiouAEIOU"\nfrase = input("Ingrese una frase: ")\n# COMPLETA: recorrer caracter por caracter\n# Si esta en contilde, reemplazar por su equivalente\n\n\nprint(nueva)`,
+     solution:`contilde = "\u00e1\u00e9\u00ed\u00f3\u00fa\u00c1\u00c9\u00cd\u00d3\u00da"\nsintilde = "aeiouAEIOU"\nfrase = input("Ingrese una frase: ")\nnueva = ""\nfor caracter in frase:\n    if caracter in contilde:\n        posicion = contilde.index(caracter)\n        nueva = nueva + sintilde[posicion]\n    else:\n        nueva = nueva + caracter\nprint(nueva)`,
+     checks:[
+         {type:'need',re:/for\s+\w+\s+in\s+/,msg:'Falta recorrer la frase caracter por caracter con for'},
+         {type:'need',re:/\.index\s*\(/,msg:'Falta index() para encontrar la posicion'},
+         {type:'need',re:/in\s+contilde|in\s+\w*tilde/,msg:'Falta verificar si el caracter esta en la cadena con tildes'},
+         {type:'need',re:/print\s*\(/,msg:'Falta print()'},
+     ]},
+    {id:4,title:"Factura formateada",diff:"m",
+     desc:'Imprimir una factura usando center, ljust, rjust y zfill para el formato.',
+     template:`empresa = "Industrias Alimenticias S.A."\ndireccion = "Avenida del Campo 279"\ntelefono = "Tel. 46019-1146"\nnumero = 12\narticulo = "Aceite de oliva premium"\nprecio = 416\n# COMPLETA: usar center(40), ljust(20), rjust(20), zfill(8)\n# Imprimir factura formateada\n`,
+     solution:`empresa = "Industrias Alimenticias S.A."\ndireccion = "Avenida del Campo 279"\ntelefono = "Tel. 46019-1146"\nnumero = 12\narticulo = "Aceite de oliva premium"\nprecio = 416\nprint("-" * 40)\nprint(empresa.center(40))\nprint()\nprint(direccion.ljust(20), end="")\nprint(telefono.rjust(20))\nprint()\nprint("Factura No", str(numero).zfill(8))\nprint()\nprint(articulo.ljust(30, '.'), end="")\nprint(str(precio).rjust(10, '.'))\nprint("-" * 40)`,
+     checks:[
+         {type:'need',re:/\.center\s*\(/,msg:'Falta center() para centrar'},
+         {type:'need',re:/\.ljust\s*\(/,msg:'Falta ljust() para alinear a la izquierda'},
+         {type:'need',re:/\.rjust\s*\(/,msg:'Falta rjust() para alinear a la derecha'},
+         {type:'need',re:/\.zfill\s*\(/,msg:'Falta zfill() para rellenar con ceros'},
+         {type:'need',re:/print\s*\(/,msg:'Falta print()'},
+     ]},
+    {id:5,title:"Triangulo de Floyd con f-strings",diff:"d",
+     desc:'Imprimir un triangulo de Floyd de n filas, usando f-strings con ancho 3 para alinear. Ej 4 filas: 1 / 2 3 / 4 5 6 / 7 8 9 10.',
+     template:`n = int(input("Cantidad de filas? "))\n# COMPLETA: doble for, usar f"{k:3}"\n`,
+     solution:`n = int(input("Cantidad de filas? "))\nk = 1\nfor i in range(n):\n    for j in range(i+1):\n        print(f"{k:3}", end="")\n        k += 1\n    print()`,
+     checks:[
+         {type:'need',re:/for\s+\w+\s+in\s+range/,msg:'Falta for con range para las filas'},
+         {type:'need',re:/f"/,msg:'Falta f-string para el formato'},
+         {type:'need',re:/:3|:(\s)*3/,msg:'Falta formato de ancho 3 en el f-string'},
+         {type:'need',re:/print\s*\(/,msg:'Falta print()'},
+     ]},
+    {id:6,title:"Limpiar palabra de puntuacion",diff:"d",
+     desc:'Escribir una funcion que separe una palabra de los signos de puntuacion. Ej: "(ingeniero)," -> ("(", "ingeniero", ",)").',
+     template:`def limpiarpalabra(palabra):\n    # COMPLETA: usar isalpha() para encontrar\n    # donde empiezan y terminan las letras\n    # Devolver (prefijo, palabra_limpia, sufijo)\n    pass\n\nprint(limpiarpalabra("(ingeniero),"))\nprint(limpiarpalabra("increible!"))`,
+     solution:`def limpiarpalabra(palabra):\n    i = 0\n    while i < len(palabra) and not palabra[i].isalpha():\n        i += 1\n    inicio = palabra[:i]\n    j = len(palabra) - 1\n    while j > i and not palabra[j].isalpha():\n        j -= 1\n    final = palabra[j+1:]\n    palabra = palabra[i:j+1]\n    return inicio, palabra, final\n\nprint(limpiarpalabra("(ingeniero),"))\nprint(limpiarpalabra("increible!"))`,
+     checks:[
+         {type:'need',re:/def\s+\w+\s*\(/,msg:'Falta definir la funcion con def'},
+         {type:'need',re:/\.isalpha\s*\(/,msg:'Falta isalpha() para detectar letras'},
+         {type:'need',re:/return/,msg:'Falta return para devolver los resultados'},
+         {type:'need',re:/while/,msg:'Falta while para buscar los limites'},
+     ]},
+];
+
+function buildExercises(){
+    const box=document.getElementById('exBox');
+    box.innerHTML='';
+    const diffLabels={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffClass={f:'diff-f',m:'diff-m',d:'diff-d'};
+    exData.forEach(ex=>{
+        box.innerHTML+=`
+        <div class="ex-area">
+            <h3>Ejercicio ${ex.id}: ${ex.title} <span class="diff ${diffClass[ex.diff]}">${diffLabels[ex.diff]}</span></h3>
+            <p style="color:#94a3b8;margin:10px 0">${ex.desc}</p>
+            <textarea id="ext${ex.id}" spellcheck="false">${ex.template}</textarea>
+            <button class="btn btn-p" onclick="checkEx(${ex.id})">Verificar</button>
+            <button class="btn btn-s" onclick="showSol(${ex.id})">Ver Solucion</button>
+            <div class="result" id="exr${ex.id}"></div>
+        </div>`;
+    });
+}
+
+function checkEx(id){
+    const ex=exData.find(e=>e.id===id);
+    const code=document.getElementById('ext'+id).value;
+    const r=document.getElementById('exr'+id);
+    let errors=[],goods=[];
+
+    if(/COMPLETA/.test(code)){
+        r.innerHTML='<div style="color:#f59e0b">Todavia no completaste el codigo. Reemplaza los comentarios con tu solucion.</div>';
+        r.className='result show';r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+        return;
+    }
+
+    ex.checks.forEach(ch=>{
+        if(ch.type==='bad' && ch.re.test(code)) errors.push(ch.msg);
+        if(ch.type==='need' && !ch.re.test(code)) errors.push(ch.msg);
+    });
+
+    // good things found
+    if(/\.split\s*\(/.test(code)) goods.push('Usa split()');
+    if(/\.join\s*\(/.test(code)) goods.push('Usa join()');
+    if(/\.replace\s*\(/.test(code)) goods.push('Usa replace()');
+    if(/\.upper\s*\(/.test(code)) goods.push('Usa upper()');
+    if(/\.lower\s*\(/.test(code)) goods.push('Usa lower()');
+    if(/\.strip\s*\(|\.rstrip\s*\(|\.lstrip\s*\(/.test(code)) goods.push('Usa strip/rstrip/lstrip');
+    if(/\.isalpha\s*\(/.test(code)) goods.push('Usa isalpha()');
+    if(/\.center\s*\(|\.ljust\s*\(|\.rjust\s*\(/.test(code)) goods.push('Usa metodos de alineacion');
+    if(/\.zfill\s*\(/.test(code)) goods.push('Usa zfill()');
+    if(/f"/.test(code)) goods.push('Usa f-strings');
+
+    let h='';
+    if(goods.length){h+='<div style="color:#86efac"><b>Bien hecho:</b><ul>';goods.forEach(g=>h+='<li>'+g+'</li>');h+='</ul></div>';}
+    if(errors.length){h+='<div style="color:#fca5a5;margin-top:8px"><b>Problemas:</b><ul>';errors.forEach(e=>h+='<li>'+e+'</li>');h+='</ul></div>';}
+
+    if(!errors.length){
+        h+='<div style="color:#86efac;font-size:1.1em;margin-top:8px"><b>Excelente! Tu codigo usa los metodos adecuados.</b></div>';
+        addScore('ex'+id);
+    }
+    r.innerHTML=h;r.className='result show';
+    r.style.background=errors.length?'#1e1b2e':'#1a2e1a';
+    r.style.border='1px solid '+(errors.length?'#a78bfa':'#22c55e');
+}
+
+function showSol(id){
+    const ex=exData.find(e=>e.id===id);
+    document.getElementById('ext'+id).value=ex.solution;
+    const r=document.getElementById('exr'+id);
+    r.innerHTML='<div style="color:#93c5fd">Solucion mostrada. Estudiala y trata de hacerla sin mirar!</div>';
+    r.className='result show';r.style.background='#1e3a5f';r.style.border='1px solid #38bdf8';
+}
+
+// ===== ORDER CHALLENGES =====
+const orderData=[
+    {id:1,title:"Invertir palabras con split/join",diff:"f",lines:[
+        'frase = input("Ingrese una frase: ")',
+        'palabras = frase.split()',
+        'palabras.reverse()',
+        'resultado = " ".join(palabras)',
+        'print(resultado)'
+    ]},
+    {id:2,title:"Generar sigla de una institucion",diff:"m",lines:[
+        'cad = input("Ingrese nombre: ")',
+        'palabras = cad.split()',
+        'sigla = ""',
+        'for palabra in palabras:',
+        '    sigla = sigla + palabra[0].upper()',
+        'print(sigla)'
+    ]},
+    {id:3,title:"Formatear factura con center/ljust/rjust",diff:"m",lines:[
+        'print("-" * 40)',
+        'print("Empresa S.A.".center(40))',
+        'print()',
+        'print("Direccion".ljust(20), end="")',
+        'print("Telefono".rjust(20))',
+        'print()',
+        'print("Factura No", str(12).zfill(8))',
+        'print("-" * 40)'
+    ]},
+    {id:4,title:"Triangulo de Floyd con f-strings",diff:"d",lines:[
+        'n = int(input("Filas? "))',
+        'k = 1',
+        'for i in range(n):',
+        '    for j in range(i+1):',
+        '        print(f"{k:3}", end="")',
+        '        k += 1',
+        '    print()'
+    ]},
+];
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+function buildOrderChallenges(){
+    const box=document.getElementById('orderBox');
+    box.innerHTML='';
+    const diffL={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffC={f:'diff-f',m:'diff-m',d:'diff-d'};
+    let allHTML='';
+    orderData.forEach(ch=>{
+        allHTML+=`
+        <div class="oc" id="oc${ch.id}">
+            <h3>Desafio ${ch.id}: ${ch.title} <span class="diff ${diffC[ch.diff]}">${diffL[ch.diff]}</span></h3>
+            <p style="color:#94a3b8;margin:8px 0">Banco (clic para enviar al destino):</p>
+            <div class="oc-pool" id="ocp${ch.id}"></div>
+            <p style="color:#94a3b8;margin:8px 0">Destino (usa &#9650;&#9660; para reordenar, &#10005; para devolver):</p>
+            <div class="oc-target" id="oct${ch.id}"></div>
+            <button class="btn btn-p" onclick="checkOC(${ch.id})">Verificar</button>
+            <button class="btn btn-w" onclick="resetOC(${ch.id})">Reiniciar</button>
+            <div class="result" id="ocr${ch.id}"></div>
+        </div>`;
+    });
+    box.innerHTML=allHTML;
+    orderData.forEach(ch=>resetOC(ch.id));
+}
+
+function makeOCItem(id, item){
+    const pool=document.getElementById('ocp'+id);
+    const tgt=document.getElementById('oct'+id);
+
+    const d=document.createElement('div');
+    d.className='oc-item';
+    d.dataset.idx=item.idx;
+
+    const arrows=document.createElement('span');
+    arrows.className='oc-arrows';
+    arrows.innerHTML='<button onclick="event.stopPropagation();moveOC(this.closest(\'.oc-item\'),-1)">&#9650;</button><button onclick="event.stopPropagation();moveOC(this.closest(\'.oc-item\'),1)">&#9660;</button>';
+    d.appendChild(arrows);
+
+    const span=document.createElement('span');
+    span.className='item-text';
+    span.textContent=item.text;
+    d.appendChild(span);
+
+    const ret=document.createElement('button');
+    ret.className='oc-ret';
+    ret.textContent='\u2715';
+    ret.onclick=function(e){e.stopPropagation();pool.appendChild(d);d.classList.remove('right','wrong');};
+    d.appendChild(ret);
+
+    d.onclick=function(){
+        if(this.parentElement===pool){
+            tgt.appendChild(this);
+            this.classList.remove('right','wrong');
+        }
+    };
+    return d;
+}
+
+function moveOC(el, dir){
+    const parent=el.parentElement;
+    if(dir===-1 && el.previousElementSibling){
+        parent.insertBefore(el, el.previousElementSibling);
+    }else if(dir===1 && el.nextElementSibling){
+        parent.insertBefore(el.nextElementSibling, el);
+    }
+    el.classList.remove('right','wrong');
+}
+
+function resetOC(id){
+    const ch=orderData.find(c=>c.id===id);
+    const pool=document.getElementById('ocp'+id);
+    const tgt=document.getElementById('oct'+id);
+    pool.innerHTML='';tgt.innerHTML='';
+    document.getElementById('ocr'+id).className='result';
+
+    const shuffled=shuffle(ch.lines.map((l,i)=>({text:l,idx:i})));
+    shuffled.forEach(item=>{
+        pool.appendChild(makeOCItem(id, item));
+    });
+}
+
+function checkOC(id){
+    const ch=orderData.find(c=>c.id===id);
+    const tgt=document.getElementById('oct'+id);
+    const items=tgt.querySelectorAll('.oc-item');
+    const r=document.getElementById('ocr'+id);
+
+    if(items.length<ch.lines.length){
+        r.innerHTML='<div style="color:#f59e0b">Faltan lineas. Haz clic en cada una del banco para moverla.</div>';
+        r.className='result show';r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+        return;
+    }
+
+    let allOk=true;
+    items.forEach((item,i)=>{
+        if(parseInt(item.dataset.idx)===i){
+            item.classList.add('right');item.classList.remove('wrong');
+        }else{
+            item.classList.add('wrong');item.classList.remove('right');
+            allOk=false;
+        }
+    });
+
+    if(allOk){
+        r.innerHTML='<div style="color:#86efac;font-size:1.1em"><b>Perfecto! Orden correcto.</b></div>';
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';
+        addScore('oc'+id);
+    }else{
+        r.innerHTML='<div style="color:#fca5a5"><b>Hay errores.</b> Verde = posicion correcta. Rojo = posicion incorrecta.</div>';
+        r.style.background='#1e1b2e';r.style.border='1px solid #ef4444';
+    }
+    r.className='result show';
+}
+
+// ===== ERROR FINDERS =====
+const errData=[
+    {id:1,title:"Codigo 1",diff:"f",
+     consigna:"Se pide invertir una cadena y guardar el resultado.",
+     code:`cad = "Hola Mundo"
+cad.upper()
+print(cad)`,
+     question:"Cual es el error?",
+     options:[
+         {text:"upper() devuelve una nueva cadena, pero no se guarda en ninguna variable. cad sigue siendo 'Hola Mundo'.",correct:true},
+         {text:"Deberia ser: cad = cad.upper()",correct:true},
+         {text:"upper() no existe para strings",correct:false},
+         {text:"print() esta mal usado",correct:false},
+         {text:"Falta un import",correct:false},
+     ]},
+    {id:2,title:"Codigo 2",diff:"m",
+     consigna:"Se pide cambiar la primera letra de una cadena a minuscula.",
+     code:`cad = "Hola"
+cad[0] = "h"
+print(cad)`,
+     question:"Cual es el error?",
+     options:[
+         {text:"Las cadenas son inmutables, no se puede asignar a un indice. Da TypeError.",correct:true},
+         {text:'Deberia ser: cad = "h" + cad[1:]',correct:true},
+         {text:"El indice 0 no existe",correct:false},
+         {text:"print() esta mal",correct:false},
+         {text:"Falta convertir con str()",correct:false},
+     ]},
+    {id:3,title:"Codigo 3",diff:"m",
+     consigna:'Se pide separar "21/9/2020" en dia, mes, anio.',
+     code:`fecha = "21/9/2020"
+partes = fecha.split("/")
+dia = partes[0]
+mes = partes[1]
+anio = partes[3]
+print(dia, mes, anio)`,
+     question:"Cual es el error?",
+     options:[
+         {text:"partes[3] da IndexError. La lista tiene 3 elementos (indices 0, 1, 2). Deberia ser partes[2].",correct:true},
+         {text:"split() esta bien usado",correct:true},
+         {text:"split deberia usar '-' como separador",correct:false},
+         {text:"Falta convertir a int",correct:false},
+         {text:"La variable fecha esta mal definida",correct:false},
+     ]},
+    {id:4,title:"Codigo 4",diff:"d",
+     consigna:"Se pide quitar los espacios de los extremos y convertir a mayusculas.",
+     code:`nombre = "  Juan Perez  "
+nombre.strip()
+nombre.upper()
+print(nombre)`,
+     question:"Cuales son los errores?",
+     options:[
+         {text:"strip() y upper() devuelven nuevas cadenas pero no se guardan. nombre sigue igual.",correct:true},
+         {text:'Deberia ser: nombre = nombre.strip().upper()',correct:true},
+         {text:"strip() no funciona con espacios",correct:false},
+         {text:"upper() da error si hay espacios",correct:false},
+         {text:"print() esta mal",correct:false},
+     ]},
+    {id:5,title:"Codigo 5",diff:"d",
+     consigna:'Se pide verificar si un string contiene solo digitos e imprimirlo como entero.',
+     code:`dato = "123abc"
+if dato.isalpha():
+    print(int(dato))
+else:
+    print("No es un numero")`,
+     question:"Cuales son los errores?",
+     options:[
+         {text:"Usa isalpha() en vez de isdigit(). isalpha() verifica LETRAS, no digitos.",correct:true},
+         {text:'Aunque corrigiera a isdigit(), "123abc" devolveria False y no entraria al if.',correct:true},
+         {text:"int() esta mal usado",correct:false},
+         {text:"El else esta mal indentado",correct:false},
+         {text:"Falta un try/except",correct:false},
+     ]},
+];
+
+function buildErrorFinders(){
+    const box=document.getElementById('errBox');
+    box.innerHTML='';
+    const diffL={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffC={f:'diff-f',m:'diff-m',d:'diff-d'};
+    errData.forEach(ef=>{
+        let h=`<div class="oc" id="ef${ef.id}">
+            <h3>${ef.title} <span class="diff ${diffC[ef.diff]}">${diffL[ef.diff]}</span></h3>
+            <p style="color:#93c5fd;margin:8px 0"><b>Consigna:</b> ${ef.consigna}</p>
+            <pre>${ef.code}</pre>
+            <p style="margin:10px 0;font-weight:bold">${ef.question}</p>
+            <div id="efo${ef.id}">`;
+        ef.options.forEach((o,i)=>{
+            h+=`<div class="ef-opt" id="ef${ef.id}o${i}" onclick="toggleEfOpt(this)">${o.text}</div>`;
+        });
+        h+=`</div>
+            <button class="btn btn-p" onclick="checkEF(${ef.id})" style="margin-top:10px">Verificar</button>
+            <div class="result" id="efr${ef.id}"></div>
+        </div>`;
+        box.innerHTML+=h;
+    });
+}
+
+function toggleEfOpt(el){
+    if(el.classList.contains('ans-ok')||el.classList.contains('ans-no'))return;
+    el.classList.toggle('selected');
+}
+
+function checkEF(id){
+    const ef=errData.find(e=>e.id===id);
+    const r=document.getElementById('efr'+id);
+    let allCorrect=true;
+
+    ef.options.forEach((o,i)=>{
+        const el=document.getElementById('ef'+id+'o'+i);
+        const selected=el.classList.contains('selected');
+        el.classList.remove('selected');
+        if(o.correct && selected){
+            el.classList.add('ans-ok');
+        }else if(o.correct && !selected){
+            el.classList.add('ans-ok');
+            el.innerHTML+=' <span style="color:#fde68a"> &larr; te falto este!</span>';
+            allCorrect=false;
+        }else if(!o.correct && selected){
+            el.classList.add('ans-no');
+            el.innerHTML+=' <span style="color:#fca5a5"> &larr; esto NO es un error</span>';
+            allCorrect=false;
+        }
+        el.onclick=null;
+    });
+
+    if(allCorrect){
+        r.innerHTML='<div style="color:#86efac;font-size:1.1em"><b>Perfecto! Identificaste todos los errores correctamente.</b></div>';
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';
+        addScore('ef'+id);
+    }else{
+        r.innerHTML='<div style="color:#f59e0b">Revisa las marcas. Verde = error real. Rojo = no era un error.</div>';
+        r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+    }
+    r.className='result show';
+}
+
+// ===== QUE DEVUELVE =====
+const qdData=[
+    {id:1,
+     code:`cad = "Python"
+print(cad[1:4])`,
+     answer:"yth",
+     hint:"Slicing: indices 1, 2, 3 (el 4 no se incluye)."},
+    {id:2,
+     code:`cad = "Hola Mundo"
+print(cad[::-1])`,
+     answer:"odnuM aloH",
+     hint:"[::-1] invierte toda la cadena caracter por caracter."},
+    {id:3,
+     code:`palabras = "uno dos tres".split()
+resultado = "-".join(palabras)
+print(resultado)`,
+     answer:"uno-dos-tres",
+     hint:'split() separa por espacios -> ["uno","dos","tres"]. join une con "-".'},
+    {id:4,
+     code:`cad = "Hola Mundo Hola"
+print(cad.replace("Hola", "Chau", 1))`,
+     answer:"Chau Mundo Hola",
+     hint:"replace con tercer parametro 1: solo reemplaza la PRIMERA aparicion."},
+    {id:5,
+     code:`cad = "  Python  "
+print(cad.strip().upper())`,
+     answer:"PYTHON",
+     hint:"strip() quita espacios de ambos lados, upper() convierte a mayusculas."},
+    {id:6,
+     code:`cad = "archivo_datos.csv"
+print(cad.find("datos"))`,
+     answer:"8",
+     hint:'find() devuelve la posicion donde empieza "datos". Contar: a(0)r(1)c(2)h(3)i(4)v(5)o(6)_(7)d(8).'},
+    {id:7,
+     code:`nombre = "juan"
+edad = 25
+print(f"{nombre.title()} tiene {edad} anios")`,
+     answer:"Juan tiene 25 anios",
+     hint:'title() pone la primera letra en mayuscula. f-string inserta las variables.'},
+    {id:8,
+     code:`cad = "Hola"
+cad.upper()
+print(cad)`,
+     answer:"Hola",
+     hint:"Las cadenas son inmutables. upper() devuelve una NUEVA cadena, pero cad no cambio porque no se reasigno."},
+    {id:9,
+     code:`print("ja" * 3)`,
+     answer:"jajaja",
+     hint:'El operador * replica la cadena. "ja" * 3 = "ja" + "ja" + "ja".'},
+    {id:10,
+     code:`cad = "lunes MARTES"
+print(cad.capitalize())`,
+     answer:"Lunes martes",
+     hint:"capitalize() pone la PRIMERA letra en mayuscula y TODO lo demas en minuscula."},
+];
+
+function buildQueDevuelve(){
+    const box=document.getElementById('qdBox');
+    box.innerHTML='';
+    qdData.forEach((qd,i)=>{
+        box.innerHTML+=`
+        <div class="question" id="qd${qd.id}">
+            <p>${i+1}. Que devuelve/imprime este codigo?</p>
+            <pre>${qd.code}</pre>
+            <input type="text" class="qd-input" id="qdi${qd.id}" placeholder="Escribe la salida exacta..." autocomplete="off">
+            <button class="btn btn-p" onclick="checkQD(${qd.id})">Verificar</button>
+            <button class="btn btn-w" onclick="showQDHint(${qd.id})">Pista</button>
+            <div class="fb" id="qdfb${qd.id}"></div>
+        </div>`;
+    });
+}
+
+function normalizeQD(s){
+    return s.trim();
+}
+
+function checkQD(id){
+    const qd=qdData.find(q=>q.id===id);
+    const el=document.getElementById('qd'+id);
+    if(el.dataset.done)return;
+
+    const userAns=normalizeQD(document.getElementById('qdi'+id).value);
+    const correct=normalizeQD(qd.answer);
+    const fb=document.getElementById('qdfb'+id);
+
+    if(userAns===''){
+        fb.className='fb show fb-no';
+        fb.textContent='Escribe una respuesta primero.';
+        return;
+    }
+
+    el.dataset.done='1';
+    document.getElementById('qdi'+id).disabled=true;
+
+    if(userAns===correct){
+        fb.className='fb show fb-ok';
+        fb.textContent='Correcto! '+qd.hint;
+        addScore('qd'+id);
+    }else{
+        fb.className='fb show fb-no';
+        fb.innerHTML='Incorrecto. La respuesta correcta es: <code style="background:#0c1222;padding:3px 8px;border-radius:4px;color:#86efac">'+correct+'</code><br>'+qd.hint;
+    }
+}
+
+function showQDHint(id){
+    const qd=qdData.find(q=>q.id===id);
+    const fb=document.getElementById('qdfb'+id);
+    if(!document.getElementById('qd'+id).dataset.done){
+        fb.className='fb show fb-ok';
+        fb.style.background='#2e2a1a';fb.style.color='#fde68a';fb.style.border='1px solid #f59e0b';
+        fb.textContent='Pista: '+qd.hint;
+    }
+}
+
+// ===== INIT =====
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -c '\"\"q\"\":' v2_expanded.html)"
+    ]
+  }
+}

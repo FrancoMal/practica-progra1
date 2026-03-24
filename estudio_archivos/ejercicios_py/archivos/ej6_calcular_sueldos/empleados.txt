@@ -1,0 +1,6 @@
+Gonzalez Maria;185000;5
+Lopez Juan;210000;12
+Martinez Ana;150000;2
+Rodriguez Carlos;320000;20
+Fernandez Laura;175000;8
+Garcia Pedro;195000;3

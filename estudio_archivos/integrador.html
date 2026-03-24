@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrador Final - Programacion 1 Python</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.7}
+        .container{max-width:920px;margin:0 auto;padding:20px}
+        h1{text-align:center;font-size:2.2em;margin:30px 0;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        h2{color:#38bdf8;margin:30px 0 15px;font-size:1.5em;border-bottom:2px solid #1e3a5f;padding-bottom:8px}
+        h3{color:#a78bfa;margin:15px 0 10px}
+        .tabs{display:flex;flex-wrap:wrap;gap:5px;margin:20px 0;justify-content:center}
+        .tab-btn{padding:10px 18px;background:#1e293b;border:2px solid #334155;color:#94a3b8;border-radius:8px;cursor:pointer;font-size:.95em;transition:.3s}
+        .tab-btn:hover{border-color:#38bdf8;color:#38bdf8}
+        .tab-btn.active{background:#1e3a5f;border-color:#38bdf8;color:#38bdf8;font-weight:bold}
+        .section{display:none;animation:fadeIn .4s}.section.active{display:block}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .card{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0;border-left:4px solid #38bdf8}
+        .card.danger{border-left-color:#ef4444;background:#1e1b2e}
+        .card.success{border-left-color:#22c55e;background:#1a2e1a}
+        .card.warning{border-left-color:#f59e0b;background:#2e2a1a}
+        pre{background:#0c1222;border:1px solid #334155;border-radius:8px;padding:15px;overflow-x:auto;font-family:Consolas,'Courier New',monospace;font-size:.9em;margin:10px 0}
+        code{font-family:Consolas,monospace}
+        .kw{color:#c084fc}.str{color:#86efac}.cmt{color:#64748b;font-style:italic}.fn{color:#38bdf8}
+        .err-hl{background:rgba(239,68,68,.2);display:block;padding:2px 0}
+        .ok-hl{background:rgba(34,197,94,.15);display:block;padding:2px 0}
+        .label{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.8em;font-weight:bold;margin:3px}
+        .label-ok{background:#166534;color:#86efac}.label-bad{background:#7f1d1d;color:#fca5a5}.label-info{background:#1e3a5f;color:#93c5fd}
+        .comparison{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
+        @media(max-width:700px){.comparison{grid-template-columns:1fr}}
+        .diagram{display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0;flex-wrap:wrap}
+        .diagram-box{padding:15px 25px;border-radius:10px;font-weight:bold;text-align:center}
+        .diagram-arrow{font-size:1.5em;color:#64748b}
+        .step-number{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:#2563eb;border-radius:50%;color:white;font-weight:bold;margin-right:8px}
+        ul,ol{margin:10px 0 10px 25px}li{margin:5px 0}
+        .diff{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.75em;font-weight:bold;margin-left:10px}
+        .diff-f{background:#166534;color:#86efac}.diff-m{background:#854d0e;color:#fde68a}.diff-d{background:#7f1d1d;color:#fca5a5}
+
+        .progress-bar{width:100%;height:8px;background:#334155;border-radius:4px;margin:10px 0;overflow:hidden}
+        .progress-fill{height:100%;background:linear-gradient(90deg,#38bdf8,#818cf8);border-radius:4px;transition:width .5s}
+        .score-display{text-align:center;padding:15px;background:#1e293b;border-radius:12px;margin:15px 0;font-size:1.2em}
+        .score-num{color:#38bdf8;font-weight:bold;font-size:1.5em}
+
+        .btn{padding:10px 25px;border:none;border-radius:8px;cursor:pointer;font-size:1em;font-weight:bold;margin:8px 5px 8px 0;transition:.3s}
+        .btn-p{background:#2563eb;color:white}.btn-p:hover{background:#1d4ed8}
+        .btn-s{background:#16a34a;color:white}.btn-s:hover{background:#15803d}
+        .btn-w{background:#d97706;color:white}.btn-w:hover{background:#b45309}
+        .btn-d{background:#dc2626;color:white}.btn-d:hover{background:#b91c1c}
+
+        .ex-area{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0}
+        .ex-area textarea{width:100%;min-height:240px;background:#0c1222;color:#e2e8f0;border:2px solid #334155;border-radius:8px;padding:15px;font-family:Consolas,monospace;font-size:.95em;resize:vertical;tab-size:4}
+        .ex-area textarea:focus{outline:none;border-color:#38bdf8}
+
+        .result{margin-top:10px;padding:15px;border-radius:8px;display:none}
+        .result.show{display:block}
+
+        .oc{background:#1e293b;border-radius:12px;padding:20px;margin:20px 0;border:2px solid #334155}
+        .oc-pool{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:#0f172a;border-radius:8px;min-height:50px;margin:10px 0}
+        .oc-target{border:2px dashed #475569;border-radius:8px;padding:10px;margin:10px 0;min-height:60px}
+        .oc-target .oc-item{width:100%;margin:3px 0}
+        .oc-item{padding:10px 16px;background:#2563eb;color:white;border-radius:6px;cursor:pointer;user-select:none;font-family:Consolas,monospace;font-size:.9em;transition:.2s;display:flex;align-items:center;gap:8px}
+        .oc-pool .oc-item{display:inline-flex}
+        .oc-item:hover{background:#3b82f6}
+        .oc-item.right{background:#16a34a!important}.oc-item.wrong{background:#dc2626!important}
+        .oc-item .item-text{flex:1}
+        .oc-arrows{display:flex;flex-direction:column;gap:1px;margin-right:4px}
+        .oc-arrows button{background:rgba(255,255,255,.2);border:none;color:white;cursor:pointer;font-size:.7em;padding:1px 5px;border-radius:3px;line-height:1}
+        .oc-arrows button:hover{background:rgba(255,255,255,.4)}
+        .oc-pool .oc-arrows{display:none}
+        .oc-ret{background:rgba(255,255,255,.2);border:none;color:white;cursor:pointer;font-size:.8em;padding:2px 8px;border-radius:3px;margin-left:4px}
+        .oc-ret:hover{background:rgba(239,68,68,.5)}
+        .oc-pool .oc-ret{display:none}
+
+        .question{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0;border:2px solid #334155}
+        .question>p{margin-bottom:12px;font-weight:bold}
+        .opts{display:flex;flex-direction:column;gap:8px}
+        .opt{padding:12px 15px;background:#0f172a;border:2px solid #334155;border-radius:8px;cursor:pointer;transition:.3s}
+        .opt:hover{border-color:#38bdf8;background:#1e3a5f}
+        .opt.ok{border-color:#22c55e!important;background:#14532d!important;color:#86efac}
+        .opt.no{border-color:#ef4444!important;background:#7f1d1d!important;color:#fca5a5}
+        .opt.dis{pointer-events:none;opacity:.7}
+        .fb{margin-top:10px;padding:10px 15px;border-radius:8px;display:none;font-size:.95em}
+        .fb.show{display:block}
+        .fb.fb-ok{background:#14532d;color:#86efac;border:1px solid #22c55e}
+        .fb.fb-no{background:#7f1d1d;color:#fca5a5;border:1px solid #ef4444}
+
+        .ef-block{background:#0c1222;border:1px solid #334155;border-radius:8px;padding:15px;margin:10px 0;font-family:Consolas,monospace;font-size:.9em;line-height:2}
+        .ef-opt{padding:8px 15px;background:#0f172a;border:2px solid #334155;border-radius:8px;cursor:pointer;transition:.3s;margin:5px 0;display:block}
+        .ef-opt:hover{border-color:#38bdf8}
+        .ef-opt.selected{border-color:#f59e0b;background:#2e2a1a}
+        .ef-opt.ans-ok{border-color:#22c55e!important;background:#14532d!important}
+        .ef-opt.ans-no{border-color:#ef4444!important;background:#7f1d1d!important}
+
+        .perm-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
+        @media(max-width:700px){.perm-grid{grid-template-columns:1fr}}
+        .perm-ok{background:#1a2e1a;border:2px solid #22c55e;border-radius:10px;padding:15px}
+        .perm-ok h4{color:#86efac;margin-bottom:8px}
+        .perm-bad{background:#1e1b2e;border:2px solid #ef4444;border-radius:10px;padding:15px}
+        .perm-bad h4{color:#fca5a5;margin-bottom:8px}
+
+        .sim-problem{background:#1e293b;border-radius:12px;padding:25px;margin:20px 0;border:2px solid #818cf8}
+        .sim-problem h3{color:#818cf8;font-size:1.3em}
+        .hint-box{background:#2e2a1a;border:1px solid #f59e0b;border-radius:8px;padding:12px;margin:10px 0}
+        .hint-box b{color:#f59e0b}
+        .sol-toggle{cursor:pointer;color:#38bdf8;text-decoration:underline;margin:10px 0;display:inline-block}
+        .sol-content{display:none;margin-top:10px}
+        .sol-content.visible{display:block}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>INTEGRADOR FINAL - Programacion 1</h1>
+    <p style="text-align:center;color:#94a3b8;margin-bottom:5px;">Repaso completo de TODOS los temas del curso</p>
+    <p style="text-align:center;color:#f59e0b;margin-bottom:10px;font-weight:bold;">Lo que necesitas para aprobar el examen final</p>
+
+    <div class="progress-bar"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
+    <div class="score-display">Puntaje: <span class="score-num" id="sDisp">0</span> / <span id="sTotal">0</span></div>
+
+    <div class="tabs" id="tabBar"></div>
+
+    <!-- ===== 1. TEORIA ===== -->
+    <div class="section active" id="sec-teoria">
+        <h2>1. Teoria - Resumen General</h2>
+
+        <!-- FUNCIONES -->
+        <div class="card"><h3>Funciones</h3>
+            <ul>
+                <li><b>def</b> nombre_funcion(parametros): ... <b>return</b> valor</li>
+                <li>Variables locales: solo existen dentro de la funcion</li>
+                <li>Parametros inmutables (int, str, tuple): NO se modifican afuera</li>
+                <li>Parametros mutables (list, dict): SI se modifican afuera</li>
+                <li><b>lambda</b>: funciones anonimas de una expresion: <code style="color:#86efac">lambda x: x * 2</code></li>
+                <li><b>Modulos</b>: import modulo / from modulo import funcion</li>
+            </ul>
+<pre><span class="kw">def</span> <span class="fn">calcular_promedio</span>(lista):
+    <span class="cmt"># UNA sola tarea, NO input, NO print</span>
+    <span class="kw">if</span> <span class="fn">len</span>(lista) == 0:
+        <span class="kw">return</span> 0
+    <span class="kw">return</span> <span class="fn">sum</span>(lista) / <span class="fn">len</span>(lista)</pre>
+        </div>
+        <div class="perm-grid">
+            <div class="perm-ok"><h4>PERMITIDO</h4>
+                <ul>
+                    <li>Una tarea por funcion</li>
+                    <li>return al final de la funcion</li>
+                    <li>Funciones definidas al inicio</li>
+                    <li>Separar: input en main, calculo en funcion</li>
+                    <li>Documentar con docstrings</li>
+                </ul>
+            </div>
+            <div class="perm-bad"><h4>PROHIBIDO</h4>
+                <ul>
+                    <li>return dentro de un loop (for/while)</li>
+                    <li>input() dentro de funciones de calculo</li>
+                    <li>print() dentro de funciones de calculo</li>
+                    <li>Funcion que haga input + calculo + print</li>
+                    <li>Parametro mutable por defecto: <code>def f(lista=[])</code></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- LISTAS -->
+        <div class="card"><h3>Listas</h3>
+            <ul>
+                <li>Creacion: <code style="color:#86efac">lista = [1, 2, 3]</code> o <code style="color:#86efac">lista = list()</code></li>
+                <li>Indexing: <code style="color:#86efac">lista[0]</code>, <code style="color:#86efac">lista[-1]</code></li>
+                <li>Slicing: <code style="color:#86efac">lista[1:3]</code>, <code style="color:#86efac">lista[::-1]</code></li>
+                <li>Metodos: append, insert, pop, remove, sort, reverse, index, count</li>
+                <li>Copia: <code style="color:#86efac">copia = lista[:]</code> o <code style="color:#86efac">copia = list(lista)</code></li>
+                <li>List comprehension: <code style="color:#86efac">[x**2 for x in lista if x > 0]</code></li>
+                <li>map/filter: <code style="color:#86efac">list(map(int, lista_str))</code></li>
+            </ul>
+<pre><span class="cmt"># Copia vs referencia</span>
+a = [1, 2, 3]
+<span class="err-hl">b = a          <span class="cmt"># b apunta a la MISMA lista (referencia)</span></span>
+<span class="ok-hl">c = a[:]       <span class="cmt"># c es una COPIA independiente</span></span>
+<span class="ok-hl">d = list(a)    <span class="cmt"># d es otra COPIA independiente</span></span></pre>
+        </div>
+        <div class="perm-grid">
+            <div class="perm-ok"><h4>PERMITIDO</h4>
+                <ul>
+                    <li>append() para agregar al final</li>
+                    <li>insert(pos, elem) en posicion</li>
+                    <li>sort() / sorted() para ordenar</li>
+                    <li>Copiar con [:] o list()</li>
+                    <li>List comprehension</li>
+                </ul>
+            </div>
+            <div class="perm-bad"><h4>PROHIBIDO</h4>
+                <ul>
+                    <li>Modificar lista mientras se itera con for</li>
+                    <li>Asignar lista como parametro default: <code>def f(l=[])</code></li>
+                    <li>Confundir referencia con copia</li>
+                    <li>Usar remove() sin verificar existencia</li>
+                    <li>Acceder indice fuera de rango sin control</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CADENAS -->
+        <div class="card"><h3>Cadenas (Strings)</h3>
+            <ul>
+                <li><b>Inmutables</b>: no se pueden cambiar caracteres individuales</li>
+                <li>Indexing/slicing igual que listas: <code style="color:#86efac">s[0]</code>, <code style="color:#86efac">s[1:4]</code></li>
+                <li><b>split(sep)</b>: separa en lista. <code style="color:#86efac">"a;b;c".split(';')</code> da <code>['a','b','c']</code></li>
+                <li><b>join()</b>: une lista en string. <code style="color:#86efac">';'.join(lista)</code></li>
+                <li><b>replace(old, new)</b>: reemplaza subcadenas</li>
+                <li><b>upper()/lower()</b>: mayusculas/minusculas</li>
+                <li><b>strip()/rstrip()/lstrip()</b>: quita espacios o caracteres</li>
+                <li><b>find(sub)</b>: devuelve posicion o -1</li>
+                <li><b>f-strings</b>: <code style="color:#86efac">f"Hola {nombre}, nota: {nota:.2f}"</code></li>
+                <li><b>Escape</b>: <code>\n</code> salto, <code>\t</code> tab, <code>\\</code> barra</li>
+            </ul>
+        </div>
+        <div class="perm-grid">
+            <div class="perm-ok"><h4>PERMITIDO</h4>
+                <ul>
+                    <li>split() para separar campos CSV</li>
+                    <li>rstrip('\n') para limpiar lineas</li>
+                    <li>f-strings para formatear salida</li>
+                    <li>Comparar con == (case-sensitive)</li>
+                    <li>in para buscar subcadena</li>
+                </ul>
+            </div>
+            <div class="perm-bad"><h4>PROHIBIDO</h4>
+                <ul>
+                    <li>Intentar modificar s[0] = 'X' (inmutable!)</li>
+                    <li>Olvidar que split devuelve STRINGS (hay que convertir)</li>
+                    <li>Olvidar rstrip('\n') al leer de archivo</li>
+                    <li>Concatenar con + en loops (ineficiente)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- EXCEPCIONES -->
+        <div class="card"><h3>Excepciones</h3>
+            <ul>
+                <li><b>try/except/else/finally</b>: estructura de manejo de errores</li>
+                <li><b>Orden</b>: excepciones especificas ANTES de generales</li>
+                <li><b>FileNotFoundError</b> antes de <b>OSError</b> (es mas especifica)</li>
+                <li><b>raise</b>: lanzar excepcion manualmente</li>
+                <li><b>assert</b>: verificar condicion (debug)</li>
+                <li><b>finally</b>: SIEMPRE se ejecuta (ideal para cerrar archivos)</li>
+            </ul>
+<pre><span class="kw">try</span>:
+    resultado = x / y
+<span class="kw">except</span> <span class="fn">ZeroDivisionError</span>:
+    <span class="fn">print</span>(<span class="str">"No se puede dividir por cero"</span>)
+<span class="kw">except</span> <span class="fn">TypeError</span>:
+    <span class="fn">print</span>(<span class="str">"Tipo de dato incorrecto"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">"Todo salio bien"</span>)
+<span class="kw">finally</span>:
+    <span class="fn">print</span>(<span class="str">"Siempre se ejecuta"</span>)</pre>
+        </div>
+        <div class="perm-grid">
+            <div class="perm-ok"><h4>PERMITIDO</h4>
+                <ul>
+                    <li>FileNotFoundError ANTES de OSError</li>
+                    <li>finally para cerrar archivos</li>
+                    <li>try/except NameError en finally (proteger close)</li>
+                    <li>ValueError para conversion de tipos</li>
+                    <li>else para codigo que solo corre si no hubo error</li>
+                </ul>
+            </div>
+            <div class="perm-bad"><h4>PROHIBIDO</h4>
+                <ul>
+                    <li>except sin tipo: <code>except:</code> (atrapa todo)</li>
+                    <li>OSError antes de FileNotFoundError</li>
+                    <li>Ignorar excepciones con pass sin justificar</li>
+                    <li>Usar excepciones para control de flujo normal</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ARCHIVOS -->
+        <div class="card"><h3>Archivos</h3>
+            <ul>
+                <li>3 etapas: <b>open()</b> &#10132; <b>proceso</b> &#10132; <b>close()</b></li>
+                <li>Modos: <b>"r"</b> lectura, <b>"w"</b> escritura (destruye!), <b>"a"</b> append</li>
+                <li>Lectura: <b>readline()</b> o <b>for linea in arch</b></li>
+                <li>Escritura: <b>write(dato + '\n')</b> - un write por registro</li>
+                <li><b>seek(0)</b> para volver al inicio sin cerrar</li>
+                <li>CSV: campos separados por <b>;</b> , usar <b>split(';')</b></li>
+            </ul>
+<pre><span class="cmt"># Estructura OBLIGATORIA para archivos</span>
+<span class="kw">try</span>:
+    arch = <span class="fn">open</span>(<span class="str">"datos.txt"</span>, <span class="str">"rt"</span>)
+    <span class="kw">for</span> linea <span class="kw">in</span> arch:
+        linea = linea.<span class="fn">rstrip</span>(<span class="str">'\n'</span>)
+        <span class="cmt"># procesar...</span>
+<span class="kw">except</span> <span class="fn">FileNotFoundError</span> <span class="kw">as</span> msg:
+    <span class="fn">print</span>(<span class="str">"No encontrado:"</span>, msg)
+<span class="kw">except</span> <span class="fn">OSError</span> <span class="kw">as</span> msg:
+    <span class="fn">print</span>(<span class="str">"Error:"</span>, msg)
+<span class="kw">finally</span>:
+    <span class="kw">try</span>:
+        arch.<span class="fn">close</span>()
+    <span class="kw">except</span> <span class="fn">NameError</span>:
+        <span class="kw">pass</span></pre>
+        </div>
+        <div class="perm-grid">
+            <div class="perm-ok"><h4>PERMITIDO</h4>
+                <ul>
+                    <li>readline() con while</li>
+                    <li>for linea in arch:</li>
+                    <li>write() con \n manual</li>
+                    <li>seek(0) para releer</li>
+                    <li>try/except/finally SIEMPRE</li>
+                    <li>rstrip('\n') al leer</li>
+                </ul>
+            </div>
+            <div class="perm-bad"><h4>PROHIBIDO</h4>
+                <ul>
+                    <li><b>readlines()</b> - carga todo en lista</li>
+                    <li><b>read()</b> - carga todo en string</li>
+                    <li><b>list(arch)</b> - carga todo en lista</li>
+                    <li>Mezclar for con readline()</li>
+                    <li>Abrir/cerrar por cada registro</li>
+                    <li>Cerrar/reabrir mismo modo (usar seek(0))</li>
+                    <li>Varios write() por registro</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- RECURSIVIDAD -->
+        <div class="card"><h3>Recursividad</h3>
+            <ul>
+                <li><b>Caso base</b>: condicion de parada (sin llamada recursiva)</li>
+                <li><b>Caso recursivo</b>: llama a si misma con problema mas chico</li>
+                <li>Toda recursion puede hacerse iterativa (y viceversa)</li>
+                <li>Ventaja: codigo mas elegante y natural para ciertos problemas</li>
+                <li>Desventaja: usa mas memoria (pila de llamadas), puede ser mas lenta</li>
+            </ul>
+<pre><span class="kw">def</span> <span class="fn">factorial</span>(n):
+    <span class="kw">if</span> n <= 1:          <span class="cmt"># caso base</span>
+        <span class="kw">return</span> 1
+    <span class="kw">return</span> n * <span class="fn">factorial</span>(n - 1)  <span class="cmt"># caso recursivo</span>
+
+<span class="kw">def</span> <span class="fn">fibonacci</span>(n):
+    <span class="kw">if</span> n <= 0: <span class="kw">return</span> 0
+    <span class="kw">if</span> n == 1: <span class="kw">return</span> 1
+    <span class="kw">return</span> <span class="fn">fibonacci</span>(n-1) + <span class="fn">fibonacci</span>(n-2)
+
+<span class="kw">def</span> <span class="fn">potencia</span>(base, exp):
+    <span class="kw">if</span> exp == 0: <span class="kw">return</span> 1
+    <span class="kw">return</span> base * <span class="fn">potencia</span>(base, exp - 1)</pre>
+        </div>
+        <div class="perm-grid">
+            <div class="perm-ok"><h4>PERMITIDO</h4>
+                <ul>
+                    <li>Caso base con if simple (sin loops)</li>
+                    <li>Reducir el problema en cada llamada</li>
+                    <li>return con llamada recursiva</li>
+                    <li>Multiples casos base si es necesario</li>
+                </ul>
+            </div>
+            <div class="perm-bad"><h4>PROHIBIDO</h4>
+                <ul>
+                    <li>for/while para determinar caso base</li>
+                    <li>Recursion sin caso base (loop infinito)</li>
+                    <li>No reducir el problema (loop infinito)</li>
+                    <li>Variables globales en recursion</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- TUPLAS/CONJUNTOS/DICCIONARIOS -->
+        <div class="card"><h3>Tuplas, Conjuntos y Diccionarios</h3>
+            <p style="color:#f59e0b;margin-bottom:10px"><b>Tres estructuras complementarias a las listas</b></p>
+            <table style="width:100%;border-collapse:collapse">
+                <tr style="border-bottom:1px solid #334155;background:#0c1222"><th style="padding:8px">Estructura</th><th style="padding:8px">Sintaxis</th><th style="padding:8px">Mutable?</th><th style="padding:8px">Duplicados?</th></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><b>Tupla</b></td><td style="padding:8px"><code>(1, 2, 3)</code></td><td style="padding:8px;color:#fca5a5">NO</td><td style="padding:8px">Si</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><b>Conjunto</b></td><td style="padding:8px"><code>{1, 2, 3}</code></td><td style="padding:8px;color:#86efac">SI</td><td style="padding:8px;color:#fca5a5">NO</td></tr>
+                <tr><td style="padding:8px"><b>Diccionario</b></td><td style="padding:8px"><code>{"a": 1}</code></td><td style="padding:8px;color:#86efac">SI</td><td style="padding:8px">Claves NO</td></tr>
+            </table>
+<pre><span class="cmt"># Tupla - inmutable, acceso por indice</span>
+coord = (10, 20)
+x, y = coord          <span class="cmt"># desempaquetado</span>
+
+<span class="cmt"># Conjunto - sin duplicados, operaciones matematicas</span>
+s = {1, 2, 3}
+s.<span class="fn">add</span>(4)
+s.<span class="fn">discard</span>(2)          <span class="cmt"># no da error si no existe</span>
+union = s1 | s2       <span class="cmt"># union</span>
+inter = s1 & s2       <span class="cmt"># interseccion</span>
+
+<span class="cmt"># Diccionario - clave:valor</span>
+d = {<span class="str">"nombre"</span>: <span class="str">"Juan"</span>, <span class="str">"edad"</span>: 20}
+d[<span class="str">"nota"</span>] = 8.5       <span class="cmt"># agregar/modificar</span>
+<span class="kw">for</span> clave, valor <span class="kw">in</span> d.<span class="fn">items</span>():
+    <span class="fn">print</span>(clave, valor)</pre>
+        </div>
+        <div class="perm-grid">
+            <div class="perm-ok"><h4>PERMITIDO</h4>
+                <ul>
+                    <li>Tuplas como claves de diccionario</li>
+                    <li>Desempaquetado de tuplas</li>
+                    <li>dict.get(clave, default) para evitar KeyError</li>
+                    <li>items(), keys(), values() para recorrer</li>
+                    <li>Conjuntos para eliminar duplicados</li>
+                </ul>
+            </div>
+            <div class="perm-bad"><h4>PROHIBIDO</h4>
+                <ul>
+                    <li>Modificar tupla (es inmutable)</li>
+                    <li>Lista como clave de diccionario (no es hashable)</li>
+                    <li>Acceder clave inexistente sin get() o in</li>
+                    <li>Modificar diccionario mientras se itera</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 2. QUIZ ===== -->
+    <div class="section" id="sec-quiz">
+        <h2>2. Quiz Final - 20 Preguntas</h2>
+        <p style="color:#94a3b8;margin-bottom:10px">Preguntas de nivel examen mezclando TODOS los temas.</p>
+        <div id="quizBox"></div>
+        <div style="text-align:center;margin:20px 0"><button class="btn btn-w" onclick="resetQuiz()">Reiniciar Quiz</button></div>
+    </div>
+
+    <!-- ===== 3. EJERCICIOS ===== -->
+    <div class="section" id="sec-ejercicios">
+        <h2>3. Ejercicios Integradores</h2>
+        <p style="color:#94a3b8">Ejercicios que combinan multiples temas. La verificacion revisa patrones del curso.</p>
+        <div id="exBox"></div>
+    </div>
+
+    <!-- ===== 4. ORDENAR ===== -->
+    <div class="section" id="sec-ordenar">
+        <h2>4. Ordenar Codigo</h2>
+        <p style="color:#94a3b8">Clic en las lineas del banco para moverlas al destino. Usa las flechas para reordenar.</p>
+        <div id="orderBox"></div>
+    </div>
+
+    <!-- ===== 5. ERRORES ===== -->
+    <div class="section" id="sec-errores">
+        <h2>5. Errores de Examen</h2>
+        <p style="color:#94a3b8">Errores basados en patrones reales de examen. Selecciona TODOS los problemas que encuentres.</p>
+        <div id="errBox"></div>
+    </div>
+
+    <!-- ===== 6. SIMULACRO ===== -->
+    <div class="section" id="sec-simulacro">
+        <h2>6. Simulacro de Examen</h2>
+        <p style="color:#94a3b8;margin-bottom:10px">Tres problemas estilo examen final simplificados. Intentalos sin ver la solucion primero.</p>
+
+        <!-- PROBLEMA 1: Elecciones -->
+        <div class="sim-problem">
+            <h3>Problema 1: Conteo de Votos</h3>
+            <div class="card">
+                <p><b>Consigna:</b> Se tiene un archivo <code>"votos.txt"</code> donde cada linea tiene el formato <code>partido;lista</code>. Se pide:</p>
+                <ol>
+                    <li>Leer el archivo y contar la cantidad de votos por partido (usar diccionario)</li>
+                    <li>Mostrar el partido ganador (el que mas votos tiene)</li>
+                    <li>Mostrar un grafico de barras con asteriscos (1 asterisco = 1 voto)</li>
+                </ol>
+                <p style="margin-top:10px"><b>Contenido de prueba para votos.txt:</b></p>
+<pre>Partido_A;101
+Partido_B;202
+Partido_A;101
+Partido_C;303
+Partido_B;202
+Partido_A;101
+Partido_A;102
+Partido_B;201
+Partido_C;303
+Partido_A;101</pre>
+            </div>
+            <div class="hint-box"><b>Pistas:</b> Temas involucrados: archivos + diccionarios + funciones + cadenas. Usar dict.get(clave, 0) para contar. Usar max() con key para encontrar ganador.</div>
+            <span class="sol-toggle" onclick="toggleSol('sol1')">Ver solucion</span>
+            <div class="sol-content" id="sol1">
+<pre><span class="kw">def</span> <span class="fn">contar_votos</span>(nombre_archivo):
+    votos = {}
+    <span class="kw">try</span>:
+        arch = <span class="fn">open</span>(nombre_archivo, <span class="str">"rt"</span>)
+        <span class="kw">for</span> linea <span class="kw">in</span> arch:
+            linea = linea.<span class="fn">rstrip</span>(<span class="str">'\n'</span>)
+            partido, lista = linea.<span class="fn">split</span>(<span class="str">';'</span>)
+            votos[partido] = votos.<span class="fn">get</span>(partido, 0) + 1
+    <span class="kw">except</span> <span class="fn">FileNotFoundError</span> <span class="kw">as</span> msg:
+        <span class="fn">print</span>(<span class="str">"No encontrado:"</span>, msg)
+    <span class="kw">except</span> <span class="fn">OSError</span> <span class="kw">as</span> msg:
+        <span class="fn">print</span>(<span class="str">"Error:"</span>, msg)
+    <span class="kw">finally</span>:
+        <span class="kw">try</span>:
+            arch.<span class="fn">close</span>()
+        <span class="kw">except</span> <span class="fn">NameError</span>:
+            <span class="kw">pass</span>
+    <span class="kw">return</span> votos
+
+<span class="kw">def</span> <span class="fn">mostrar_ganador</span>(votos):
+    <span class="kw">if</span> <span class="fn">len</span>(votos) == 0:
+        <span class="fn">print</span>(<span class="str">"No hay votos."</span>)
+        <span class="kw">return</span>
+    ganador = <span class="fn">max</span>(votos, key=<span class="kw">lambda</span> p: votos[p])
+    <span class="fn">print</span>(<span class="str">f"Ganador: </span>{ganador}<span class="str"> con </span>{votos[ganador]}<span class="str"> votos"</span>)
+
+<span class="kw">def</span> <span class="fn">grafico_barras</span>(votos):
+    <span class="kw">for</span> partido, cant <span class="kw">in</span> votos.<span class="fn">items</span>():
+        <span class="fn">print</span>(<span class="str">f"</span>{partido:15s}<span class="str"> | </span>{<span class="str">'*'</span> * cant}<span class="str"> (</span>{cant}<span class="str">)"</span>)
+
+<span class="cmt"># Programa principal</span>
+votos = <span class="fn">contar_votos</span>(<span class="str">"votos.txt"</span>)
+<span class="kw">if</span> votos:
+    <span class="fn">mostrar_ganador</span>(votos)
+    <span class="fn">grafico_barras</span>(votos)</pre>
+            </div>
+        </div>
+
+        <!-- PROBLEMA 2: Alquiler -->
+        <div class="sim-problem">
+            <h3>Problema 2: Gestion de Alquiler de Items</h3>
+            <div class="card">
+                <p><b>Consigna:</b> Sistema de alquiler con menu. Usar un diccionario donde la clave es el codigo del item y el valor es el nombre del cliente.</p>
+                <ol>
+                    <li><b>Registrar alquiler</b>: pedir codigo y cliente, agregar al dict. Si ya esta alquilado, avisar.</li>
+                    <li><b>Devolver item</b>: pedir codigo, eliminar del dict. Si no esta alquilado, avisar.</li>
+                    <li><b>Reporte</b>: mostrar todos los items alquilados ordenados por codigo.</li>
+                    <li><b>Salir</b></li>
+                </ol>
+                <p style="margin-top:10px">El menu se repite hasta que el usuario elija salir. Usar excepciones para entrada invalida.</p>
+            </div>
+            <div class="hint-box"><b>Pistas:</b> Temas: diccionarios + funciones + excepciones + while + listas (sorted). Cada opcion del menu deberia ser una funcion separada.</div>
+            <span class="sol-toggle" onclick="toggleSol('sol2')">Ver solucion</span>
+            <div class="sol-content" id="sol2">
+<pre><span class="kw">def</span> <span class="fn">registrar</span>(alquilados):
+    codigo = <span class="fn">input</span>(<span class="str">"Codigo del item: "</span>)
+    <span class="kw">if</span> codigo <span class="kw">in</span> alquilados:
+        <span class="fn">print</span>(<span class="str">f"Item </span>{codigo}<span class="str"> ya alquilado por </span>{alquilados[codigo]}<span class="str">"</span>)
+    <span class="kw">else</span>:
+        cliente = <span class="fn">input</span>(<span class="str">"Nombre del cliente: "</span>)
+        alquilados[codigo] = cliente
+        <span class="fn">print</span>(<span class="str">"Alquiler registrado."</span>)
+
+<span class="kw">def</span> <span class="fn">devolver</span>(alquilados):
+    codigo = <span class="fn">input</span>(<span class="str">"Codigo del item a devolver: "</span>)
+    <span class="kw">if</span> codigo <span class="kw">in</span> alquilados:
+        <span class="kw">del</span> alquilados[codigo]
+        <span class="fn">print</span>(<span class="str">"Devolucion registrada."</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="str">"Ese item no esta alquilado."</span>)
+
+<span class="kw">def</span> <span class="fn">reporte</span>(alquilados):
+    <span class="kw">if</span> <span class="fn">len</span>(alquilados) == 0:
+        <span class="fn">print</span>(<span class="str">"No hay items alquilados."</span>)
+        <span class="kw">return</span>
+    <span class="fn">print</span>(<span class="str">"--- Items Alquilados ---"</span>)
+    <span class="kw">for</span> codigo <span class="kw">in</span> <span class="fn">sorted</span>(alquilados):
+        <span class="fn">print</span>(<span class="str">f"  </span>{codigo}<span class="str"> -> </span>{alquilados[codigo]}<span class="str">"</span>)
+
+<span class="cmt"># Programa principal</span>
+alquilados = {}
+opcion = <span class="str">""</span>
+<span class="kw">while</span> opcion != <span class="str">"4"</span>:
+    <span class="fn">print</span>(<span class="str">"\n1. Registrar alquiler"</span>)
+    <span class="fn">print</span>(<span class="str">"2. Devolver item"</span>)
+    <span class="fn">print</span>(<span class="str">"3. Reporte"</span>)
+    <span class="fn">print</span>(<span class="str">"4. Salir"</span>)
+    opcion = <span class="fn">input</span>(<span class="str">"Opcion: "</span>)
+    <span class="kw">if</span> opcion == <span class="str">"1"</span>:
+        <span class="fn">registrar</span>(alquilados)
+    <span class="kw">elif</span> opcion == <span class="str">"2"</span>:
+        <span class="fn">devolver</span>(alquilados)
+    <span class="kw">elif</span> opcion == <span class="str">"3"</span>:
+        <span class="fn">reporte</span>(alquilados)
+    <span class="kw">elif</span> opcion == <span class="str">"4"</span>:
+        <span class="fn">print</span>(<span class="str">"Fin."</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="str">"Opcion invalida."</span>)</pre>
+            </div>
+        </div>
+
+        <!-- PROBLEMA 3: Aerolinea -->
+        <div class="sim-problem">
+            <h3>Problema 3: Asignacion de Asientos</h3>
+            <div class="card">
+                <p><b>Consigna:</b> Se tiene un archivo <code>"pasajeros.txt"</code> con formato <code>nombre;asiento</code> donde asiento puede estar vacio (pasajero sin asiento asignado). Se pide:</p>
+                <ol>
+                    <li>Leer el archivo y armar una lista de pasajeros con asiento y otra sin asiento</li>
+                    <li>Detectar colisiones (dos pasajeros con el mismo asiento) y reportarlas</li>
+                    <li>Asignar asientos libres (del 1 al 30) a los pasajeros sin asiento</li>
+                    <li>Grabar el resultado en <code>"asignacion.txt"</code></li>
+                </ol>
+                <p style="margin-top:10px"><b>Contenido de prueba para pasajeros.txt:</b></p>
+<pre>Garcia, Juan;5
+Lopez, Maria;
+Martinez, Ana;12
+Rodriguez, Pedro;5
+Fernandez, Luis;
+Gomez, Carlos;20</pre>
+            </div>
+            <div class="hint-box"><b>Pistas:</b> Temas: archivos + listas + diccionarios + conjuntos + funciones. Usar un conjunto para asientos ocupados. Detectar colision = asiento ya esta en el conjunto cuando lo queres agregar.</div>
+            <span class="sol-toggle" onclick="toggleSol('sol3')">Ver solucion</span>
+            <div class="sol-content" id="sol3">
+<pre><span class="kw">def</span> <span class="fn">leer_pasajeros</span>(nombre_archivo):
+    con_asiento = []
+    sin_asiento = []
+    colisiones = []
+    asientos_usados = <span class="fn">set</span>()
+    <span class="kw">try</span>:
+        arch = <span class="fn">open</span>(nombre_archivo, <span class="str">"rt"</span>)
+        <span class="kw">for</span> linea <span class="kw">in</span> arch:
+            linea = linea.<span class="fn">rstrip</span>(<span class="str">'\n'</span>)
+            nombre, asiento = linea.<span class="fn">split</span>(<span class="str">';'</span>)
+            <span class="kw">if</span> asiento == <span class="str">""</span>:
+                sin_asiento.<span class="fn">append</span>(nombre)
+            <span class="kw">else</span>:
+                num = <span class="fn">int</span>(asiento)
+                <span class="kw">if</span> num <span class="kw">in</span> asientos_usados:
+                    colisiones.<span class="fn">append</span>((nombre, num))
+                <span class="kw">else</span>:
+                    asientos_usados.<span class="fn">add</span>(num)
+                    con_asiento.<span class="fn">append</span>((nombre, num))
+    <span class="kw">except</span> <span class="fn">FileNotFoundError</span> <span class="kw">as</span> msg:
+        <span class="fn">print</span>(<span class="str">"No encontrado:"</span>, msg)
+    <span class="kw">except</span> <span class="fn">OSError</span> <span class="kw">as</span> msg:
+        <span class="fn">print</span>(<span class="str">"Error:"</span>, msg)
+    <span class="kw">finally</span>:
+        <span class="kw">try</span>:
+            arch.<span class="fn">close</span>()
+        <span class="kw">except</span> <span class="fn">NameError</span>:
+            <span class="kw">pass</span>
+    <span class="kw">return</span> con_asiento, sin_asiento, colisiones, asientos_usados
+
+<span class="kw">def</span> <span class="fn">asignar_libres</span>(sin_asiento, asientos_usados, max_asientos=30):
+    nuevos = []
+    asiento_actual = 1
+    <span class="kw">for</span> nombre <span class="kw">in</span> sin_asiento:
+        <span class="kw">while</span> asiento_actual <span class="kw">in</span> asientos_usados <span class="kw">and</span> asiento_actual <= max_asientos:
+            asiento_actual += 1
+        <span class="kw">if</span> asiento_actual <= max_asientos:
+            nuevos.<span class="fn">append</span>((nombre, asiento_actual))
+            asientos_usados.<span class="fn">add</span>(asiento_actual)
+            asiento_actual += 1
+        <span class="kw">else</span>:
+            <span class="fn">print</span>(<span class="str">f"Sin asiento disponible para </span>{nombre}<span class="str">"</span>)
+    <span class="kw">return</span> nuevos
+
+<span class="kw">def</span> <span class="fn">grabar_asignacion</span>(con_asiento, nuevos, nombre_salida):
+    <span class="kw">try</span>:
+        arch = <span class="fn">open</span>(nombre_salida, <span class="str">"wt"</span>)
+        todos = con_asiento + nuevos
+        todos.<span class="fn">sort</span>(key=<span class="kw">lambda</span> x: x[1])
+        <span class="kw">for</span> nombre, asiento <span class="kw">in</span> todos:
+            arch.<span class="fn">write</span>(nombre + <span class="str">';'</span> + <span class="fn">str</span>(asiento) + <span class="str">'\n'</span>)
+    <span class="kw">except</span> <span class="fn">OSError</span> <span class="kw">as</span> msg:
+        <span class="fn">print</span>(<span class="str">"Error:"</span>, msg)
+    <span class="kw">finally</span>:
+        <span class="kw">try</span>:
+            arch.<span class="fn">close</span>()
+        <span class="kw">except</span> <span class="fn">NameError</span>:
+            <span class="kw">pass</span>
+
+<span class="cmt"># Programa principal</span>
+con_asiento, sin_asiento, colisiones, usados = <span class="fn">leer_pasajeros</span>(<span class="str">"pasajeros.txt"</span>)
+<span class="kw">if</span> colisiones:
+    <span class="fn">print</span>(<span class="str">"COLISIONES detectadas:"</span>)
+    <span class="kw">for</span> nombre, asiento <span class="kw">in</span> colisiones:
+        <span class="fn">print</span>(<span class="str">f"  </span>{nombre}<span class="str"> quiere asiento </span>{asiento}<span class="str"> (ya ocupado)"</span>)
+    sin_asiento += [n <span class="kw">for</span> n, a <span class="kw">in</span> colisiones]
+nuevos = <span class="fn">asignar_libres</span>(sin_asiento, usados)
+<span class="fn">grabar_asignacion</span>(con_asiento, nuevos, <span class="str">"asignacion.txt"</span>)
+<span class="fn">print</span>(<span class="str">"Asignacion grabada en asignacion.txt"</span>)</pre>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ===== GLOBALS =====
+let score=0, answered={};
+const TABS=[
+    {id:'teoria',label:'1. Teoria'},
+    {id:'quiz',label:'2. Quiz'},
+    {id:'ejercicios',label:'3. Ejercicios'},
+    {id:'ordenar',label:'4. Ordenar'},
+    {id:'errores',label:'5. Errores'},
+    {id:'simulacro',label:'6. Simulacro'}
+];
+
+function init(){
+    const tb=document.getElementById('tabBar');
+    TABS.forEach((t,i)=>{
+        const b=document.createElement('button');
+        b.className='tab-btn'+(i===0?' active':'');
+        b.textContent=t.label;
+        b.onclick=()=>{
+            document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+            document.getElementById('sec-'+t.id).classList.add('active');
+            b.classList.add('active');
+        };
+        tb.appendChild(b);
+    });
+    buildQuiz();
+    buildExercises();
+    buildOrderChallenges();
+    buildErrorFinders();
+    updateTotal();
+}
+
+function updateTotal(){
+    const t=quizData.length + exData.length + orderData.length + errData.length;
+    document.getElementById('sTotal').textContent=t;
+}
+function addScore(id){
+    if(answered[id])return;
+    answered[id]=true;
+    score++;
+    document.getElementById('sDisp').textContent=score;
+    const t=parseInt(document.getElementById('sTotal').textContent);
+    document.getElementById('pFill').style.width=(t>0?(score/t)*100:0)+'%';
+}
+
+// ===== QUIZ =====
+const quizData=[
+    {q:"Que devuelve readlines()? (metodo PROHIBIDO en la cursada)",o:["Un string","Un generador","Una lista con todas las lineas","Un iterador"],c:2,e:"readlines() devuelve una LISTA con todas las lineas, cargando todo en memoria. PROHIBIDO."},
+    {q:"Por que NO se debe usar 'def f(lista=[])' como parametro?",o:["Porque Python no lo permite","Porque la lista se comparte entre llamadas","Porque es mas lento","Porque no se puede modificar"],c:1,e:"El parametro mutable por defecto se crea UNA sola vez y se reutiliza entre llamadas. Cada llamada modifica la misma lista."},
+    {q:"Cual es el caso base correcto para factorial recursivo?",o:["if n == 0: return n","if n <= 1: return 1","while n > 0: return n","for i in range(n): return 1"],c:1,e:"Caso base: if n <= 1: return 1. NUNCA usar for/while para caso base."},
+    {q:"Que pasa si haces return dentro de un for que busca un maximo?",o:["Funciona perfecto","Solo revisa el primer elemento y sale","Da error de sintaxis","Revisa todos y devuelve el ultimo"],c:1,e:"return dentro del loop sale en la primera iteracion. Solo compara el primer elemento."},
+    {q:"Para que sirve seek(0)?",o:["Borrar el contenido","Cerrar el archivo","Volver al inicio sin cerrar","Abrir en modo lectura"],c:2,e:"seek(0) mueve el puntero al inicio del archivo sin necesidad de cerrar y reabrir."},
+    {q:"Cual es la diferencia entre remove() y pop()?",o:["Son iguales","remove quita por valor, pop por indice","remove quita por indice, pop por valor","pop no existe en listas"],c:1,e:"remove(valor) busca y quita la primera aparicion. pop(indice) quita por posicion y lo devuelve."},
+    {q:"Que devuelve dict.get('clave_inexistente', 0)?",o:["KeyError","None","0","False"],c:2,e:"get() con segundo parametro devuelve ese valor por defecto si la clave no existe. Devuelve 0."},
+    {q:"Que error da acceder a arch.close() en finally si open() fallo?",o:["OSError","FileNotFoundError","NameError","TypeError"],c:2,e:"Si open() fallo, la variable 'arch' nunca se creo. Llamar arch.close() da NameError."},
+    {q:"Que tipo es inmutable en Python?",o:["Lista","Diccionario","Conjunto","Tupla"],c:3,e:"Las tuplas son inmutables. No se pueden modificar despues de crear."},
+    {q:"Si f-string es f'Nota: {n:.2f}', que hace .2f?",o:["Redondea a 2 enteros","Muestra con 2 decimales","Multiplica por 2","Convierte a fraccion"],c:1,e:".2f formatea como float con exactamente 2 decimales."},
+    {q:"Que excepcion va PRIMERO: FileNotFoundError u OSError?",o:["OSError","FileNotFoundError","Da igual el orden","Ninguna, se usa Exception"],c:1,e:"FileNotFoundError es HIJA de OSError. La mas especifica va primero, sino nunca se alcanza."},
+    {q:"Que hace lista[:] ?",o:["Borra la lista","Devuelve una copia superficial","Invierte la lista","Devuelve el ultimo elemento"],c:1,e:"lista[:] crea una copia superficial (shallow copy). Es igual a list(lista)."},
+    {q:"En recursividad, que pasa si no hay caso base?",o:["Funciona igual","Se ejecuta una sola vez","RecursionError (stack overflow)","Devuelve None"],c:2,e:"Sin caso base la funcion se llama infinitamente hasta agotar la pila: RecursionError."},
+    {q:"Cual es la forma CORRECTA de leer un archivo linea por linea?",o:["contenido = arch.read()","lineas = arch.readlines()","for linea in arch:","datos = list(arch)"],c:2,e:"for linea in arch: lee una linea por vez sin cargar todo en memoria."},
+    {q:"Que hace 'a;b;c'.split(';')?",o:["'abc'","['a', 'b', 'c']","('a', 'b', 'c')","Error"],c:1,e:"split(';') separa por punto y coma y devuelve una LISTA de strings."},
+    {q:"Que pasa al modificar una lista mientras se itera con for?",o:["Funciona correctamente","Se saltea elementos o da resultados inesperados","Error de sintaxis","Se crea una copia automatica"],c:1,e:"Modificar la lista durante la iteracion desplaza indices y se saltean elementos."},
+    {q:"Para contar frecuencias de palabras, la estructura ideal es:",o:["Lista","Tupla","Conjunto","Diccionario"],c:3,e:"Diccionario: clave=palabra, valor=cantidad. Perfecto para frecuencias."},
+    {q:"Que pasa si abres un archivo con 'w' y ya existe?",o:["Error, no se puede","Se abre para leer","Se DESTRUYE el contenido anterior","Se agrega al final"],c:2,e:"Modo 'w' BORRA todo el contenido existente y crea el archivo de cero."},
+    {q:"Que hace ';'.join(['a','b','c'])?",o:["['a;b;c']","'a;b;c'","Error","'abc'"],c:1,e:"join() une los elementos de la lista con el separador, devolviendo 'a;b;c'."},
+    {q:"En una funcion de calculo, que NO debe tener?",o:["return","parametros","variables locales","input() y print()"],c:3,e:"Funciones de calculo NO deben hacer input ni print. Solo recibir datos, calcular y retornar."}
+];
+
+function buildQuiz(){
+    const box=document.getElementById('quizBox');
+    box.innerHTML='';
+    quizData.forEach((q,i)=>{
+        let h=`<div class="question" id="q${i}"><p>${i+1}. ${q.q}</p><div class="opts">`;
+        q.o.forEach((o,j)=>{h+=`<div class="opt" id="q${i}o${j}" onclick="ansQ(${i},${j})">${o}</div>`;});
+        h+=`</div><div class="fb" id="qfb${i}"></div></div>`;
+        box.innerHTML+=h;
+    });
+}
+function ansQ(qi,oi){
+    const el=document.getElementById('q'+qi);
+    if(el.dataset.done)return;el.dataset.done='1';
+    el.querySelectorAll('.opt').forEach(o=>o.classList.add('dis'));
+    const fb=document.getElementById('qfb'+qi);
+    if(oi===quizData[qi].c){
+        document.getElementById('q'+qi+'o'+oi).classList.add('ok');
+        fb.className='fb show fb-ok';fb.textContent='Correcto! '+quizData[qi].e;
+        addScore('q'+qi);
+    }else{
+        document.getElementById('q'+qi+'o'+oi).classList.add('no');
+        document.getElementById('q'+qi+'o'+quizData[qi].c).classList.add('ok');
+        fb.className='fb show fb-no';fb.textContent='Incorrecto. '+quizData[qi].e;
+    }
+}
+function resetQuiz(){
+    quizData.forEach((_,i)=>delete answered['q'+i]);
+    score=Object.keys(answered).length;
+    document.getElementById('sDisp').textContent=score;
+    const t=parseInt(document.getElementById('sTotal').textContent);
+    document.getElementById('pFill').style.width=(t>0?(score/t)*100:0)+'%';
+    buildQuiz();
+}
+
+// ===== EXERCISES =====
+const exData=[
+    {id:1,title:"Leer CSV y devolver diccionario",diff:"m",
+     desc:'Funcion que lea "productos.csv" (codigo;nombre;precio) y devuelva un diccionario {codigo: (nombre, precio)}. Combina archivos + funciones + diccionarios.',
+     template:`def leer_productos(nombre_archivo):\n    productos = {}\n    # COMPLETA: abrir archivo, leer linea por linea\n    # split por ';', armar dict con codigo como clave\n    # valor = tupla (nombre, float(precio))\n    # retornar el diccionario\n    return productos\n\n# Programa principal\nresultado = leer_productos("productos.csv")\nfor cod, datos in resultado.items():\n    print(f"Codigo: {cod}, Nombre: {datos[0]}, Precio: {datos[1]}")`,
+     solution:`def leer_productos(nombre_archivo):\n    productos = {}\n    try:\n        arch = open(nombre_archivo, "rt")\n        for linea in arch:\n            linea = linea.rstrip('\\n')\n            codigo, nombre, precio = linea.split(';')\n            productos[codigo] = (nombre, float(precio))\n    except FileNotFoundError as msg:\n        print("No encontrado:", msg)\n    except OSError as msg:\n        print("Error:", msg)\n    finally:\n        try:\n            arch.close()\n        except NameError:\n            pass\n    return productos\n\n# Programa principal\nresultado = leer_productos("productos.csv")\nfor cod, datos in resultado.items():\n    print(f"Codigo: {cod}, Nombre: {datos[0]}, Precio: {datos[1]}")`,
+     checks:[
+         {type:'bad',re:/\.readlines\s*\(/,msg:'readlines() PROHIBIDO'},
+         {type:'bad',re:/\.read\s*\(\s*\)/,msg:'read() PROHIBIDO'},
+         {type:'need',re:/for\s+\w+\s+in\s+\w+|\.readline\s*\(/,msg:'Falta lectura linea por linea'},
+         {type:'need',re:/\.split\s*\(/,msg:'Falta split() para separar campos'},
+         {type:'need',re:/try\s*:/,msg:'Falta try'},
+         {type:'need',re:/finally\s*:/,msg:'Falta finally'},
+         {type:'need',re:/\.close\s*\(/,msg:'Falta close()'},
+         {type:'need',re:/except\s+NameError/,msg:'Falta except NameError en finally'},
+         {type:'need',re:/float\s*\(/,msg:'Falta convertir precio a float'},
+         {type:'need',re:/return/,msg:'Falta return del diccionario'},
+     ]},
+    {id:2,title:"Busqueda binaria recursiva",diff:"d",
+     desc:'Funcion recursiva que reciba una lista ORDENADA y un elemento, y devuelva True/False si se encuentra. Busqueda binaria: comparar con el medio, si es menor buscar en la mitad izquierda, si es mayor en la derecha.',
+     template:`def busqueda_binaria(lista, elem, inicio, fin):\n    # COMPLETA: caso base y caso recursivo\n    # caso base: inicio > fin -> return False\n    # calcular medio = (inicio + fin) // 2\n    # si lista[medio] == elem -> return True\n    # si elem < lista[medio] -> buscar en mitad izquierda\n    # si elem > lista[medio] -> buscar en mitad derecha\n    pass\n\n# Programa principal\nnumeros = [2, 5, 8, 12, 16, 23, 38, 45, 67, 91]\nprint(busqueda_binaria(numeros, 23, 0, len(numeros)-1))\nprint(busqueda_binaria(numeros, 10, 0, len(numeros)-1))`,
+     solution:`def busqueda_binaria(lista, elem, inicio, fin):\n    if inicio > fin:\n        return False\n    medio = (inicio + fin) // 2\n    if lista[medio] == elem:\n        return True\n    if elem < lista[medio]:\n        return busqueda_binaria(lista, elem, inicio, medio - 1)\n    return busqueda_binaria(lista, elem, medio + 1, fin)\n\n# Programa principal\nnumeros = [2, 5, 8, 12, 16, 23, 38, 45, 67, 91]\nprint(busqueda_binaria(numeros, 23, 0, len(numeros)-1))\nprint(busqueda_binaria(numeros, 10, 0, len(numeros)-1))`,
+     checks:[
+         {type:'need',re:/def\s+busqueda_binaria/,msg:'Falta definir la funcion busqueda_binaria'},
+         {type:'need',re:/if\s+inicio\s*>\s*fin|if\s+fin\s*<\s*inicio/,msg:'Falta caso base (inicio > fin)'},
+         {type:'need',re:/busqueda_binaria\s*\(/,msg:'Falta llamada recursiva'},
+         {type:'need',re:/medio|mid/i,msg:'Falta calcular el punto medio'},
+         {type:'need',re:/\/\/\s*2/,msg:'Falta division entera para calcular medio'},
+         {type:'need',re:/return\s+True|return\s+False/,msg:'Falta return True/False'},
+         {type:'bad',re:/for\s+.*in\s+.*:|while\s+/,msg:'En busqueda binaria RECURSIVA no uses for/while'},
+     ]},
+    {id:3,title:"Archivo de alumnos con promedios",diff:"d",
+     desc:'"alumnos.txt" tiene: nombre;nota1;nota2;nota3. Leer, crear dict {nombre: promedio}, ordenar por promedio descendente e imprimir.',
+     template:`# COMPLETA TODO\n# 1. Leer archivo linea por linea\n# 2. Calcular promedio de cada alumno\n# 3. Guardar en diccionario {nombre: promedio}\n# 4. Ordenar por promedio (sorted con key)\n# 5. Imprimir ranking`,
+     solution:`def leer_alumnos(nombre_archivo):\n    alumnos = {}\n    try:\n        arch = open(nombre_archivo, "rt")\n        for linea in arch:\n            linea = linea.rstrip('\\n')\n            campos = linea.split(';')\n            nombre = campos[0]\n            notas = [float(campos[i]) for i in range(1, len(campos))]\n            promedio = sum(notas) / len(notas)\n            alumnos[nombre] = round(promedio, 2)\n    except FileNotFoundError as msg:\n        print("No encontrado:", msg)\n    except OSError as msg:\n        print("Error:", msg)\n    finally:\n        try:\n            arch.close()\n        except NameError:\n            pass\n    return alumnos\n\ndef mostrar_ranking(alumnos):\n    ranking = sorted(alumnos.items(), key=lambda x: x[1], reverse=True)\n    print("--- Ranking por Promedio ---")\n    for i, (nombre, prom) in enumerate(ranking, 1):\n        print(f"{i}. {nombre}: {prom}")\n\n# Programa principal\nalumnos = leer_alumnos("alumnos.txt")\nif alumnos:\n    mostrar_ranking(alumnos)`,
+     checks:[
+         {type:'bad',re:/\.readlines\s*\(/,msg:'readlines() PROHIBIDO'},
+         {type:'bad',re:/\.read\s*\(\s*\)/,msg:'read() PROHIBIDO'},
+         {type:'need',re:/for\s+\w+\s+in\s+\w+|\.readline\s*\(/,msg:'Falta lectura linea por linea'},
+         {type:'need',re:/\.split\s*\(/,msg:'Falta split()'},
+         {type:'need',re:/float\s*\(/,msg:'Falta convertir notas a float'},
+         {type:'need',re:/sorted|\.sort/,msg:'Falta ordenar (sorted o sort)'},
+         {type:'need',re:/try\s*:/,msg:'Falta try'},
+         {type:'need',re:/finally\s*:/,msg:'Falta finally'},
+         {type:'need',re:/return/,msg:'Falta return'},
+     ]},
+    {id:4,title:"Frecuencia de palabras",diff:"m",
+     desc:'Funcion que reciba una frase (string) y devuelva un diccionario con la frecuencia de cada palabra. Convertir a minusculas.',
+     template:`def frecuencia_palabras(frase):\n    # COMPLETA:\n    # 1. Convertir a minusculas con .lower()\n    # 2. Separar en palabras con .split()\n    # 3. Recorrer y contar con diccionario\n    # 4. Retornar el diccionario\n    pass\n\n# Programa principal\ntexto = "hola mundo hola Python mundo hola"\nresultado = frecuencia_palabras(texto)\nfor palabra, cant in resultado.items():\n    print(f"{palabra}: {cant}")`,
+     solution:`def frecuencia_palabras(frase):\n    frase = frase.lower()\n    palabras = frase.split()\n    frecuencias = {}\n    for palabra in palabras:\n        frecuencias[palabra] = frecuencias.get(palabra, 0) + 1\n    return frecuencias\n\n# Programa principal\ntexto = "hola mundo hola Python mundo hola"\nresultado = frecuencia_palabras(texto)\nfor palabra, cant in resultado.items():\n    print(f"{palabra}: {cant}")`,
+     checks:[
+         {type:'need',re:/\.lower\s*\(\s*\)/,msg:'Falta convertir a minusculas con .lower()'},
+         {type:'need',re:/\.split\s*\(/,msg:'Falta split() para separar palabras'},
+         {type:'need',re:/\.get\s*\(|if\s+\w+\s+(not\s+)?in/,msg:'Falta dict.get() o verificar existencia con in'},
+         {type:'need',re:/return/,msg:'Falta return del diccionario'},
+         {type:'need',re:/for\s+\w+\s+in/,msg:'Falta recorrer las palabras'},
+         {type:'bad',re:/input\s*\(/,msg:'La funcion NO debe usar input (recibe datos por parametro)'},
+         {type:'bad',re:/print\s*\(/,msg:'La funcion de calculo NO debe usar print (solo retorna)'},
+     ]},
+    {id:5,title:"Menu con archivos y excepciones",diff:"d",
+     desc:'Menu para gestionar contactos: 1.Agregar (append), 2.Listar (leer archivo), 3.Buscar (recorrer), 4.Salir. Archivo "contactos.txt" con nombre;telefono.',
+     template:`# COMPLETA TODO\n# Funciones separadas: agregar, listar, buscar\n# Menu con while, input con try/except\n# Archivo contactos.txt con modo "at" para agregar, "rt" para leer\n# Estructura de excepciones correcta`,
+     solution:`def agregar_contacto():\n    nombre = input("Nombre: ")\n    telefono = input("Telefono: ")\n    try:\n        arch = open("contactos.txt", "at")\n        arch.write(nombre + ';' + telefono + '\\n')\n        print("Contacto agregado.")\n    except OSError as msg:\n        print("Error:", msg)\n    finally:\n        try:\n            arch.close()\n        except NameError:\n            pass\n\ndef listar_contactos():\n    try:\n        arch = open("contactos.txt", "rt")\n        print("--- Contactos ---")\n        for linea in arch:\n            linea = linea.rstrip('\\n')\n            nombre, tel = linea.split(';')\n            print(f"  {nombre}: {tel}")\n    except FileNotFoundError:\n        print("No hay contactos aun.")\n    except OSError as msg:\n        print("Error:", msg)\n    finally:\n        try:\n            arch.close()\n        except NameError:\n            pass\n\ndef buscar_contacto():\n    buscar = input("Nombre a buscar: ").lower()\n    encontrado = False\n    try:\n        arch = open("contactos.txt", "rt")\n        for linea in arch:\n            linea = linea.rstrip('\\n')\n            nombre, tel = linea.split(';')\n            if buscar in nombre.lower():\n                print(f"Encontrado: {nombre}: {tel}")\n                encontrado = True\n        if not encontrado:\n            print("No encontrado.")\n    except FileNotFoundError:\n        print("No hay contactos aun.")\n    except OSError as msg:\n        print("Error:", msg)\n    finally:\n        try:\n            arch.close()\n        except NameError:\n            pass\n\n# Programa principal\nopcion = ""\nwhile opcion != "4":\n    print("\\n1. Agregar contacto")\n    print("2. Listar contactos")\n    print("3. Buscar contacto")\n    print("4. Salir")\n    opcion = input("Opcion: ")\n    if opcion == "1":\n        agregar_contacto()\n    elif opcion == "2":\n        listar_contactos()\n    elif opcion == "3":\n        buscar_contacto()\n    elif opcion == "4":\n        print("Fin.")\n    else:\n        print("Opcion invalida.")`,
+     checks:[
+         {type:'bad',re:/\.readlines\s*\(/,msg:'readlines() PROHIBIDO'},
+         {type:'bad',re:/\.read\s*\(\s*\)/,msg:'read() PROHIBIDO'},
+         {type:'need',re:/for\s+\w+\s+in\s+\w+|\.readline\s*\(/,msg:'Falta lectura linea por linea'},
+         {type:'need',re:/while/,msg:'Falta while para el menu'},
+         {type:'need',re:/def\s+/,msg:'Falta definir funciones'},
+         {type:'need',re:/open.*at|open.*"a"/,msg:'Falta modo append para agregar'},
+         {type:'need',re:/\.write\s*\(/,msg:'Falta write()'},
+         {type:'need',re:/try\s*:/,msg:'Falta try'},
+         {type:'need',re:/finally\s*:/,msg:'Falta finally'},
+         {type:'need',re:/\.close\s*\(/,msg:'Falta close()'},
+         {type:'need',re:/\.split\s*\(/,msg:'Falta split()'},
+     ]},
+    {id:6,title:"Programa estilo examen final",diff:"d",
+     desc:'Leer "ventas.csv" (vendedor;producto;cantidad;precio_unitario). Crear dict {vendedor: monto_total}. Grabar "resumen.txt" ordenado por monto descendente. Formato: vendedor;monto_total.',
+     template:`# COMPLETA TODO\n# Funciones:\n# 1. leer_ventas(archivo) -> dict {vendedor: monto_total}\n# 2. grabar_resumen(dict, archivo_salida)\n# Programa principal: llamar funciones`,
+     solution:`def leer_ventas(nombre_archivo):\n    vendedores = {}\n    try:\n        arch = open(nombre_archivo, "rt")\n        for linea in arch:\n            linea = linea.rstrip('\\n')\n            vendedor, producto, cantidad, precio = linea.split(';')\n            monto = int(cantidad) * float(precio)\n            vendedores[vendedor] = vendedores.get(vendedor, 0) + monto\n    except FileNotFoundError as msg:\n        print("No encontrado:", msg)\n    except OSError as msg:\n        print("Error:", msg)\n    finally:\n        try:\n            arch.close()\n        except NameError:\n            pass\n    return vendedores\n\ndef grabar_resumen(vendedores, nombre_salida):\n    try:\n        arch = open(nombre_salida, "wt")\n        ordenados = sorted(vendedores.items(), key=lambda x: x[1], reverse=True)\n        for vendedor, monto in ordenados:\n            arch.write(vendedor + ';' + str(round(monto, 2)) + '\\n')\n        print("Resumen grabado.")\n    except OSError as msg:\n        print("Error:", msg)\n    finally:\n        try:\n            arch.close()\n        except NameError:\n            pass\n\n# Programa principal\nventas = leer_ventas("ventas.csv")\nif ventas:\n    grabar_resumen(ventas, "resumen.txt")\n    print("Ranking de vendedores:")\n    for v, m in sorted(ventas.items(), key=lambda x: x[1], reverse=True):\n        print(f"  {v}: ${m:.2f}")`,
+     checks:[
+         {type:'bad',re:/\.readlines\s*\(/,msg:'readlines() PROHIBIDO'},
+         {type:'bad',re:/\.read\s*\(\s*\)/,msg:'read() PROHIBIDO'},
+         {type:'need',re:/for\s+\w+\s+in\s+\w+|\.readline\s*\(/,msg:'Falta lectura linea por linea'},
+         {type:'need',re:/\.split\s*\(/,msg:'Falta split()'},
+         {type:'need',re:/def\s+/,msg:'Falta definir funciones'},
+         {type:'need',re:/\.get\s*\(/,msg:'Falta dict.get() para acumular'},
+         {type:'need',re:/sorted|\.sort/,msg:'Falta ordenar'},
+         {type:'need',re:/\.write\s*\(/,msg:'Falta write() para grabar'},
+         {type:'need',re:/open.*wt|open.*"w"/,msg:'Falta abrir archivo de salida en modo escritura'},
+         {type:'need',re:/try\s*:/,msg:'Falta try'},
+         {type:'need',re:/finally\s*:/,msg:'Falta finally'},
+         {type:'need',re:/return/,msg:'Falta return'},
+     ]}
+];
+
+function buildExercises(){
+    const box=document.getElementById('exBox');
+    box.innerHTML='';
+    const diffLabels={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffClass={f:'diff-f',m:'diff-m',d:'diff-d'};
+    exData.forEach(ex=>{
+        box.innerHTML+=`
+        <div class="ex-area">
+            <h3>Ejercicio ${ex.id}: ${ex.title} <span class="diff ${diffClass[ex.diff]}">${diffLabels[ex.diff]}</span></h3>
+            <p style="color:#94a3b8;margin:10px 0">${ex.desc}</p>
+            <textarea id="ext${ex.id}" spellcheck="false">${ex.template}</textarea>
+            <button class="btn btn-p" onclick="checkEx(${ex.id})">Verificar</button>
+            <button class="btn btn-s" onclick="showSol(${ex.id})">Ver Solucion</button>
+            <div class="result" id="exr${ex.id}"></div>
+        </div>`;
+    });
+}
+
+function checkEx(id){
+    const ex=exData.find(e=>e.id===id);
+    const code=document.getElementById('ext'+id).value;
+    const r=document.getElementById('exr'+id);
+    let errors=[],goods=[];
+    if(/COMPLETA/.test(code)){
+        r.innerHTML='<div style="color:#f59e0b">Todavia no completaste el codigo.</div>';
+        r.className='result show';r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+        return;
+    }
+    if(/for\s+\w+\s+in\s+\w+/.test(code) && /\.readline\s*\(/.test(code) && !/while/.test(code)){
+        errors.push('Mezclas for con readline() - PROHIBIDO');
+    }
+    ex.checks.forEach(ch=>{
+        if(ch.type==='bad' && ch.re.test(code)) errors.push(ch.msg);
+        if(ch.type==='need' && !ch.re.test(code)) errors.push(ch.msg);
+    });
+    if(/for\s+\w+\s+in\s+\w+/.test(code)||/\.readline\s*\(/.test(code)) goods.push('Lectura registro por registro');
+    if(/try\s*:/.test(code)) goods.push('Usa try/except');
+    if(/finally\s*:/.test(code)) goods.push('Usa finally');
+    if(/\.close\s*\(/.test(code)) goods.push('Cierra archivo(s)');
+    if(/except\s+NameError/.test(code)) goods.push('Protege close()');
+    if(/rstrip|strip/.test(code)) goods.push('Limpia \\n');
+    if(/\.split\s*\(/.test(code)) goods.push('Usa split()');
+    if(/\.write\s*\(/.test(code)) goods.push('Usa write()');
+    if(/def\s+/.test(code)) goods.push('Usa funciones');
+    if(/return/.test(code)) goods.push('Retorna resultado');
+    let h='';
+    if(goods.length){h+='<div style="color:#86efac"><b>Bien hecho:</b><ul>';goods.forEach(g=>h+='<li>'+g+'</li>');h+='</ul></div>';}
+    if(errors.length){h+='<div style="color:#fca5a5;margin-top:8px"><b>Problemas:</b><ul>';errors.forEach(e=>h+='<li>'+e+'</li>');h+='</ul></div>';}
+    if(!errors.length){
+        h+='<div style="color:#86efac;font-size:1.1em;margin-top:8px"><b>Excelente! Sigue las buenas practicas del curso.</b></div>';
+        addScore('ex'+id);
+    }
+    r.innerHTML=h;r.className='result show';
+    r.style.background=errors.length?'#1e1b2e':'#1a2e1a';
+    r.style.border='1px solid '+(errors.length?'#a78bfa':'#22c55e');
+}
+
+function showSol(id){
+    const ex=exData.find(e=>e.id===id);
+    document.getElementById('ext'+id).value=ex.solution;
+    const r=document.getElementById('exr'+id);
+    r.innerHTML='<div style="color:#93c5fd">Solucion mostrada. Estudiala y trata de hacerla sin mirar!</div>';
+    r.className='result show';r.style.background='#1e3a5f';r.style.border='1px solid #38bdf8';
+}
+
+// ===== ORDER CHALLENGES =====
+const orderData=[
+    {id:1,title:"Funcion que lee archivo y retorna dict",diff:"m",lines:[
+        "def leer_datos(archivo):",
+        "    datos = {}",
+        "    try:",
+        "        arch = open(archivo, \"rt\")",
+        "        for linea in arch:",
+        "            clave, valor = linea.rstrip('\\n').split(';')",
+        "            datos[clave] = valor",
+        "    except FileNotFoundError as msg:",
+        "        print(\"No encontrado:\", msg)",
+        "    finally:",
+        "        try: arch.close()",
+        "        except NameError: pass",
+        "    return datos"
+    ]},
+    {id:2,title:"Busqueda binaria recursiva",diff:"d",lines:[
+        "def buscar(lista, elem, ini, fin):",
+        "    if ini > fin:",
+        "        return False",
+        "    medio = (ini + fin) // 2",
+        "    if lista[medio] == elem:",
+        "        return True",
+        "    if elem < lista[medio]:",
+        "        return buscar(lista, elem, ini, medio - 1)",
+        "    return buscar(lista, elem, medio + 1, fin)"
+    ]},
+    {id:3,title:"Contar frecuencia y grabar resultado",diff:"d",lines:[
+        "def contar_palabras(frase):",
+        "    freq = {}",
+        "    for p in frase.lower().split():",
+        "        freq[p] = freq.get(p, 0) + 1",
+        "    return freq",
+        "",
+        "def grabar_frecuencias(freq, archivo):",
+        "    try:",
+        "        arch = open(archivo, \"wt\")",
+        "        for palabra, cant in sorted(freq.items()):",
+        "            arch.write(palabra + ';' + str(cant) + '\\n')",
+        "    except OSError as msg:",
+        "        print(\"Error:\", msg)",
+        "    finally:",
+        "        try: arch.close()",
+        "        except NameError: pass"
+    ]},
+    {id:4,title:"Menu con excepciones y lista",diff:"d",lines:[
+        "contactos = []",
+        "opcion = \"\"",
+        "while opcion != \"3\":",
+        "    print(\"1.Agregar 2.Listar 3.Salir\")",
+        "    opcion = input(\"Opcion: \")",
+        "    if opcion == \"1\":",
+        "        nombre = input(\"Nombre: \")",
+        "        contactos.append(nombre)",
+        "    elif opcion == \"2\":",
+        "        for c in contactos:",
+        "            print(c)",
+        "    elif opcion != \"3\":",
+        "        print(\"Opcion invalida\")"
+    ]}
+];
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+function buildOrderChallenges(){
+    const box=document.getElementById('orderBox');
+    box.innerHTML='';
+    const diffL={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffC={f:'diff-f',m:'diff-m',d:'diff-d'};
+    let allHTML='';
+    orderData.forEach(ch=>{
+        allHTML+=`
+        <div class="oc" id="oc${ch.id}">
+            <h3>Desafio ${ch.id}: ${ch.title} <span class="diff ${diffC[ch.diff]}">${diffL[ch.diff]}</span></h3>
+            <p style="color:#94a3b8;margin:8px 0">Banco (clic para enviar al destino):</p>
+            <div class="oc-pool" id="ocp${ch.id}"></div>
+            <p style="color:#94a3b8;margin:8px 0">Destino (usa &#9650;&#9660; para reordenar, &#10005; para devolver):</p>
+            <div class="oc-target" id="oct${ch.id}"></div>
+            <button class="btn btn-p" onclick="checkOC(${ch.id})">Verificar</button>
+            <button class="btn btn-w" onclick="resetOC(${ch.id})">Reiniciar</button>
+            <div class="result" id="ocr${ch.id}"></div>
+        </div>`;
+    });
+    box.innerHTML=allHTML;
+    orderData.forEach(ch=>resetOC(ch.id));
+}
+
+function makeOCItem(id, item){
+    const pool=document.getElementById('ocp'+id);
+    const tgt=document.getElementById('oct'+id);
+    const d=document.createElement('div');
+    d.className='oc-item';
+    d.dataset.idx=item.idx;
+    const arrows=document.createElement('span');
+    arrows.className='oc-arrows';
+    arrows.innerHTML='<button onclick="event.stopPropagation();moveOC(this.closest(\'.oc-item\'),-1)">&#9650;</button><button onclick="event.stopPropagation();moveOC(this.closest(\'.oc-item\'),1)">&#9660;</button>';
+    d.appendChild(arrows);
+    const span=document.createElement('span');
+    span.className='item-text';
+    span.textContent=item.text;
+    d.appendChild(span);
+    const ret=document.createElement('button');
+    ret.className='oc-ret';
+    ret.textContent='\u2715';
+    ret.onclick=function(e){e.stopPropagation();pool.appendChild(d);d.classList.remove('right','wrong');};
+    d.appendChild(ret);
+    d.onclick=function(){
+        if(this.parentElement===pool){
+            tgt.appendChild(this);
+            this.classList.remove('right','wrong');
+        }
+    };
+    return d;
+}
+
+function moveOC(el, dir){
+    const parent=el.parentElement;
+    if(dir===-1 && el.previousElementSibling){
+        parent.insertBefore(el, el.previousElementSibling);
+    }else if(dir===1 && el.nextElementSibling){
+        parent.insertBefore(el.nextElementSibling, el);
+    }
+    el.classList.remove('right','wrong');
+}
+
+function resetOC(id){
+    const ch=orderData.find(c=>c.id===id);
+    const pool=document.getElementById('ocp'+id);
+    const tgt=document.getElementById('oct'+id);
+    pool.innerHTML='';tgt.innerHTML='';
+    document.getElementById('ocr'+id).className='result';
+    const shuffled=shuffle(ch.lines.map((l,i)=>({text:l,idx:i})));
+    shuffled.forEach(item=>{
+        pool.appendChild(makeOCItem(id, item));
+    });
+}
+
+function checkOC(id){
+    const ch=orderData.find(c=>c.id===id);
+    const tgt=document.getElementById('oct'+id);
+    const items=tgt.querySelectorAll('.oc-item');
+    const r=document.getElementById('ocr'+id);
+    if(items.length<ch.lines.length){
+        r.innerHTML='<div style="color:#f59e0b">Faltan lineas. Haz clic en cada una del banco.</div>';
+        r.className='result show';r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+        return;
+    }
+    let allOk=true;
+    items.forEach((item,i)=>{
+        if(parseInt(item.dataset.idx)===i){
+            item.classList.add('right');item.classList.remove('wrong');
+        }else{
+            item.classList.add('wrong');item.classList.remove('right');
+            allOk=false;
+        }
+    });
+    if(allOk){
+        r.innerHTML='<div style="color:#86efac;font-size:1.1em"><b>Perfecto! Orden correcto.</b></div>';
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';
+        addScore('oc'+id);
+    }else{
+        r.innerHTML='<div style="color:#fca5a5"><b>Hay errores.</b> Verde = correcto. Rojo = incorrecto. Reordena las rojas.</div>';
+        r.style.background='#1e1b2e';r.style.border='1px solid #ef4444';
+    }
+    r.className='result show';
+}
+
+// ===== ERROR FINDERS =====
+const errData=[
+    {id:1,title:"Error 1: Funcion que hace todo",diff:"m",
+     consigna:"Consigna: crear una funcion que calcule el promedio de una lista de notas.",
+     code:`def calcular_promedio():
+    notas = []
+    n = int(input("Cuantas notas? "))
+    for i in range(n):
+        nota = float(input("Nota: "))
+        notas.append(nota)
+    promedio = sum(notas) / len(notas)
+    print(f"El promedio es: {promedio}")
+
+calcular_promedio()`,
+     question:"Que errores tiene segun las reglas del curso?",
+     options:[
+         {text:"La funcion hace input() - el input debe estar AFUERA",correct:true},
+         {text:"La funcion hace print() - debe RETORNAR el resultado",correct:true},
+         {text:"No recibe la lista por parametro",correct:true},
+         {text:"No tiene return",correct:true},
+         {text:"El for esta mal usado",correct:false},
+         {text:"Falta convertir a float",correct:false},
+     ]},
+    {id:2,title:"Error 2: readlines en examen",diff:"f",
+     consigna:"Consigna: leer un archivo y contar las lineas que tienen la palabra 'error'.",
+     code:`try:
+    arch = open("log.txt", "rt")
+    lineas = arch.readlines()
+    contador = 0
+    for linea in lineas:
+        if "error" in linea.lower():
+            contador += 1
+    print("Errores:", contador)
+except OSError as msg:
+    print("Error:", msg)
+finally:
+    try: arch.close()
+    except NameError: pass`,
+     question:"Que errores tiene? (esto DESAPRUEBA en examen)",
+     options:[
+         {text:"readlines() PROHIBIDO - carga todo en memoria",correct:true},
+         {text:"Itera sobre la lista en memoria en vez del archivo",correct:true},
+         {text:"Falta FileNotFoundError antes de OSError",correct:true},
+         {text:"El lower() esta mal",correct:false},
+         {text:"Falta finally",correct:false},
+         {text:"El close() esta mal",correct:false},
+     ]},
+    {id:3,title:"Error 3: return dentro de loop",diff:"m",
+     consigna:"Consigna: funcion que busque el maximo de una lista.",
+     code:`def buscar_maximo(lista):
+    maximo = lista[0]
+    for elem in lista:
+        if elem > maximo:
+            maximo = elem
+            return maximo`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"return dentro del for - sale en la primera vez que encuentra un mayor",correct:true},
+         {text:"No compara todos los elementos, solo hasta el primer 'mayor'",correct:true},
+         {text:"El return debe estar FUERA del for, despues de recorrer todo",correct:true},
+         {text:"No retorna nada si el primer elemento ya es el maximo",correct:true},
+         {text:"Deberia usar while en vez de for",correct:false},
+         {text:"lista[0] da error siempre",correct:false},
+     ]},
+    {id:4,title:"Error 4: archivo sin try/finally",diff:"m",
+     consigna:"Consigna: leer archivo CSV y mostrar los datos.",
+     code:`arch = open("datos.csv", "rt")
+for linea in arch:
+    campos = linea.split(';')
+    print(campos[0], campos[1])
+arch.close()`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"No tiene try/except/finally (OBLIGATORIO con archivos)",correct:true},
+         {text:"Si open() falla, el programa crashea sin mensaje claro",correct:true},
+         {text:"Si hay error en el proceso, close() nunca se ejecuta",correct:true},
+         {text:"Falta rstrip('\\n') - el ultimo campo trae \\n",correct:true},
+         {text:"El for esta mal, deberia usar readline",correct:false},
+         {text:"split(';') no funciona con archivos",correct:false},
+     ]},
+    {id:5,title:"Error 5: modificar lista iterando",diff:"d",
+     consigna:"Consigna: eliminar todos los numeros negativos de una lista.",
+     code:`def quitar_negativos(lista):
+    for num in lista:
+        if num < 0:
+            lista.remove(num)
+    return lista
+
+numeros = [3, -1, 4, -5, -2, 6, -3, 8]
+print(quitar_negativos(numeros))`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"Modifica la lista mientras itera con for (se saltea elementos)",correct:true},
+         {text:"No elimina todos los negativos: al remover, los indices se desplazan",correct:true},
+         {text:"Deberia iterar sobre una COPIA: for num in lista[:]",correct:true},
+         {text:"remove() da error si el elemento no existe",correct:false},
+         {text:"Deberia usar pop() en vez de remove()",correct:false},
+         {text:"La funcion no retorna nada",correct:false},
+     ]},
+    {id:6,title:"Error 6: parametro mutable default",diff:"d",
+     consigna:"Consigna: funcion que agregue un elemento a una lista y la devuelva.",
+     code:`def agregar(elemento, lista=[]):
+    lista.append(elemento)
+    return lista
+
+print(agregar("a"))
+print(agregar("b"))
+print(agregar("c"))`,
+     question:"Que problema tiene este codigo?",
+     options:[
+         {text:"lista=[] se crea UNA sola vez, se comparte entre llamadas",correct:true},
+         {text:"La segunda llamada recibe ['a'] en vez de [] (no se reinicia)",correct:true},
+         {text:"Imprime ['a'], ['a','b'], ['a','b','c'] en vez de listas separadas",correct:true},
+         {text:"Solucion: usar lista=None y crear adentro si es None",correct:true},
+         {text:"append() no funciona en este caso",correct:false},
+         {text:"Falta try/except",correct:false},
+     ]}
+];
+
+function buildErrorFinders(){
+    const box=document.getElementById('errBox');
+    box.innerHTML='';
+    const diffL={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffC={f:'diff-f',m:'diff-m',d:'diff-d'};
+    errData.forEach(ef=>{
+        let h=`<div class="oc" id="ef${ef.id}">
+            <h3>${ef.title} <span class="diff ${diffC[ef.diff]}">${diffL[ef.diff]}</span></h3>
+            <div class="card warning" style="margin-bottom:10px"><p>${ef.consigna}</p></div>
+            <pre>${ef.code}</pre>
+            <p style="margin:10px 0;font-weight:bold">${ef.question}</p>
+            <div id="efo${ef.id}">`;
+        ef.options.forEach((o,i)=>{
+            h+=`<div class="ef-opt" id="ef${ef.id}o${i}" onclick="toggleEfOpt(this)">${o.text}</div>`;
+        });
+        h+=`</div>
+            <button class="btn btn-p" onclick="checkEF(${ef.id})" style="margin-top:10px">Verificar</button>
+            <div class="result" id="efr${ef.id}"></div>
+        </div>`;
+        box.innerHTML+=h;
+    });
+}
+
+function toggleEfOpt(el){
+    if(el.classList.contains('ans-ok')||el.classList.contains('ans-no'))return;
+    el.classList.toggle('selected');
+}
+
+function checkEF(id){
+    const ef=errData.find(e=>e.id===id);
+    const r=document.getElementById('efr'+id);
+    let allCorrect=true;
+    ef.options.forEach((o,i)=>{
+        const el=document.getElementById('ef'+id+'o'+i);
+        const selected=el.classList.contains('selected');
+        el.classList.remove('selected');
+        if(o.correct && selected){
+            el.classList.add('ans-ok');
+        }else if(o.correct && !selected){
+            el.classList.add('ans-ok');
+            el.innerHTML+=' <span style="color:#fde68a"> &larr; te falto este!</span>';
+            allCorrect=false;
+        }else if(!o.correct && selected){
+            el.classList.add('ans-no');
+            el.innerHTML+=' <span style="color:#fca5a5"> &larr; esto NO es un error</span>';
+            allCorrect=false;
+        }
+        el.onclick=null;
+    });
+    if(allCorrect){
+        r.innerHTML='<div style="color:#86efac;font-size:1.1em"><b>Perfecto! Identificaste todos los errores.</b></div>';
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';
+        addScore('ef'+id);
+    }else{
+        r.innerHTML='<div style="color:#f59e0b">Revisa. Verde = error real. Rojo = no era error.</div>';
+        r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+    }
+    r.className='result show';
+}
+
+// ===== SIMULACRO TOGGLE =====
+function toggleSol(id){
+    const el=document.getElementById(id);
+    el.classList.toggle('visible');
+}
+
+// ===== INIT =====
+init();
+</script>
+</body>
+</html>

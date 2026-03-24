@@ -1,0 +1,6 @@
+Gonzalez Maria;212749.99999999997
+Lopez Juan;285600.0
+Martinez Ana;159000.0
+Rodriguez Carlos;512000.0
+Fernandez Laura;217000.0
+Garcia Pedro;212550.00000000003

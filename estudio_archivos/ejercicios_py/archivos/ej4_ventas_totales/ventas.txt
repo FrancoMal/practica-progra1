@@ -1,0 +1,7 @@
+Teclado mecanico;3;8500.50
+Monitor LED 24;1;45000.00
+Mouse inalambrico;5;3200.75
+Auriculares bluetooth;2;12500.00
+Cable HDMI;10;950.00
+Webcam HD;2;7800.00
+Parlante portatil;1;15600.50

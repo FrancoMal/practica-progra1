@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listas en Python - Clases 3 y 4</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.7}
+        .container{max-width:920px;margin:0 auto;padding:20px}
+        h1{text-align:center;font-size:2.2em;margin:30px 0;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        h2{color:#38bdf8;margin:30px 0 15px;font-size:1.5em;border-bottom:2px solid #1e3a5f;padding-bottom:8px}
+        h3{color:#a78bfa;margin:15px 0 10px}
+        .tabs{display:flex;flex-wrap:wrap;gap:5px;margin:20px 0;justify-content:center}
+        .tab-btn{padding:10px 18px;background:#1e293b;border:2px solid #334155;color:#94a3b8;border-radius:8px;cursor:pointer;font-size:.95em;transition:.3s}
+        .tab-btn:hover{border-color:#38bdf8;color:#38bdf8}
+        .tab-btn.active{background:#1e3a5f;border-color:#38bdf8;color:#38bdf8;font-weight:bold}
+        .section{display:none;animation:fadeIn .4s}.section.active{display:block}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .card{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0;border-left:4px solid #38bdf8}
+        .card.danger{border-left-color:#ef4444;background:#1e1b2e}
+        .card.success{border-left-color:#22c55e;background:#1a2e1a}
+        .card.warning{border-left-color:#f59e0b;background:#2e2a1a}
+        pre{background:#0c1222;border:1px solid #334155;border-radius:8px;padding:15px;overflow-x:auto;font-family:Consolas,'Courier New',monospace;font-size:.9em;margin:10px 0}
+        code{font-family:Consolas,monospace}
+        .kw{color:#c084fc}.str{color:#86efac}.cmt{color:#64748b;font-style:italic}.fn{color:#38bdf8}
+        .err-hl{background:rgba(239,68,68,.2);display:block;padding:2px 0}
+        .ok-hl{background:rgba(34,197,94,.15);display:block;padding:2px 0}
+        .label{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.8em;font-weight:bold;margin:3px}
+        .label-ok{background:#166534;color:#86efac}.label-bad{background:#7f1d1d;color:#fca5a5}.label-info{background:#1e3a5f;color:#93c5fd}
+        .comparison{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
+        @media(max-width:700px){.comparison{grid-template-columns:1fr}}
+        .diagram{display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0;flex-wrap:wrap}
+        .diagram-box{padding:15px 25px;border-radius:10px;font-weight:bold;text-align:center}
+        .diagram-arrow{font-size:1.5em;color:#64748b}
+        .step-number{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:#2563eb;border-radius:50%;color:white;font-weight:bold;margin-right:8px}
+        ul,ol{margin:10px 0 10px 25px}li{margin:5px 0}
+        .diff{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.75em;font-weight:bold;margin-left:10px}
+        .diff-f{background:#166534;color:#86efac}.diff-m{background:#854d0e;color:#fde68a}.diff-d{background:#7f1d1d;color:#fca5a5}
+
+        .progress-bar{width:100%;height:8px;background:#334155;border-radius:4px;margin:10px 0;overflow:hidden}
+        .progress-fill{height:100%;background:linear-gradient(90deg,#38bdf8,#818cf8);border-radius:4px;transition:width .5s}
+        .score-display{text-align:center;padding:15px;background:#1e293b;border-radius:12px;margin:15px 0;font-size:1.2em}
+        .score-num{color:#38bdf8;font-weight:bold;font-size:1.5em}
+
+        /* Buttons */
+        .btn{padding:10px 25px;border:none;border-radius:8px;cursor:pointer;font-size:1em;font-weight:bold;margin:8px 5px 8px 0;transition:.3s}
+        .btn-p{background:#2563eb;color:white}.btn-p:hover{background:#1d4ed8}
+        .btn-s{background:#16a34a;color:white}.btn-s:hover{background:#15803d}
+        .btn-w{background:#d97706;color:white}.btn-w:hover{background:#b45309}
+        .btn-d{background:#dc2626;color:white}.btn-d:hover{background:#b91c1c}
+
+        /* Exercise area */
+        .ex-area{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0}
+        .ex-area textarea{width:100%;min-height:240px;background:#0c1222;color:#e2e8f0;border:2px solid #334155;border-radius:8px;padding:15px;font-family:Consolas,monospace;font-size:.95em;resize:vertical;tab-size:4}
+        .ex-area textarea:focus{outline:none;border-color:#38bdf8}
+
+        .result{margin-top:10px;padding:15px;border-radius:8px;display:none}
+        .result.show{display:block}
+
+        /* Order challenge */
+        .oc{background:#1e293b;border-radius:12px;padding:20px;margin:20px 0;border:2px solid #334155}
+        .oc-pool{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:#0f172a;border-radius:8px;min-height:50px;margin:10px 0}
+        .oc-target{border:2px dashed #475569;border-radius:8px;padding:10px;margin:10px 0;min-height:60px}
+        .oc-target .oc-item{width:100%;margin:3px 0}
+        .oc-item{padding:10px 16px;background:#2563eb;color:white;border-radius:6px;cursor:pointer;user-select:none;font-family:Consolas,monospace;font-size:.9em;transition:.2s;display:flex;align-items:center;gap:8px}
+        .oc-pool .oc-item{display:inline-flex}
+        .oc-item:hover{background:#3b82f6}
+        .oc-item.right{background:#16a34a!important}.oc-item.wrong{background:#dc2626!important}
+        .oc-item .item-text{flex:1}
+        .oc-arrows{display:flex;flex-direction:column;gap:1px;margin-right:4px}
+        .oc-arrows button{background:rgba(255,255,255,.2);border:none;color:white;cursor:pointer;font-size:.7em;padding:1px 5px;border-radius:3px;line-height:1}
+        .oc-arrows button:hover{background:rgba(255,255,255,.4)}
+        .oc-pool .oc-arrows{display:none}
+        .oc-ret{background:rgba(255,255,255,.2);border:none;color:white;cursor:pointer;font-size:.8em;padding:2px 8px;border-radius:3px;margin-left:4px}
+        .oc-ret:hover{background:rgba(239,68,68,.5)}
+        .oc-pool .oc-ret{display:none}
+
+        /* Quiz */
+        .question{background:#1e293b;border-radius:12px;padding:20px;margin:15px 0;border:2px solid #334155}
+        .question>p{margin-bottom:12px;font-weight:bold}
+        .opts{display:flex;flex-direction:column;gap:8px}
+        .opt{padding:12px 15px;background:#0f172a;border:2px solid #334155;border-radius:8px;cursor:pointer;transition:.3s}
+        .opt:hover{border-color:#38bdf8;background:#1e3a5f}
+        .opt.ok{border-color:#22c55e!important;background:#14532d!important;color:#86efac}
+        .opt.no{border-color:#ef4444!important;background:#7f1d1d!important;color:#fca5a5}
+        .opt.dis{pointer-events:none;opacity:.7}
+        .fb{margin-top:10px;padding:10px 15px;border-radius:8px;display:none;font-size:.95em}
+        .fb.show{display:block}
+        .fb.fb-ok{background:#14532d;color:#86efac;border:1px solid #22c55e}
+        .fb.fb-no{background:#7f1d1d;color:#fca5a5;border:1px solid #ef4444}
+
+        /* Error finder - multiple choice style */
+        .ef-block{background:#0c1222;border:1px solid #334155;border-radius:8px;padding:15px;margin:10px 0;font-family:Consolas,monospace;font-size:.9em;line-height:2}
+        .ef-opt{padding:8px 15px;background:#0f172a;border:2px solid #334155;border-radius:8px;cursor:pointer;transition:.3s;margin:5px 0;display:block}
+        .ef-opt:hover{border-color:#38bdf8}
+        .ef-opt.selected{border-color:#f59e0b;background:#2e2a1a}
+        .ef-opt.ans-ok{border-color:#22c55e!important;background:#14532d!important}
+        .ef-opt.ans-no{border-color:#ef4444!important;background:#7f1d1d!important}
+
+        /* Que devuelve */
+        .qd-input{width:100%;background:#0c1222;color:#e2e8f0;border:2px solid #334155;border-radius:8px;padding:12px 15px;font-family:Consolas,monospace;font-size:.95em;margin:8px 0}
+        .qd-input:focus{outline:none;border-color:#38bdf8}
+
+        /* Index diagram */
+        .idx-table{border-collapse:collapse;margin:10px auto}
+        .idx-table td{border:1px solid #475569;padding:8px 16px;text-align:center;font-family:Consolas,monospace}
+        .idx-table .val-row td{background:#1e3a5f;color:#38bdf8;font-weight:bold}
+        .idx-table .idx-row td{background:#0c1222;color:#94a3b8;font-size:.85em}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Listas en Python</h1>
+    <p style="text-align:center;color:#94a3b8;margin-bottom:10px;">Guia interactiva - Clases 3 y 4</p>
+
+    <div class="progress-bar"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
+    <div class="score-display">Puntaje: <span class="score-num" id="sDisp">0</span> / <span id="sTotal">0</span></div>
+
+    <div class="tabs" id="tabBar"></div>
+
+    <!-- ===== TEORIA ===== -->
+    <div class="section active" id="sec-teoria">
+        <h2>Teoria Completa - Listas (Clases 3 y 4)</h2>
+
+        <!-- Que es una lista -->
+        <div class="card"><h3>Que es una lista?</h3>
+            <p>Una lista es una <b>secuencia mutable de elementos</b>. Son el equivalente a los arreglos/vectores de otros lenguajes, pero mucho mas flexibles.</p>
+            <ul>
+                <li>Pueden contener elementos de <b>distintos tipos</b>, pero por convencion se guardan elementos <b>homogeneos</b>.</li>
+                <li>Se crean con <b>corchetes [ ]</b> y elementos separados por comas.</li>
+            </ul>
+<pre>numeros = [<span class="str">1</span>, <span class="str">2</span>, <span class="str">3</span>, <span class="str">4</span>, <span class="str">5</span>]
+dias = [<span class="str">"lunes"</span>, <span class="str">"martes"</span>, <span class="str">"jueves"</span>]
+vacia = []                        <span class="cmt"># lista vacia</span>
+sublistas = [[<span class="str">1</span>,<span class="str">2</span>], [<span class="str">3</span>,<span class="str">4</span>]]    <span class="cmt"># lista de listas</span></pre>
+        </div>
+
+        <!-- Acceso por indice -->
+        <div class="card"><h3>Acceso por indice</h3>
+            <p>Se usa un <b>subindice entre corchetes</b>. El primer elemento tiene indice <b>0</b>.</p>
+            <table class="idx-table">
+                <tr class="val-row"><td>10</td><td>20</td><td>30</td><td>40</td><td>50</td></tr>
+                <tr class="idx-row"><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td></tr>
+                <tr class="idx-row"><td>-5</td><td>-4</td><td>-3</td><td>-2</td><td>-1</td></tr>
+            </table>
+<pre>lista = [<span class="str">10</span>, <span class="str">20</span>, <span class="str">30</span>, <span class="str">40</span>, <span class="str">50</span>]
+<span class="fn">print</span>(lista[<span class="str">0</span>])    <span class="cmt"># 10</span>
+<span class="fn">print</span>(lista[<span class="str">-1</span>])   <span class="cmt"># 50 (ultimo)</span>
+<span class="fn">print</span>(lista[<span class="str">-2</span>])   <span class="cmt"># 40 (penultimo)</span></pre>
+            <p style="color:#fca5a5"><b>IndexError:</b> Usar un indice fuera de rango provoca un error.</p>
+        </div>
+
+        <!-- Impresion -->
+        <div class="card"><h3>Impresion de listas</h3>
+<pre>numeros = [<span class="str">1</span>, <span class="str">2</span>, <span class="str">3</span>, <span class="str">4</span>]
+<span class="fn">print</span>(numeros)    <span class="cmt"># [1, 2, 3, 4]  (con corchetes)</span>
+<span class="fn">print</span>(*numeros)   <span class="cmt"># 1 2 3 4       (sin corchetes, desempaquetado)</span></pre>
+        </div>
+
+        <!-- Pack/Unpack -->
+        <div class="card"><h3>Empaquetado y desempaquetado</h3>
+<pre><span class="cmt"># Empaquetar: constantes/variables -> lista</span>
+n1, n2, n3 = <span class="str">5</span>, <span class="str">9</span>, <span class="str">4</span>
+numeros = [n1, n2, n3]
+
+<span class="cmt"># Desempaquetar: lista -> variables</span>
+dias = [<span class="str">"lunes"</span>, <span class="str">"martes"</span>, <span class="str">"jueves"</span>]
+d1, d2, d3 = dias    <span class="cmt"># d1="lunes", d2="martes", d3="jueves"</span></pre>
+        </div>
+
+        <!-- Operaciones -->
+        <h2>Operaciones con listas</h2>
+        <div class="card"><h3>Concatenacion (+) y replicacion (*)</h3>
+<pre>lista1 = [<span class="str">1</span>, <span class="str">2</span>, <span class="str">3</span>]
+lista2 = [<span class="str">4</span>, <span class="str">5</span>, <span class="str">6</span>]
+lista3 = lista1 + lista2       <span class="cmt"># [1, 2, 3, 4, 5, 6]</span>
+
+lista = [<span class="str">3</span>, <span class="str">4</span>, <span class="str">5</span>]
+lista = lista + [<span class="str">6</span>]           <span class="cmt"># [3, 4, 5, 6] agregar con +</span>
+
+ceros = [<span class="str">0</span>] * <span class="str">5</span>               <span class="cmt"># [0, 0, 0, 0, 0]</span>
+rep = [<span class="str">1</span>, <span class="str">2</span>] * <span class="str">3</span>              <span class="cmt"># [1, 2, 1, 2, 1, 2]</span></pre>
+        </div>
+
+        <div class="card"><h3>Funciones utiles</h3>
+            <table style="width:100%;border-collapse:collapse">
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><span class="label label-info">len(lista)</span></td><td style="padding:8px">Cantidad de elementos</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><span class="label label-info">sum(lista)</span></td><td style="padding:8px">Suma de elementos (solo numeros)</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><span class="label label-info">max(lista)</span></td><td style="padding:8px">Mayor elemento (homogeneos)</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><span class="label label-info">min(lista)</span></td><td style="padding:8px">Menor elemento (homogeneos)</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><span class="label label-info">list(x)</span></td><td style="padding:8px">Convierte iterable a lista</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><span class="label label-info">x in lista</span></td><td style="padding:8px">True si x esta en la lista</td></tr>
+                <tr><td style="padding:8px"><span class="label label-info">x not in lista</span></td><td style="padding:8px">True si x NO esta en la lista</td></tr>
+            </table>
+        </div>
+
+        <!-- Metodos -->
+        <h2>Metodos de listas</h2>
+        <div class="card"><h3>Agregar y eliminar</h3>
+            <table style="width:100%;border-collapse:collapse">
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code><span class="fn">append</span>(elem)</code></td><td style="padding:8px">Agrega elem al <b>final</b></td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code><span class="fn">insert</span>(pos, elem)</code></td><td style="padding:8px">Inserta elem en posicion pos</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code><span class="fn">pop</span>(pos)</code></td><td style="padding:8px">Elimina y <b>devuelve</b> el elem en pos (default: ultimo)</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code><span class="fn">remove</span>(elem)</code></td><td style="padding:8px">Elimina <b>primera aparicion</b> por valor (error si no existe)</td></tr>
+                <tr><td style="padding:8px"><code><span class="fn">clear</span>()</code></td><td style="padding:8px">Elimina <b>todos</b> los elementos</td></tr>
+            </table>
+<pre>lista = [<span class="str">3</span>, <span class="str">4</span>, <span class="str">5</span>]
+lista.<span class="fn">append</span>(<span class="str">6</span>)        <span class="cmt"># [3, 4, 5, 6]</span>
+lista.<span class="fn">insert</span>(<span class="str">1</span>, <span class="str">9</span>)     <span class="cmt"># [3, 9, 4, 5, 6]</span>
+x = lista.<span class="fn">pop</span>(<span class="str">2</span>)       <span class="cmt"># x=4, lista=[3, 9, 5, 6]</span>
+lista.<span class="fn">remove</span>(<span class="str">9</span>)        <span class="cmt"># [3, 5, 6]</span></pre>
+        </div>
+
+        <div class="card"><h3>Busqueda y conteo</h3>
+            <table style="width:100%;border-collapse:collapse">
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code><span class="fn">index</span>(elem)</code></td><td style="padding:8px">Posicion de elem (error si no existe)</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code><span class="fn">index</span>(elem, ini, fin)</code></td><td style="padding:8px">Busca en region [ini, fin)</td></tr>
+                <tr><td style="padding:8px"><code><span class="fn">count</span>(elem)</code></td><td style="padding:8px">Cantidad de apariciones (0 si no existe)</td></tr>
+            </table>
+        </div>
+
+        <div class="card"><h3>Ordenamiento y reversion</h3>
+            <table style="width:100%;border-collapse:collapse">
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code><span class="fn">reverse</span>()</code></td><td style="padding:8px">Invierte <b>in situ</b></td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code><span class="fn">sort</span>()</code></td><td style="padding:8px">Ordena <b>in situ</b> (menor a mayor)</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code><span class="fn">sort</span>(reverse=True)</code></td><td style="padding:8px">Ordena in situ (mayor a menor)</td></tr>
+                <tr style="border-bottom:1px solid #334155"><td style="padding:8px"><code><span class="fn">sort</span>(key=funcion)</code></td><td style="padding:8px">Ordena por criterio personalizado</td></tr>
+                <tr><td style="padding:8px"><code><span class="fn">sorted</span>(lista)</code></td><td style="padding:8px">Devuelve <b>nueva lista</b> ordenada (no modifica original)</td></tr>
+            </table>
+<pre>lista = [<span class="str">5</span>, <span class="str">1</span>, <span class="str">7</span>]
+lista.<span class="fn">sort</span>()                          <span class="cmt"># [1, 5, 7] - modifica lista</span>
+lista.<span class="fn">sort</span>(reverse=<span class="kw">True</span>)              <span class="cmt"># [7, 5, 1]</span>
+
+<span class="cmt"># sort con key y lambda</span>
+nums = [<span class="str">1</span>, <span class="str">2</span>, <span class="str">3</span>, <span class="str">4</span>, <span class="str">5</span>, <span class="str">6</span>]
+nums.<span class="fn">sort</span>(key=<span class="kw">lambda</span> x: x%<span class="str">2</span>)          <span class="cmt"># [2, 4, 6, 1, 3, 5] pares primero</span>
+
+nombres = [<span class="str">"Andres"</span>, <span class="str">"Ariel"</span>, <span class="str">"Juan"</span>]
+nombres.<span class="fn">sort</span>(key=<span class="fn">len</span>)                <span class="cmt"># ["Juan", "Ariel", "Andres"]</span>
+
+<span class="cmt"># sorted() NO modifica la original</span>
+original = [<span class="str">9</span>, <span class="str">6</span>, <span class="str">7</span>]
+nueva = <span class="fn">sorted</span>(original)              <span class="cmt"># nueva=[6,7,9], original=[9,6,7]</span></pre>
+        </div>
+
+        <div class="card warning"><h3>sort() vs sorted() - Diferencia clave</h3>
+            <div class="comparison">
+                <div class="card" style="margin:0"><h3>sort()</h3>
+                    <ul>
+                        <li>Es un <b>metodo</b> de listas</li>
+                        <li>Modifica la lista <b>in situ</b></li>
+                        <li>Devuelve <b>None</b></li>
+                    </ul>
+                </div>
+                <div class="card" style="margin:0"><h3>sorted()</h3>
+                    <ul>
+                        <li>Es una <b>funcion</b></li>
+                        <li><b>No modifica</b> la original</li>
+                        <li>Devuelve una <b>nueva lista</b></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- CLASE 4 -->
+        <h2>Rebanadas (Slicing) - Clase 4</h2>
+        <div class="card"><h3>Sintaxis: lista[inicio:fin:paso]</h3>
+            <p>Una rebanada permite extraer un <b>subconjunto</b> de la lista. El indice <b>fin no esta incluido</b>.</p>
+<pre>lista = [<span class="str">7</span>, <span class="str">8</span>, <span class="str">9</span>, <span class="str">10</span>, <span class="str">11</span>, <span class="str">12</span>]
+sublista = lista[<span class="str">2</span>:<span class="str">5</span>]      <span class="cmt"># [9, 10, 11]</span>
+primeros = lista[:<span class="str">3</span>]       <span class="cmt"># [7, 8, 9]</span>
+ultimos = lista[<span class="str">3</span>:]        <span class="cmt"># [10, 11, 12]</span>
+copia = lista[:]            <span class="cmt"># copia completa</span>
+
+<span class="cmt"># Con paso (incremento)</span>
+lista2 = [<span class="str">7</span>, <span class="str">8</span>, <span class="str">9</span>, <span class="str">10</span>, <span class="str">11</span>, <span class="str">12</span>, <span class="str">13</span>, <span class="str">14</span>]
+sub = lista2[<span class="str">1</span>:<span class="str">6</span>:<span class="str">2</span>]         <span class="cmt"># [8, 10, 12]</span>
+
+<span class="cmt"># Invertir con paso negativo</span>
+original = [<span class="str">1</span>, <span class="str">2</span>, <span class="str">3</span>, <span class="str">4</span>, <span class="str">5</span>]
+invertida = original[::-<span class="str">1</span>]   <span class="cmt"># [5, 4, 3, 2, 1]</span></pre>
+        </div>
+
+        <div class="card"><h3>Slicing con variables y rebanadas nulas</h3>
+<pre><span class="cmt"># Con variables</span>
+lista = [<span class="str">1</span>, <span class="str">2</span>, <span class="str">3</span>, <span class="str">4</span>, <span class="str">5</span>, <span class="str">6</span>, <span class="str">7</span>, <span class="str">8</span>]
+a, b = <span class="str">3</span>, <span class="str">5</span>
+sublista = lista[a:b]       <span class="cmt"># [4, 5]</span>
+
+<span class="cmt"># Rebanada nula (mismo inicio y fin) - para INSERTAR</span>
+lista = [<span class="str">'a'</span>, <span class="str">'b'</span>, <span class="str">'c'</span>, <span class="str">'d'</span>]
+lista[<span class="str">2</span>:<span class="str">2</span>] = [<span class="str">'X'</span>, <span class="str">'Y'</span>]
+<span class="fn">print</span>(lista)  <span class="cmt"># ['a', 'b', 'X', 'Y', 'c', 'd']</span></pre>
+        </div>
+
+        <div class="card"><h3>Indices negativos en slicing</h3>
+<pre>lista = <span class="fn">list</span>(<span class="fn">range</span>(<span class="str">10</span>))  <span class="cmt"># [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]</span>
+n = <span class="str">3</span>
+comienzo = lista[:n]       <span class="cmt"># [0, 1, 2]</span>
+final = lista[-n:]         <span class="cmt"># [7, 8, 9]</span>
+extremos = comienzo + final <span class="cmt"># [0, 1, 2, 7, 8, 9]</span></pre>
+        </div>
+
+        <h2>Copia de listas - Referencia vs Copia</h2>
+        <div class="card danger"><h3>Asignacion = copia la REFERENCIA</h3>
+<pre>lista1 = [<span class="str">1</span>, <span class="str">2</span>, <span class="str">3</span>]
+lista2 = lista1            <span class="cmt"># NO copia, apuntan al MISMO objeto</span>
+lista2.<span class="fn">append</span>(<span class="str">4</span>)
+<span class="fn">print</span>(lista1)               <span class="cmt"># [1, 2, 3, 4]  !! lista1 tambien cambio !!</span></pre>
+        </div>
+
+        <div class="card success"><h3>4 formas de hacer copia real</h3>
+<pre><span class="cmt"># 1. Con rebanada [:]</span>
+<span class="ok-hl">lista2 = lista1[:]</span>
+
+<span class="cmt"># 2. Con list()</span>
+<span class="ok-hl">lista2 = <span class="fn">list</span>(lista1)</span>
+
+<span class="cmt"># 3. Concatenando con lista vacia</span>
+<span class="ok-hl">lista2 = lista1 + []</span>
+
+<span class="cmt"># 4. Con el metodo copy()</span>
+<span class="ok-hl">lista2 = lista1.<span class="fn">copy</span>()</span></pre>
+        </div>
+
+        <h2>Comparacion de listas</h2>
+        <div class="card">
+<pre>[<span class="str">2</span>, <span class="str">3</span>] > [<span class="str">1</span>, <span class="str">4</span>]      <span class="cmt"># True  (compara primer elem: 2>1)</span>
+[<span class="str">2</span>, <span class="str">3</span>] > [<span class="str">2</span>, <span class="str">4</span>]      <span class="cmt"># False (primer elem igual, 3<4)</span>
+[<span class="str">2</span>, <span class="str">4</span>, <span class="str">6</span>] > [<span class="str">2</span>, <span class="str">4</span>]  <span class="cmt"># True  (iguales hasta donde hay, la mas larga gana)</span></pre>
+        </div>
+
+        <h2>enumerate() y for con listas</h2>
+        <div class="card">
+<pre><span class="cmt"># for recorre elementos directamente</span>
+vocales = [<span class="str">'a'</span>, <span class="str">'e'</span>, <span class="str">'i'</span>, <span class="str">'o'</span>, <span class="str">'u'</span>]
+<span class="kw">for</span> letra <span class="kw">in</span> vocales:
+    <span class="fn">print</span>(letra, end=<span class="str">" "</span>)  <span class="cmt"># a e i o u</span>
+
+<span class="cmt"># enumerate() da indice + elemento</span>
+<span class="kw">for</span> i, letra <span class="kw">in</span> <span class="fn">enumerate</span>(vocales):
+    <span class="fn">print</span>(i, letra)       <span class="cmt"># 0 a, 1 e, 2 i...</span>
+
+<span class="cmt"># Recorrer parcialmente con slicing</span>
+<span class="kw">for</span> letra <span class="kw">in</span> vocales[<span class="str">1</span>:<span class="str">4</span>]:
+    <span class="fn">print</span>(letra, end=<span class="str">" "</span>)  <span class="cmt"># e i o</span></pre>
+        </div>
+
+        <h2>map() y filter()</h2>
+        <div class="card"><h3>map() - Aplicar funcion a cada elemento</h3>
+<pre><span class="cmt"># Sintaxis: list(map(funcion, lista))</span>
+numeros = [<span class="str">1</span>, <span class="str">2</span>, <span class="str">3</span>, <span class="str">4</span>]
+raices = <span class="fn">list</span>(<span class="fn">map</span>(<span class="kw">lambda</span> x: x**(<span class="str">1</span>/<span class="str">2</span>), numeros))
+<span class="cmt"># [1.0, 1.4142..., 1.7320..., 2.0]</span>
+
+<span class="cmt"># Equivalente con for:</span>
+raices = []
+<span class="kw">for</span> i <span class="kw">in</span> numeros:
+    raices.<span class="fn">append</span>(i**(<span class="str">1</span>/<span class="str">2</span>))</pre>
+        </div>
+
+        <div class="card"><h3>filter() - Seleccionar elementos</h3>
+<pre><span class="cmt"># Sintaxis: list(filter(funcion, lista))</span>
+numeros = [<span class="str">0</span>, <span class="str">1</span>, <span class="str">2</span>, <span class="str">3</span>, <span class="str">4</span>, <span class="str">5</span>]
+impares = <span class="fn">list</span>(<span class="fn">filter</span>(<span class="kw">lambda</span> x: x%<span class="str">2</span>!=<span class="str">0</span>, numeros))
+<span class="fn">print</span>(impares)  <span class="cmt"># [1, 3, 5]</span></pre>
+        </div>
+
+        <h2>Listas por comprension</h2>
+        <div class="card"><h3>Sintaxis: [expresion for elem in secuencia]</h3>
+<pre><span class="cmt"># Crear lista de cuadrados</span>
+cuadrados = [x**<span class="str">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="str">6</span>)]
+<span class="fn">print</span>(cuadrados)  <span class="cmt"># [0, 1, 4, 9, 16, 25]</span>
+
+<span class="cmt"># Con condicion (if)</span>
+cubos_pares = [i**<span class="str">3</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="str">11</span>) <span class="kw">if</span> i**<span class="str">3</span> % <span class="str">2</span> == <span class="str">0</span>]
+<span class="fn">print</span>(cubos_pares)  <span class="cmt"># [0, 8, 64, 216, 512, 1000]</span>
+
+<span class="cmt"># Reemplaza map y filter en muchos casos</span>
+raices = [x**(<span class="str">1</span>/<span class="str">2</span>) <span class="kw">for</span> x <span class="kw">in</span> [<span class="str">1</span>,<span class="str">4</span>,<span class="str">9</span>,<span class="str">16</span>]]     <span class="cmt"># [1.0, 2.0, 3.0, 4.0]</span>
+pares = [x <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="str">10</span>) <span class="kw">if</span> x%<span class="str">2</span>==<span class="str">0</span>]  <span class="cmt"># [0, 2, 4, 6, 8]</span></pre>
+        </div>
+
+        <h2>Matrices (Listas de listas)</h2>
+        <div class="card"><h3>Creacion y acceso</h3>
+<pre><span class="cmt"># Creacion estatica</span>
+matriz = [[<span class="str">0</span>,<span class="str">0</span>,<span class="str">0</span>,<span class="str">0</span>],
+           [<span class="str">0</span>,<span class="str">0</span>,<span class="str">0</span>,<span class="str">0</span>],
+           [<span class="str">0</span>,<span class="str">0</span>,<span class="str">0</span>,<span class="str">0</span>]]
+
+<span class="cmt"># Creacion dinamica</span>
+filas, columnas = <span class="str">3</span>, <span class="str">4</span>
+matriz = []
+<span class="kw">for</span> f <span class="kw">in</span> <span class="fn">range</span>(filas):
+    matriz.<span class="fn">append</span>([<span class="str">0</span>] * columnas)
+
+<span class="cmt"># Con list comprehension</span>
+matriz = [[<span class="str">0</span>] * columnas <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(filas)]
+
+<span class="cmt"># Acceso: matriz[fila][columna]</span>
+matriz[<span class="str">1</span>][<span class="str">2</span>] = <span class="str">5</span>   <span class="cmt"># fila 1, columna 2</span>
+
+<span class="cmt"># len(matriz) = filas,  len(matriz[0]) = columnas</span></pre>
+        </div>
+
+        <h2>Numeros al azar (random)</h2>
+        <div class="card">
+<pre><span class="kw">import</span> random
+
+random.<span class="fn">random</span>()              <span class="cmt"># float en [0, 1)</span>
+random.<span class="fn">randint</span>(<span class="str">1</span>, <span class="str">6</span>)        <span class="cmt"># entero entre 1 y 6 (inclusive)</span>
+random.<span class="fn">choice</span>([<span class="str">"a"</span>,<span class="str">"b"</span>,<span class="str">"c"</span>]) <span class="cmt"># elemento al azar de la secuencia</span>
+random.<span class="fn">shuffle</span>(lista)        <span class="cmt"># mezcla IN SITU los elementos</span></pre>
+        </div>
+
+        <div class="card"><h3>Instruccion del</h3>
+<pre>lista = [<span class="str">1</span>, <span class="str">2</span>, <span class="str">3</span>, <span class="str">4</span>, <span class="str">5</span>]
+<span class="kw">del</span> lista[<span class="str">2</span>]       <span class="cmt"># [1, 2, 4, 5] - elimina por indice</span>
+<span class="kw">del</span> lista[<span class="str">1</span>:<span class="str">3</span>]     <span class="cmt"># elimina un rango con slicing</span></pre>
+        </div>
+
+        <div class="card"><h3>Instruccion pass</h3>
+<pre><span class="cmt"># No hace nada. Sirve como placeholder.</span>
+<span class="kw">def</span> <span class="fn">calcular_salario</span>(empleado):
+    <span class="kw">pass</span>  <span class="cmt"># aun no implementado</span></pre>
+        </div>
+    </div>
+
+    <!-- ===== QUIZ ===== -->
+    <div class="section" id="sec-quiz">
+        <h2>Quiz</h2>
+        <div id="quizBox"></div>
+        <div style="text-align:center;margin:20px 0"><button class="btn btn-w" onclick="resetQuiz()">Reiniciar Quiz</button></div>
+    </div>
+
+    <!-- ===== EJERCICIOS ===== -->
+    <div class="section" id="sec-ejercicios">
+        <h2>Ejercicios - Completa el Codigo</h2>
+        <p style="color:#94a3b8">La verificacion revisa la estructura de tu codigo: que uses los patrones correctos.</p>
+        <div id="exBox"></div>
+    </div>
+
+    <!-- ===== ORDENAR ===== -->
+    <div class="section" id="sec-ordenar">
+        <h2>Ordena el Codigo</h2>
+        <p style="color:#94a3b8">Haz clic en las lineas del banco para moverlas al destino. Usa las flechas para reordenar y X para devolver. Luego verifica.</p>
+        <div id="orderBox"></div>
+    </div>
+
+    <!-- ===== ERRORES ===== -->
+    <div class="section" id="sec-errores">
+        <h2>Encuentra los Errores</h2>
+        <p style="color:#94a3b8">Cada codigo tiene errores. Selecciona de las opciones cual es el problema.</p>
+        <div id="errBox"></div>
+    </div>
+
+    <!-- ===== QUE DEVUELVE ===== -->
+    <div class="section" id="sec-quedevuelve">
+        <h2>Que devuelve?</h2>
+        <p style="color:#94a3b8">Escribe exactamente lo que imprime cada fragmento de codigo. Respeta espacios, corchetes, etc.</p>
+        <div id="qdBox"></div>
+        <div style="text-align:center;margin:20px 0"><button class="btn btn-w" onclick="resetQD()">Reiniciar Seccion</button></div>
+    </div>
+
+</div>
+
+<script>
+// ===== GLOBALS =====
+let score=0, answered={};
+const TABS=[
+    {id:'teoria',label:'1. Teoria'},
+    {id:'quiz',label:'2. Quiz'},
+    {id:'ejercicios',label:'3. Ejercicios'},
+    {id:'ordenar',label:'4. Ordenar'},
+    {id:'errores',label:'5. Errores'},
+    {id:'quedevuelve',label:'6. Que devuelve?'}
+];
+
+function init(){
+    const tb=document.getElementById('tabBar');
+    TABS.forEach((t,i)=>{
+        const b=document.createElement('button');
+        b.className='tab-btn'+(i===0?' active':'');
+        b.textContent=t.label;
+        b.onclick=()=>{
+            document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+            document.getElementById('sec-'+t.id).classList.add('active');
+            b.classList.add('active');
+        };
+        tb.appendChild(b);
+    });
+    buildQuiz();
+    buildExercises();
+    buildOrderChallenges();
+    buildErrorFinders();
+    buildQueDevuelve();
+    updateTotal();
+}
+
+function updateTotal(){
+    const t=quizData.length + exData.length + orderData.length + errData.length + qdData.length;
+    document.getElementById('sTotal').textContent=t;
+}
+function addScore(id){
+    if(answered[id])return;
+    answered[id]=true;
+    score++;
+    document.getElementById('sDisp').textContent=score;
+    const t=parseInt(document.getElementById('sTotal').textContent);
+    document.getElementById('pFill').style.width=(t>0?(score/t)*100:0)+'%';
+}
+
+// ===== QUIZ =====
+const quizData=[
+    {q:"Como se crea una lista vacia?",o:["lista = ()","lista = []","lista = {}","lista = empty()"],c:1,e:"Las listas se crean con corchetes []. () es tupla, {} es diccionario."},
+    {q:"Que indice tiene el PRIMER elemento de una lista?",o:["1","-1","0","Depende de la lista"],c:2,e:"En Python, los indices empiezan en 0."},
+    {q:"Que hace lista[-1]?",o:["Da error","Devuelve el primer elemento","Devuelve el ultimo elemento","Elimina el ultimo"],c:2,e:"Los indices negativos cuentan desde el final. -1 es el ultimo."},
+    {q:"Cual es la diferencia entre append() y + para agregar?",o:["No hay diferencia","append modifica in situ, + crea nueva lista","+ modifica in situ, append crea nueva","append agrega al inicio"],c:1,e:"append() modifica la lista original. Con + se crea una nueva lista (lista = lista + [elem])."},
+    {q:"Que devuelve sort()?",o:["La lista ordenada","Una nueva lista","None","True o False"],c:2,e:"sort() ordena IN SITU y devuelve None. Para obtener nueva lista se usa sorted()."},
+    {q:"Que hace lista[2:5]?",o:["Elementos en indices 2, 3, 4","Elementos en indices 2, 3, 4, 5","Elementos desde el 2do al 5to","Error"],c:0,e:"El slicing [2:5] toma indices 2, 3, 4. El final (5) NO esta incluido."},
+    {q:"Que hace lista[::-1]?",o:["Elimina el ultimo","Invierte la lista (nueva copia)","Da error","Devuelve el ultimo elemento"],c:1,e:"[::-1] crea una nueva lista con los elementos en orden inverso."},
+    {q:"Si hago lista2 = lista1, que pasa al modificar lista2?",o:["Solo cambia lista2","Solo cambia lista1","Cambian AMBAS (misma referencia)","Da error"],c:2,e:"La asignacion = copia la referencia. Ambas variables apuntan al mismo objeto."},
+    {q:"Cual es una forma correcta de copiar una lista?",o:["lista2 = lista1","lista2 = lista1[:]","lista2 = &lista1","lista2 = lista1.ref()"],c:1,e:"lista[:] crea una copia superficial. Tambien sirven list(lista), lista.copy(), lista + []."},
+    {q:"Que hace pop() sin argumento?",o:["Elimina el primero","Elimina el ultimo y lo devuelve","Elimina todos","Da error"],c:1,e:"pop() sin argumento elimina y devuelve el ultimo elemento."},
+    {q:"Que devuelve [x**2 for x in range(4)]?",o:["[1, 4, 9, 16]","[0, 1, 4, 9]","[0, 2, 4, 6]","Error"],c:1,e:"range(4) es 0,1,2,3. Elevados al cuadrado: [0, 1, 4, 9]."},
+    {q:"Que hace filter()?",o:["Aplica una funcion a cada elemento","Selecciona elementos que cumplen una condicion","Ordena la lista","Elimina duplicados"],c:1,e:"filter() selecciona los elementos para los cuales la funcion devuelve True."},
+    {q:"Que hace random.shuffle(lista)?",o:["Devuelve una nueva lista mezclada","Mezcla la lista IN SITU","Elige un elemento al azar","Ordena al azar y devuelve copia"],c:1,e:"shuffle() mezcla in situ (modifica la lista original)."},
+    {q:"Como se accede al elemento en fila 1, columna 2 de una matriz?",o:["matriz[1,2]","matriz[2][1]","matriz[1][2]","matriz(1)(2)"],c:2,e:"En una lista de listas: primer indice es fila, segundo es columna: matriz[1][2]."},
+    {q:"Que hace enumerate(lista)?",o:["Cuenta los elementos","Devuelve pares (indice, elemento)","Numera la lista desde 1","Ordena la lista"],c:1,e:"enumerate() devuelve tuplas (indice, elemento) empezando desde 0."},
+];
+
+function buildQuiz(){
+    const box=document.getElementById('quizBox');
+    box.innerHTML='';
+    quizData.forEach((q,i)=>{
+        let h=`<div class="question" id="q${i}"><p>${i+1}. ${q.q}</p><div class="opts">`;
+        q.o.forEach((o,j)=>{h+=`<div class="opt" id="q${i}o${j}" onclick="ansQ(${i},${j})">${o}</div>`;});
+        h+=`</div><div class="fb" id="qfb${i}"></div></div>`;
+        box.innerHTML+=h;
+    });
+}
+function ansQ(qi,oi){
+    const el=document.getElementById('q'+qi);
+    if(el.dataset.done)return;el.dataset.done='1';
+    el.querySelectorAll('.opt').forEach(o=>o.classList.add('dis'));
+    const fb=document.getElementById('qfb'+qi);
+    if(oi===quizData[qi].c){
+        document.getElementById('q'+qi+'o'+oi).classList.add('ok');
+        fb.className='fb show fb-ok';fb.textContent='Correcto! '+quizData[qi].e;
+        addScore('q'+qi);
+    }else{
+        document.getElementById('q'+qi+'o'+oi).classList.add('no');
+        document.getElementById('q'+qi+'o'+quizData[qi].c).classList.add('ok');
+        fb.className='fb show fb-no';fb.textContent='Incorrecto. '+quizData[qi].e;
+    }
+}
+function resetQuiz(){
+    quizData.forEach((_,i)=>delete answered['q'+i]);
+    score=Object.keys(answered).length;
+    document.getElementById('sDisp').textContent=score;
+    const t=parseInt(document.getElementById('sTotal').textContent);
+    document.getElementById('pFill').style.width=(t>0?(score/t)*100:0)+'%';
+    buildQuiz();
+}
+
+// ===== EXERCISES =====
+const exData=[
+    {id:1,title:"Promedio y mayores",diff:"f",
+     desc:'Leer numeros enteros hasta -1. Calcular el promedio e imprimir los mayores al promedio.',
+     template:`lista = []\nsuma = 0\ncant = 0\nn = int(input("Numero (-1 para terminar): "))\n# COMPLETA: while, append, acumular\n# Calcular promedio\n# Imprimir mayores al promedio`,
+     solution:`lista = []\nsuma = 0\ncant = 0\nn = int(input("Numero (-1 para terminar): "))\nwhile n != -1:\n    lista.append(n)\n    suma += n\n    cant += 1\n    n = int(input("Numero (-1 para terminar): "))\nif cant > 0:\n    prom = suma / cant\n    print("Promedio:", prom)\n    for i in range(cant):\n        if lista[i] > prom:\n            print(lista[i], end=" ")`,
+     checks:[
+         {type:'need',re:/while/,msg:'Falta while para el ciclo de entrada'},
+         {type:'need',re:/append\s*\(/,msg:'Falta append() para agregar a la lista'},
+         {type:'need',re:/\+=/,msg:'Falta acumular con +='},
+         {type:'need',re:/prom|promedio/i,msg:'Falta calcular el promedio'},
+         {type:'need',re:/for|while/,msg:'Falta recorrer la lista para imprimir'},
+     ]},
+    {id:2,title:"Buscar maximo y minimo",diff:"f",
+     desc:'Dada una lista de numeros, encontrar el maximo y minimo SIN usar max() ni min().',
+     template:`numeros = [15, 3, 27, 8, 42, 11, 6]\n# COMPLETA: inicializar maximo y minimo con numeros[0]\n# Recorrer la lista comparando\n# Imprimir resultado`,
+     solution:`numeros = [15, 3, 27, 8, 42, 11, 6]\nmaximo = numeros[0]\nminimo = numeros[0]\nfor num in numeros:\n    if num > maximo:\n        maximo = num\n    if num < minimo:\n        minimo = num\nprint("Maximo:", maximo)\nprint("Minimo:", minimo)`,
+     checks:[
+         {type:'need',re:/numeros\[0\]/,msg:'Falta inicializar con numeros[0]'},
+         {type:'need',re:/for\s+\w+\s+in/,msg:'Falta for para recorrer la lista'},
+         {type:'need',re:/maximo|mayor|max_v/i,msg:'Falta variable para el maximo'},
+         {type:'need',re:/minimo|menor|min_v/i,msg:'Falta variable para el minimo'},
+         {type:'bad',re:/\bmax\s*\(|\bmin\s*\(/,msg:'No uses max()/min() - hazlo manual'},
+     ]},
+    {id:3,title:"Lista por comprension con filtro",diff:"m",
+     desc:'Crear una lista con los cuadrados de los numeros pares del 0 al 20 usando list comprehension.',
+     template:`# COMPLETA: una sola linea con list comprehension\n# cuadrados_pares = [ ... ]\n# Imprimir la lista`,
+     solution:`cuadrados_pares = [x**2 for x in range(21) if x % 2 == 0]\nprint(cuadrados_pares)`,
+     checks:[
+         {type:'need',re:/\[.*for.*in.*\]/,msg:'Falta la list comprehension [expr for x in ...]'},
+         {type:'need',re:/range/,msg:'Falta range()'},
+         {type:'need',re:/%\s*2|x\s*%\s*2/,msg:'Falta filtro de pares (% 2)'},
+         {type:'need',re:/\*\*\s*2/,msg:'Falta elevar al cuadrado (**2)'},
+     ]},
+    {id:4,title:"Ordenar por longitud",diff:"m",
+     desc:'Dada una lista de nombres, ordenar por longitud (mas cortos primero) y mostrar.',
+     template:`nombres = ["Alejandro", "Ana", "Carlos", "Lu", "Maximiliano", "Sol"]\n# COMPLETA: ordenar por longitud usando sort con key\n# Imprimir la lista ordenada`,
+     solution:`nombres = ["Alejandro", "Ana", "Carlos", "Lu", "Maximiliano", "Sol"]\nnombres.sort(key=len)\nprint(nombres)`,
+     checks:[
+         {type:'need',re:/\.sort\s*\(/,msg:'Falta sort()'},
+         {type:'need',re:/key\s*=\s*len/,msg:'Falta key=len para ordenar por longitud'},
+     ]},
+    {id:5,title:"Crear y recorrer matriz",diff:"d",
+     desc:'Crear una matriz 3x4 de ceros dinamicamente, llenarla con numeros del 1 al 12 e imprimirla.',
+     template:`filas = 3\ncolumnas = 4\n# COMPLETA: crear la matriz de ceros\n# Llenar con numeros del 1 al 12\n# Imprimir fila por fila`,
+     solution:`filas = 3\ncolumnas = 4\nmatriz = []\nfor f in range(filas):\n    matriz.append([0] * columnas)\nnum = 1\nfor f in range(filas):\n    for c in range(columnas):\n        matriz[f][c] = num\n        num += 1\nfor fila in matriz:\n    for elem in fila:\n        print("%3d" % elem, end="")\n    print()`,
+     checks:[
+         {type:'need',re:/append|matriz\s*=/,msg:'Falta crear la matriz'},
+         {type:'need',re:/range\s*\(\s*filas\s*\)/,msg:'Falta recorrer las filas con range(filas)'},
+         {type:'need',re:/range\s*\(\s*columnas\s*\)/,msg:'Falta recorrer las columnas con range(columnas)'},
+         {type:'need',re:/matriz\s*\[/,msg:'Falta acceder a la matriz con indices'},
+         {type:'need',re:/print/,msg:'Falta imprimir la matriz'},
+     ]},
+    {id:6,title:"Dados al azar",diff:"m",
+     desc:'Simular el lanzamiento de 5 dados. Imprimir la jugada, el mayor y si hay al menos un 6.',
+     template:`import random\n# COMPLETA: crear lista de 5 dados con randint(1,6)\n# Imprimir la jugada\n# Imprimir el mayor valor\n# Verificar si hay algun 6`,
+     solution:`import random\ndados = []\nfor i in range(5):\n    dados.append(random.randint(1, 6))\nprint("Jugada:", dados)\nprint("Mayor:", max(dados))\nif 6 in dados:\n    print("Hay al menos un 6!")\nelse:\n    print("No salio ningun 6.")`,
+     checks:[
+         {type:'need',re:/import\s+random/,msg:'Falta import random'},
+         {type:'need',re:/randint/,msg:'Falta random.randint()'},
+         {type:'need',re:/range\s*\(\s*5\s*\)/,msg:'Falta range(5) para los 5 dados'},
+         {type:'need',re:/6\s+in\s+|in\s+dados/,msg:'Falta verificar si 6 esta en la lista (in)'},
+         {type:'need',re:/max\s*\(/,msg:'Falta max() para el mayor'},
+     ]},
+];
+
+function buildExercises(){
+    const box=document.getElementById('exBox');
+    box.innerHTML='';
+    const diffLabels={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffClass={f:'diff-f',m:'diff-m',d:'diff-d'};
+    exData.forEach(ex=>{
+        box.innerHTML+=`
+        <div class="ex-area">
+            <h3>Ejercicio ${ex.id}: ${ex.title} <span class="diff ${diffClass[ex.diff]}">${diffLabels[ex.diff]}</span></h3>
+            <p style="color:#94a3b8;margin:10px 0">${ex.desc}</p>
+            <textarea id="ext${ex.id}" spellcheck="false">${ex.template}</textarea>
+            <button class="btn btn-p" onclick="checkEx(${ex.id})">Verificar</button>
+            <button class="btn btn-s" onclick="showSol(${ex.id})">Ver Solucion</button>
+            <div class="result" id="exr${ex.id}"></div>
+        </div>`;
+    });
+}
+
+function checkEx(id){
+    const ex=exData.find(e=>e.id===id);
+    const code=document.getElementById('ext'+id).value;
+    const r=document.getElementById('exr'+id);
+    let errors=[],goods=[];
+
+    if(/COMPLETA/.test(code)){
+        r.innerHTML='<div style="color:#f59e0b">Todavia no completaste el codigo. Reemplaza los comentarios con tu solucion.</div>';
+        r.className='result show';r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+        return;
+    }
+
+    ex.checks.forEach(ch=>{
+        if(ch.type==='bad' && ch.re.test(code)) errors.push(ch.msg);
+        if(ch.type==='need' && !ch.re.test(code)) errors.push(ch.msg);
+    });
+
+    if(/\.append\s*\(/.test(code)) goods.push('Usa append()');
+    if(/for\s+\w+\s+in/.test(code)) goods.push('Usa for para recorrer');
+    if(/\.sort\s*\(/.test(code)) goods.push('Usa sort()');
+    if(/sorted\s*\(/.test(code)) goods.push('Usa sorted()');
+    if(/range\s*\(/.test(code)) goods.push('Usa range()');
+    if(/len\s*\(/.test(code)) goods.push('Usa len()');
+    if(/\[.*for.*in.*\]/.test(code)) goods.push('Usa list comprehension');
+
+    let h='';
+    if(goods.length){h+='<div style="color:#86efac"><b>Bien hecho:</b><ul>';goods.forEach(g=>h+='<li>'+g+'</li>');h+='</ul></div>';}
+    if(errors.length){h+='<div style="color:#fca5a5;margin-top:8px"><b>Problemas:</b><ul>';errors.forEach(e=>h+='<li>'+e+'</li>');h+='</ul></div>';}
+
+    if(!errors.length){
+        h+='<div style="color:#86efac;font-size:1.1em;margin-top:8px"><b>Excelente! Tu solucion es correcta.</b></div>';
+        addScore('ex'+id);
+    }
+    r.innerHTML=h;r.className='result show';
+    r.style.background=errors.length?'#1e1b2e':'#1a2e1a';
+    r.style.border='1px solid '+(errors.length?'#a78bfa':'#22c55e');
+}
+
+function showSol(id){
+    const ex=exData.find(e=>e.id===id);
+    document.getElementById('ext'+id).value=ex.solution;
+    const r=document.getElementById('exr'+id);
+    r.innerHTML='<div style="color:#93c5fd">Solucion mostrada. Estudiala y trata de hacerla sin mirar!</div>';
+    r.className='result show';r.style.background='#1e3a5f';r.style.border='1px solid #38bdf8';
+}
+
+// ===== ORDER CHALLENGES =====
+const orderData=[
+    {id:1,title:"Crear lista y mostrar maximo",diff:"f",lines:[
+        "numeros = []",
+        "for i in range(5):",
+        "    n = int(input(\"Numero: \"))",
+        "    numeros.append(n)",
+        "print(\"Maximo:\", max(numeros))"
+    ]},
+    {id:2,title:"Copiar lista y modificar copia",diff:"f",lines:[
+        "original = [1, 2, 3, 4, 5]",
+        "copia = original[:]",
+        "copia.append(6)",
+        "print(\"Original:\", original)",
+        "print(\"Copia:\", copia)"
+    ]},
+    {id:3,title:"Ordenar y buscar con sort e in",diff:"m",lines:[
+        "nombres = [\"Carlos\", \"Ana\", \"Beatriz\"]",
+        "nombres.sort()",
+        "print(\"Ordenados:\", nombres)",
+        "buscar = input(\"Nombre a buscar: \")",
+        "if buscar in nombres:",
+        "    print(\"Encontrado en posicion\", nombres.index(buscar))",
+        "else:",
+        "    print(\"No encontrado\")"
+    ]},
+    {id:4,title:"List comprehension con filtro",diff:"m",lines:[
+        "numeros = list(range(1, 21))",
+        "pares = [x for x in numeros if x % 2 == 0]",
+        "cubos = [x**3 for x in pares]",
+        "print(\"Pares:\", pares)",
+        "print(\"Cubos de pares:\", cubos)"
+    ]},
+    {id:5,title:"Crear y recorrer matriz 3x3",diff:"d",lines:[
+        "filas = 3",
+        "columnas = 3",
+        "matriz = [[0] * columnas for i in range(filas)]",
+        "num = 1",
+        "for f in range(filas):",
+        "    for c in range(columnas):",
+        "        matriz[f][c] = num",
+        "        num += 1",
+        "for fila in matriz:",
+        "    print(fila)"
+    ]},
+];
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+function buildOrderChallenges(){
+    const box=document.getElementById('orderBox');
+    box.innerHTML='';
+    const diffL={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffC={f:'diff-f',m:'diff-m',d:'diff-d'};
+    let allHTML='';
+    orderData.forEach(ch=>{
+        allHTML+=`
+        <div class="oc" id="oc${ch.id}">
+            <h3>Desafio ${ch.id}: ${ch.title} <span class="diff ${diffC[ch.diff]}">${diffL[ch.diff]}</span></h3>
+            <p style="color:#94a3b8;margin:8px 0">Banco (clic para enviar al destino):</p>
+            <div class="oc-pool" id="ocp${ch.id}"></div>
+            <p style="color:#94a3b8;margin:8px 0">Destino (usa &#9650;&#9660; para reordenar, &#10005; para devolver):</p>
+            <div class="oc-target" id="oct${ch.id}"></div>
+            <button class="btn btn-p" onclick="checkOC(${ch.id})">Verificar</button>
+            <button class="btn btn-w" onclick="resetOC(${ch.id})">Reiniciar</button>
+            <div class="result" id="ocr${ch.id}"></div>
+        </div>`;
+    });
+    box.innerHTML=allHTML;
+    orderData.forEach(ch=>resetOC(ch.id));
+}
+
+function makeOCItem(id, item){
+    const pool=document.getElementById('ocp'+id);
+    const tgt=document.getElementById('oct'+id);
+
+    const d=document.createElement('div');
+    d.className='oc-item';
+    d.dataset.idx=item.idx;
+
+    const arrows=document.createElement('span');
+    arrows.className='oc-arrows';
+    arrows.innerHTML='<button onclick="event.stopPropagation();moveOC(this.closest(\'.oc-item\'),-1)">&#9650;</button><button onclick="event.stopPropagation();moveOC(this.closest(\'.oc-item\'),1)">&#9660;</button>';
+    d.appendChild(arrows);
+
+    const span=document.createElement('span');
+    span.className='item-text';
+    span.textContent=item.text;
+    d.appendChild(span);
+
+    const ret=document.createElement('button');
+    ret.className='oc-ret';
+    ret.textContent='\u2715';
+    ret.onclick=function(e){e.stopPropagation();pool.appendChild(d);d.classList.remove('right','wrong');};
+    d.appendChild(ret);
+
+    d.onclick=function(){
+        if(this.parentElement===pool){
+            tgt.appendChild(this);
+            this.classList.remove('right','wrong');
+        }
+    };
+    return d;
+}
+
+function moveOC(el, dir){
+    const parent=el.parentElement;
+    if(dir===-1 && el.previousElementSibling){
+        parent.insertBefore(el, el.previousElementSibling);
+    }else if(dir===1 && el.nextElementSibling){
+        parent.insertBefore(el.nextElementSibling, el);
+    }
+    el.classList.remove('right','wrong');
+}
+
+function resetOC(id){
+    const ch=orderData.find(c=>c.id===id);
+    const pool=document.getElementById('ocp'+id);
+    const tgt=document.getElementById('oct'+id);
+    pool.innerHTML='';tgt.innerHTML='';
+    document.getElementById('ocr'+id).className='result';
+
+    const shuffled=shuffle(ch.lines.map((l,i)=>({text:l,idx:i})));
+    shuffled.forEach(item=>{
+        pool.appendChild(makeOCItem(id, item));
+    });
+}
+
+function checkOC(id){
+    const ch=orderData.find(c=>c.id===id);
+    const tgt=document.getElementById('oct'+id);
+    const items=tgt.querySelectorAll('.oc-item');
+    const r=document.getElementById('ocr'+id);
+
+    if(items.length<ch.lines.length){
+        r.innerHTML='<div style="color:#f59e0b">Faltan lineas. Haz clic en cada una del banco para moverla.</div>';
+        r.className='result show';r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+        return;
+    }
+
+    let allOk=true;
+    items.forEach((item,i)=>{
+        if(parseInt(item.dataset.idx)===i){
+            item.classList.add('right');item.classList.remove('wrong');
+        }else{
+            item.classList.add('wrong');item.classList.remove('right');
+            allOk=false;
+        }
+    });
+
+    if(allOk){
+        r.innerHTML='<div style="color:#86efac;font-size:1.1em"><b>Perfecto! Orden correcto.</b></div>';
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';
+        addScore('oc'+id);
+    }else{
+        r.innerHTML='<div style="color:#fca5a5"><b>Hay errores.</b> Verde = posicion correcta. Rojo = posicion incorrecta.</div>';
+        r.style.background='#1e1b2e';r.style.border='1px solid #ef4444';
+    }
+    r.className='result show';
+}
+
+// ===== ERROR FINDERS =====
+const errData=[
+    {id:1,title:"Codigo 1",diff:"f",
+     consigna:"Se pide crear una copia de una lista y agregarle un elemento sin afectar la original.",
+     code:`lista1 = [1, 2, 3]
+lista2 = lista1
+lista2.append(4)
+print("Original:", lista1)
+print("Copia:", lista2)`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"lista2 = lista1 copia la REFERENCIA, no los datos",correct:true},
+         {text:"Al modificar lista2, lista1 tambien cambia",correct:true},
+         {text:"Deberia usar lista2 = lista1[:] o lista1.copy()",correct:true},
+         {text:"append() esta mal usado",correct:false},
+         {text:"print() esta mal usado",correct:false},
+         {text:"Falta usar insert() en vez de append()",correct:false},
+     ]},
+    {id:2,title:"Codigo 2",diff:"m",
+     consigna:"Se pide ordenar una lista de numeros e imprimir la lista ordenada.",
+     code:`numeros = [5, 1, 7, 3, 9]
+resultado = numeros.sort()
+print("Ordenada:", resultado)`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"sort() devuelve None, no la lista ordenada",correct:true},
+         {text:"resultado sera None porque sort() modifica in situ",correct:true},
+         {text:"Deberia usar sorted() o imprimir numeros despues de sort()",correct:true},
+         {text:"sort() no funciona con enteros",correct:false},
+         {text:"Falta el parametro reverse",correct:false},
+         {text:"Los corchetes estan mal",correct:false},
+     ]},
+    {id:3,title:"Codigo 3",diff:"m",
+     consigna:"Se pide eliminar todos los numeros negativos de una lista.",
+     code:`numeros = [3, -1, 4, -2, 5, -3, 6]
+for num in numeros:
+    if num < 0:
+        numeros.remove(num)
+print(numeros)`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"Modificar una lista mientras se recorre con for causa problemas",correct:true},
+         {text:"Se saltean elementos porque el indice se desplaza al eliminar",correct:true},
+         {text:"Deberia recorrer una copia o crear lista nueva con comprension",correct:true},
+         {text:"remove() no funciona con negativos",correct:false},
+         {text:"El if esta mal planteado",correct:false},
+         {text:"Falta usar del en vez de remove",correct:false},
+     ]},
+    {id:4,title:"Codigo 4",diff:"d",
+     consigna:"Se pide crear una matriz 3x3 de ceros y llenarla.",
+     code:`filas = 3
+columnas = 3
+fila = [0] * columnas
+matriz = [fila] * filas
+matriz[0][0] = 5
+print(matriz)`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"[fila] * filas replica la REFERENCIA, no crea filas independientes",correct:true},
+         {text:"Al cambiar matriz[0][0], TODAS las filas cambian (mismo objeto)",correct:true},
+         {text:"Deberia usar list comprehension: [[0]*col for i in range(filas)]",correct:true},
+         {text:"Los indices estan mal",correct:false},
+         {text:"Falta usar append()",correct:false},
+         {text:"El print esta mal",correct:false},
+     ]},
+    {id:5,title:"Codigo 5",diff:"m",
+     consigna:"Se pide obtener los primeros 3 y ultimos 3 elementos de una lista de 10 elementos.",
+     code:`lista = list(range(10))
+primeros = lista[1:3]
+ultimos = lista[-3:-1]
+print("Primeros:", primeros)
+print("Ultimos:", ultimos)`,
+     question:"Que errores tiene?",
+     options:[
+         {text:"lista[1:3] empieza en indice 1, deberia ser lista[:3] o lista[0:3]",correct:true},
+         {text:"lista[-3:-1] no incluye el ultimo, deberia ser lista[-3:]",correct:true},
+         {text:"primeros solo tiene 2 elementos en vez de 3",correct:true},
+         {text:"ultimos solo tiene 2 elementos en vez de 3",correct:true},
+         {text:"list(range(10)) esta mal",correct:false},
+         {text:"Falta usar len()",correct:false},
+     ]},
+];
+
+function buildErrorFinders(){
+    const box=document.getElementById('errBox');
+    box.innerHTML='';
+    const diffL={f:'Facil',m:'Medio',d:'Dificil'};
+    const diffC={f:'diff-f',m:'diff-m',d:'diff-d'};
+    errData.forEach(ef=>{
+        let h=`<div class="oc" id="ef${ef.id}">
+            <h3>${ef.title} <span class="diff ${diffC[ef.diff]}">${diffL[ef.diff]}</span></h3>
+            <p style="color:#93c5fd;margin:8px 0"><b>Consigna:</b> ${ef.consigna}</p>
+            <pre>${ef.code}</pre>
+            <p style="margin:10px 0;font-weight:bold">${ef.question}</p>
+            <div id="efo${ef.id}">`;
+        ef.options.forEach((o,i)=>{
+            h+=`<div class="ef-opt" id="ef${ef.id}o${i}" onclick="toggleEfOpt(this)">${o.text}</div>`;
+        });
+        h+=`</div>
+            <button class="btn btn-p" onclick="checkEF(${ef.id})" style="margin-top:10px">Verificar</button>
+            <div class="result" id="efr${ef.id}"></div>
+        </div>`;
+        box.innerHTML+=h;
+    });
+}
+
+function toggleEfOpt(el){
+    if(el.classList.contains('ans-ok')||el.classList.contains('ans-no'))return;
+    el.classList.toggle('selected');
+}
+
+function checkEF(id){
+    const ef=errData.find(e=>e.id===id);
+    const r=document.getElementById('efr'+id);
+    let allCorrect=true;
+
+    ef.options.forEach((o,i)=>{
+        const el=document.getElementById('ef'+id+'o'+i);
+        const selected=el.classList.contains('selected');
+        el.classList.remove('selected');
+        if(o.correct && selected){
+            el.classList.add('ans-ok');
+        }else if(o.correct && !selected){
+            el.classList.add('ans-ok');
+            el.innerHTML+=' <span style="color:#fde68a"> &larr; te falto este!</span>';
+            allCorrect=false;
+        }else if(!o.correct && selected){
+            el.classList.add('ans-no');
+            el.innerHTML+=' <span style="color:#fca5a5"> &larr; esto NO es un error</span>';
+            allCorrect=false;
+        }
+        el.onclick=null;
+    });
+
+    if(allCorrect){
+        r.innerHTML='<div style="color:#86efac;font-size:1.1em"><b>Perfecto! Identificaste todos los errores correctamente.</b></div>';
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';
+        addScore('ef'+id);
+    }else{
+        r.innerHTML='<div style="color:#f59e0b">Revisa las marcas. Verde = error real. Rojo = no era un error.</div>';
+        r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+    }
+    r.className='result show';
+}
+
+// ===== QUE DEVUELVE =====
+const qdData=[
+    {id:1,title:"Indexing basico",
+     code:`lista = [10, 20, 30, 40, 50]\nprint(lista[1])`,
+     answer:"20",
+     hint:"Los indices empiezan en 0. lista[1] es el segundo elemento."},
+    {id:2,title:"Indice negativo",
+     code:`lista = [10, 20, 30, 40, 50]\nprint(lista[-2])`,
+     answer:"40",
+     hint:"-1 es el ultimo, -2 es el penultimo."},
+    {id:3,title:"Slicing",
+     code:`lista = [10, 20, 30, 40, 50]\nprint(lista[1:4])`,
+     answer:"[20, 30, 40]",
+     hint:"Slicing [1:4] toma indices 1, 2, 3. El 4 NO esta incluido."},
+    {id:4,title:"append vs +",
+     code:`a = [1, 2, 3]\nb = a + [4]\na.append(5)\nprint(a)\nprint(b)`,
+     answer:"[1, 2, 3, 5]\n[1, 2, 3, 4]",
+     hint:"+ crea nueva lista (b es independiente). append modifica a in situ."},
+    {id:5,title:"sort vs sorted",
+     code:`nums = [3, 1, 2]\nresultado = nums.sort()\nprint(resultado)\nprint(nums)`,
+     answer:"None\n[1, 2, 3]",
+     hint:"sort() modifica in situ y devuelve None."},
+    {id:6,title:"pop()",
+     code:`lista = [10, 20, 30, 40]\nx = lista.pop(1)\nprint(x)\nprint(lista)`,
+     answer:"20\n[10, 30, 40]",
+     hint:"pop(1) elimina y devuelve el elemento en indice 1."},
+    {id:7,title:"List comprehension",
+     code:`resultado = [x*2 for x in range(5)]\nprint(resultado)`,
+     answer:"[0, 2, 4, 6, 8]",
+     hint:"range(5) = 0,1,2,3,4. Cada uno multiplicado por 2."},
+    {id:8,title:"Slicing con paso",
+     code:`lista = [0, 1, 2, 3, 4, 5, 6, 7]\nprint(lista[1:7:2])`,
+     answer:"[1, 3, 5]",
+     hint:"[1:7:2] empieza en 1, hasta 7 (no incluido), de a 2."},
+    {id:9,title:"Referencia vs copia",
+     code:`a = [1, 2, 3]\nb = a\nb.append(4)\nprint(a)`,
+     answer:"[1, 2, 3, 4]",
+     hint:"b = a copia la referencia. Ambos apuntan al mismo objeto."},
+    {id:10,title:"sorted() con reverse",
+     code:`letras = ['c', 'a', 'b']\nnueva = sorted(letras, reverse=True)\nprint(letras)\nprint(nueva)`,
+     answer:"['c', 'a', 'b']\n['c', 'b', 'a']",
+     hint:"sorted() no modifica la original, devuelve nueva lista."},
+];
+
+function buildQueDevuelve(){
+    const box=document.getElementById('qdBox');
+    box.innerHTML='';
+    qdData.forEach(qd=>{
+        box.innerHTML+=`
+        <div class="oc" id="qd${qd.id}">
+            <h3>${qd.id}. ${qd.title}</h3>
+            <pre>${qd.code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
+            <p style="color:#94a3b8;margin:5px 0">Que imprime? (escribe la salida exacta, una linea por renglon):</p>
+            <textarea class="qd-input" id="qdi${qd.id}" rows="2" spellcheck="false" style="min-height:auto;width:100%;background:#0c1222;color:#e2e8f0;border:2px solid #334155;border-radius:8px;padding:12px 15px;font-family:Consolas,monospace;font-size:.95em;resize:vertical"></textarea>
+            <button class="btn btn-p" onclick="checkQD(${qd.id})">Verificar</button>
+            <button class="btn btn-s" onclick="hintQD(${qd.id})">Pista</button>
+            <div class="result" id="qdr${qd.id}"></div>
+        </div>`;
+    });
+}
+
+function normalizeAnswer(s){
+    return s.replace(/\r\n/g,'\n').replace(/\s+$/gm,'').replace(/^\s+$/gm,'').replace(/\n+$/,'').replace(/^\n+/,'');
+}
+
+function checkQD(id){
+    const qd=qdData.find(q=>q.id===id);
+    const userAns=normalizeAnswer(document.getElementById('qdi'+id).value);
+    const correctAns=normalizeAnswer(qd.answer);
+    const r=document.getElementById('qdr'+id);
+
+    if(!userAns){
+        r.innerHTML='<div style="color:#f59e0b">Escribe tu respuesta antes de verificar.</div>';
+        r.className='result show';r.style.background='#2e2a1a';r.style.border='1px solid #f59e0b';
+        return;
+    }
+
+    if(userAns===correctAns){
+        r.innerHTML=`<div style="color:#86efac;font-size:1.1em"><b>Correcto!</b></div>`;
+        r.style.background='#1a2e1a';r.style.border='1px solid #22c55e';
+        addScore('qd'+id);
+    }else{
+        r.innerHTML=`<div style="color:#fca5a5"><b>Incorrecto.</b> La respuesta correcta es:</div><pre style="margin-top:8px;color:#86efac">${correctAns.replace(/</g,'&lt;')}</pre><div style="color:#94a3b8;margin-top:5px;font-size:.9em">${qd.hint}</div>`;
+        r.style.background='#1e1b2e';r.style.border='1px solid #ef4444';
+    }
+    r.className='result show';
+}
+
+function hintQD(id){
+    const qd=qdData.find(q=>q.id===id);
+    const r=document.getElementById('qdr'+id);
+    r.innerHTML=`<div style="color:#93c5fd">${qd.hint}</div>`;
+    r.className='result show';r.style.background='#1e3a5f';r.style.border='1px solid #38bdf8';
+}
+
+function resetQD(){
+    qdData.forEach(qd=>{
+        delete answered['qd'+qd.id];
+        document.getElementById('qdi'+qd.id).value='';
+        document.getElementById('qdr'+qd.id).className='result';
+    });
+    score=Object.keys(answered).length;
+    document.getElementById('sDisp').textContent=score;
+    const t=parseInt(document.getElementById('sTotal').textContent);
+    document.getElementById('pFill').style.width=(t>0?(score/t)*100:0)+'%';
+}
+
+// ===== INIT =====
+init();
+</script>
+</body>
+</html>
