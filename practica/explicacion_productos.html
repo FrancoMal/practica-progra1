@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explicacion - Productos (Pedidos CSV)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.7;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #58a6ff;
+            font-size: 2em;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #21262d;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            color: #58a6ff;
+            font-size: 1.4em;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 4px solid #58a6ff;
+        }
+
+        h3 {
+            color: #79c0ff;
+            font-size: 1.15em;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 14px;
+            color: #b0b8c1;
+        }
+
+        .subtitle {
+            color: #8b949e;
+            font-size: 1em;
+            margin-bottom: 30px;
+        }
+
+        pre {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 18px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        code {
+            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+            color: #e6edf3;
+        }
+
+        .inline-code {
+            background-color: #1c2129;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #79c0ff;
+        }
+
+        .consigna-card {
+            background: linear-gradient(135deg, #1a2332, #161b22);
+            border: 1px solid #238636;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .consigna-card .label {
+            color: #3fb950;
+            font-weight: bold;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .consigna-card .text {
+            color: #c9d1d9;
+            font-style: italic;
+        }
+
+        .diagram {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Cascadia Code', 'Consolas', monospace;
+            font-size: 0.88em;
+            line-height: 1.9;
+            overflow-x: auto;
+        }
+
+        .diagram .sku { color: #ff7b72; font-weight: bold; }
+        .diagram .desc { color: #d2a8ff; font-weight: bold; }
+        .diagram .fecha { color: #79c0ff; font-weight: bold; }
+        .diagram .cant { color: #3fb950; font-weight: bold; }
+        .diagram .sep { color: #484f58; }
+
+        .step {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+            padding-left: 65px;
+        }
+
+        .step-number {
+            position: absolute;
+            left: 15px;
+            top: 18px;
+            background: #58a6ff;
+            color: #0d1117;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1em;
+        }
+
+        .step-title {
+            color: #e6edf3;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .step-desc {
+            color: #8b949e;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.92em;
+        }
+
+        th {
+            background-color: #21262d;
+            color: #58a6ff;
+            padding: 12px 15px;
+            text-align: left;
+            border: 1px solid #30363d;
+        }
+
+        td {
+            padding: 10px 15px;
+            border: 1px solid #30363d;
+            color: #b0b8c1;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #161b22;
+        }
+
+        .note {
+            background-color: #1a1e2e;
+            border-left: 4px solid #58a6ff;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .note strong {
+            color: #58a6ff;
+        }
+
+        .warning {
+            background-color: #2a1e0e;
+            border-left: 4px solid #d29922;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .warning strong {
+            color: #d29922;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        .checklist li {
+            padding: 8px 0 8px 35px;
+            position: relative;
+            color: #b0b8c1;
+        }
+
+        .checklist li::before {
+            content: "\2713";
+            position: absolute;
+            left: 5px;
+            color: #3fb950;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #21262d;
+            margin: 40px 0;
+        }
+
+        .flow-arrow {
+            text-align: center;
+            color: #484f58;
+            font-size: 1.5em;
+            margin: 5px 0;
+        }
+
+        .dict-visual {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Cascadia Code', 'Consolas', monospace;
+            font-size: 0.88em;
+            line-height: 2;
+        }
+
+        .dict-visual .key { color: #ff7b72; }
+        .dict-visual .key2 { color: #d2a8ff; }
+        .dict-visual .value { color: #3fb950; }
+        .dict-visual .comment { color: #484f58; }
+
+        .output-box {
+            background-color: #0d1117;
+            border: 1px solid #3fb950;
+            border-radius: 8px;
+            padding: 18px;
+            margin: 15px 0;
+            font-family: 'Cascadia Code', 'Consolas', monospace;
+            font-size: 0.88em;
+            color: #3fb950;
+            line-height: 1.8;
+        }
+
+        .section-divider {
+            display: flex;
+            align-items: center;
+            margin: 50px 0 30px 0;
+        }
+
+        .section-divider span {
+            color: #484f58;
+            font-size: 0.85em;
+            padding: 0 15px;
+            white-space: nowrap;
+        }
+
+        .section-divider::before,
+        .section-divider::after {
+            content: "";
+            flex: 1;
+            border-top: 1px solid #21262d;
+        }
+
+        .error-card {
+            background: linear-gradient(135deg, #2a1a1a, #1a1117);
+            border: 1px solid #f85149;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .error-card .label {
+            color: #f85149;
+            font-weight: bold;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .error-card .text {
+            color: #c9d1d9;
+        }
+
+        .fix-card {
+            background: linear-gradient(135deg, #1a2a1a, #161b22);
+            border: 1px solid #3fb950;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .fix-card .label {
+            color: #3fb950;
+            font-weight: bold;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .fix-card .text {
+            color: #c9d1d9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <h1>Resolucion del Previo - Pedidos CSV (Productos)</h1>
+        <p class="subtitle">Explicacion completa del ejercicio productos.py, paso a paso, vinculando cada parte con la consigna original.</p>
+
+        <!-- ===================== CONSIGNA ===================== -->
+        <h2>1. Que pide la consigna</h2>
+
+        <div class="consigna-card">
+            <div class="label">Punto 1 - Consigna textual</div>
+            <div class="text">
+                "Una distribuidora de articulos de libreria y papeleria dispone de un archivo con los pedidos
+                realizados a lo largo del anio 2019. El archivo tiene formato CSV (valores delimitados por punto y coma).
+                Se solicita escribir un programa para mostrar por pantalla un listado que indique, para cada articulo,
+                el mes del anio en que se registro la mayor demanda del mismo. Este listado debera ordenarse
+                alfabeticamente por descripcion. Cada articulo debe aparecer una sola vez en el listado."
+            </div>
+        </div>
+
+        <div class="consigna-card">
+            <div class="label">Punto 2 - Consigna textual</div>
+            <div class="text">
+                "Desarrollar una funcion recursiva que cuente la cantidad de elementos de un conjunto
+                sin utilizar la funcion len(), y cuyo funcionamiento se base en el manejo de excepciones.
+                Escribir tambien un programa que permita verificar su comportamiento."
+            </div>
+        </div>
+
+        <p>Desglosando, el programa debe:</p>
+        <ul class="checklist">
+            <li>Leer el archivo <span class="inline-code">pedidos.csv</span> con formato CSV separado por punto y coma</li>
+            <li>Acumular las cantidades por articulo (SKU) y por mes</li>
+            <li>Para cada articulo, determinar el mes con mayor demanda</li>
+            <li>Mostrar el listado ordenado alfabeticamente por descripcion</li>
+            <li>Cada articulo aparece una sola vez</li>
+            <li>Crear una funcion recursiva para contar elementos de un conjunto</li>
+        </ul>
+
+        <p>Requisitos tecnicos:</p>
+        <ul class="checklist">
+            <li>Usar manejo de excepciones</li>
+            <li>Crear funciones que modularicen el codigo</li>
+            <li>Incluir al menos una funcion lambda</li>
+            <li>Comentar la estructura de datos elegida y justificar</li>
+        </ul>
+
+        <!-- ===================== FORMATO DEL ARCHIVO ===================== -->
+        <h2>2. Formato del archivo pedidos.csv</h2>
+
+        <p>Cada linea del archivo tiene 4 campos separados por punto y coma (<span class="inline-code">;</span>):</p>
+
+        <table>
+            <tr>
+                <th>Campo</th>
+                <th>Descripcion</th>
+                <th>Ejemplo</th>
+            </tr>
+            <tr>
+                <td>SKU</td>
+                <td>Codigo unico del articulo</td>
+                <td>12316</td>
+            </tr>
+            <tr>
+                <td>Descripcion</td>
+                <td>Nombre del articulo</td>
+                <td>Broche Dorado N8 * 100</td>
+            </tr>
+            <tr>
+                <td>Fecha</td>
+                <td>Fecha del pedido (DD/MM/AA)</td>
+                <td>17/12/19</td>
+            </tr>
+            <tr>
+                <td>Cantidad</td>
+                <td>Unidades solicitadas</td>
+                <td>85</td>
+            </tr>
+        </table>
+
+        <p>Ejemplo de una linea real del archivo:</p>
+
+        <div class="diagram">
+            <span class="sku">12316</span><span class="sep">;</span><span class="desc">Broche Dorado N8 * 100 3.3 Cm</span><span class="sep">;</span><span class="fecha">17/12/19</span><span class="sep">;</span><span class="cant">85</span><br><br>
+            <span class="sku">12316</span> = SKU (codigo del articulo)<br>
+            <span class="desc">Broche Dorado N8...</span> = Descripcion del articulo<br>
+            <span class="fecha">17/12/19</span> = dia 17, mes 12 (diciembre), anio 2019<br>
+            <span class="cant">85</span> = 85 unidades pedidas
+        </div>
+
+        <div class="note">
+            <strong>Clave:</strong> A diferencia del previo 2021 que usaba formato fijo (slicing), aca se usa
+            <span class="inline-code">split(";")</span> para separar los campos y <span class="inline-code">split("/")</span>
+            para separar la fecha. Mucho mas legible.
+        </div>
+
+        <!-- ===================== ESTRUCTURA DE DATOS ===================== -->
+        <h2>3. Estructura de datos elegida</h2>
+
+        <p>Elegimos un <strong>diccionario con listas y sub-diccionarios</strong>:</p>
+
+        <div class="dict-visual">
+            articulos = {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"12316"</span>: [ <span class="key2">"Broche Dorado N8..."</span>, { <span class="key2">"12"</span>: <span class="value">85</span>, <span class="key2">"05"</span>: <span class="value">200</span> } ],<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"5332"</span>: &nbsp;[ <span class="key2">"Abro.Maped 26/6..."</span>, &nbsp;{ <span class="key2">"01"</span>: <span class="value">109</span>, <span class="key2">"03"</span>: <span class="value">340</span> } ],<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># ... miles de artículos más</span><br>
+            }<br><br>
+            <span class="comment"># Clave externa: SKU del artículo</span><br>
+            <span class="comment"># Valor: [descripcion, {mes: cantidad_total_acumulada}]</span>
+        </div>
+
+        <h3>Por que esta estructura y no otra?</h3>
+
+        <table>
+            <tr>
+                <th>Estructura</th>
+                <th>Acceso</th>
+                <th>Problema</th>
+            </tr>
+            <tr>
+                <td>Diccionario (elegida)</td>
+                <td>O(1) por SKU</td>
+                <td>Ninguno: acceso directo para buscar y acumular</td>
+            </tr>
+            <tr>
+                <td>Lista</td>
+                <td>O(n) secuencial</td>
+                <td>Con 50000 registros, buscar un SKU recorriendo toda la lista es muy lento</td>
+            </tr>
+            <tr>
+                <td>Lista enlazada</td>
+                <td>O(n) secuencial</td>
+                <td>Mismo problema, mas complejidad de implementacion</td>
+            </tr>
+            <tr>
+                <td>Arbol binario</td>
+                <td>O(log n)</td>
+                <td>Innecesario: no necesitamos orden especial para busqueda</td>
+            </tr>
+        </table>
+
+        <p>El sub-diccionario de meses dentro de cada articulo permite acumular cantidades
+        por mes de forma eficiente. Al final, basta con buscar el mes con valor maximo.</p>
+
+        <!-- ===================== FLUJO DEL PROGRAMA ===================== -->
+        <h2>4. Flujo completo del programa</h2>
+
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-title">leer_archivo()</div>
+            <div class="step-desc">Lee pedidos.csv linea por linea. Parsea cada campo con split(";"). Acumula cantidades por SKU y por mes en el diccionario.</div>
+        </div>
+        <div class="flow-arrow">|</div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-title">mostrar_informe(articulos)</div>
+            <div class="step-desc">Para cada articulo, busca el mes con mayor demanda usando mes_mayor_demanda(). Arma una lista, la ordena alfabeticamente por descripcion, y la muestra.</div>
+        </div>
+        <div class="flow-arrow">|</div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-title">contar_elementos(conjunto)</div>
+            <div class="step-desc">Funcion recursiva del punto 2. Cuenta elementos de un conjunto sin len(), usando pop() y capturando KeyError como caso base.</div>
+        </div>
+
+        <!-- ===================== FUNCION POR FUNCION ===================== -->
+        <div class="section-divider"><span>EXPLICACION FUNCION POR FUNCION</span></div>
+
+        <!-- --- leer_archivo --- -->
+        <h2>5. Funcion leer_archivo()</h2>
+
+        <div class="consigna-card">
+            <div class="label">Cumple con</div>
+            <div class="text">
+                Lectura del archivo CSV + acumulacion por articulo y mes + manejo de excepciones + modularizacion
+            </div>
+        </div>
+
+        <pre><code>def leer_archivo():
+    """Lee pedidos.csv y devuelve un diccionario con las cantidades por mes de cada artículo."""
+    articulos = {}
+    try:
+        archivo = open("pedidos.csv", "r")
+        for linea in archivo:
+            linea = linea.strip("\n")
+            # Formato CSV: SKU;descripcion;DD/MM/AA;cantidad
+            SKU, descripcion, fecha, cantidad = linea.split(";")
+            dia, mes, anio = fecha.split("/")
+            cantidad = int(cantidad)
+
+            # Si el artículo es nuevo, creo su entrada con descripcion y dict de meses
+            if SKU not in articulos:
+                articulos[SKU] = [descripcion, {}]
+            # Si el mes es nuevo para este artículo, lo inicializo en 0
+            if mes not in articulos[SKU][1]:
+                articulos[SKU][1][mes] = 0
+            # Acumulo la cantidad vendida en ese mes
+            articulos[SKU][1][mes] += cantidad
+    except FileNotFoundError:
+        print("Error: no se encontró el archivo pedidos.csv")
+    except OSError:
+        print("Error: problema al leer el archivo")
+    finally:
+        try:
+            archivo.close()
+        except NameError:
+            pass
+    return articulos</code></pre>
+
+        <h3>Parseo de cada linea:</h3>
+
+        <pre><code># linea = "12316;Broche Dorado N8 * 100 3.3 Cm;17/12/19;85"
+
+SKU, descripcion, fecha, cantidad = linea.split(";")
+# SKU = "12316"
+# descripcion = "Broche Dorado N8 * 100 3.3 Cm"
+# fecha = "17/12/19"
+# cantidad = "85" (todavía es string)
+
+dia, mes, anio = fecha.split("/")
+# dia = "17", mes = "12", anio = "19"
+
+cantidad = int(cantidad)
+# cantidad = 85 (ahora es entero, listo para sumar)</code></pre>
+
+        <div class="note">
+            <strong>Diferencia con el previo 2021:</strong> Alla usabamos slicing (<span class="inline-code">linea[0:2]</span>)
+            porque el formato era de largo fijo. Aca usamos <span class="inline-code">split(";")</span> porque es CSV.
+            Cada metodo es el correcto para su formato.
+        </div>
+
+        <h3>Acumulacion en el diccionario:</h3>
+
+        <pre><code>if SKU not in articulos:
+    articulos[SKU] = [descripcion, {}]       # Creo entrada nueva
+if mes not in articulos[SKU][1]:
+    articulos[SKU][1][mes] = 0               # Inicializo mes nuevo
+articulos[SKU][1][mes] += cantidad           # Acumulo</code></pre>
+
+        <p>Veamos como se va llenando paso a paso:</p>
+
+        <div class="dict-visual">
+            <span class="comment"># Linea: 12316;Broche Dorado...;17/12/19;85 -> SKU="12316", mes="12", cant=85</span><br>
+            articulos = { <span class="key">"12316"</span>: [<span class="key2">"Broche Dorado..."</span>, {<span class="key2">"12"</span>: <span class="value">85</span>}] }<br><br>
+
+            <span class="comment"># Linea: 5332;Abro.Maped...;14/01/19;109 -> SKU="5332", mes="01", cant=109</span><br>
+            articulos = { <span class="key">"12316"</span>: [...], <span class="key">"5332"</span>: [<span class="key2">"Abro.Maped..."</span>, {<span class="key2">"01"</span>: <span class="value">109</span>}] }<br><br>
+
+            <span class="comment"># Linea: 12316;Broche Dorado...;05/05/19;200 -> SKU="12316" YA EXISTE, mes="05", cant=200</span><br>
+            articulos = { <span class="key">"12316"</span>: [<span class="key2">"Broche Dorado..."</span>, {<span class="key2">"12"</span>: <span class="value">85</span>, <span class="key2">"05"</span>: <span class="value">200</span>}], ... }<br><br>
+
+            <span class="comment"># Linea: 12316;Broche Dorado...;22/05/19;150 -> SKU="12316" existe, mes="05" EXISTE, ACUMULO</span><br>
+            articulos = { <span class="key">"12316"</span>: [<span class="key2">"Broche Dorado..."</span>, {<span class="key2">"12"</span>: <span class="value">85</span>, <span class="key2">"05"</span>: <span class="value">350</span>}], ... }<br>
+            <span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 200 + 150 = 350</span>
+        </div>
+
+        <!-- --- mes_mayor_demanda --- -->
+        <h2>6. Funcion mes_mayor_demanda()</h2>
+
+        <div class="consigna-card">
+            <div class="label">Cumple con</div>
+            <div class="text">
+                Determinar el mes con mayor demanda + funcion lambda (requisito)
+            </div>
+        </div>
+
+        <pre><code>def mes_mayor_demanda(cantidades_por_mes):
+    """Recibe un diccionario {mes: cantidad} y devuelve el mes con mayor cantidad."""
+    return max(cantidades_por_mes, key=lambda m: cantidades_por_mes[m])</code></pre>
+
+        <h3>Como funciona max() con lambda:</h3>
+
+        <pre><code># Supongamos: cantidades_por_mes = {"01": 109, "05": 350, "12": 85}
+
+max(cantidades_por_mes, key=lambda m: cantidades_por_mes[m])
+
+# max() recorre las claves: "01", "05", "12"
+# Para cada clave, la lambda devuelve su valor:
+#   "01" -> 109
+#   "05" -> 350    <-- maximo!
+#   "12" -> 85
+# Resultado: "05" (el mes con mayor cantidad)</code></pre>
+
+        <div class="note">
+            <strong>Atencion:</strong> <span class="inline-code">max()</span> sobre un diccionario recorre las <strong>claves</strong>,
+            no los valores. La <span class="inline-code">lambda</span> le dice "compara usando el valor asociado a cada clave".
+            Sin la lambda, max() compararia las claves como strings ("12" > "05" > "01") lo cual seria incorrecto.
+        </div>
+
+        <!-- --- nombre_mes --- -->
+        <h2>7. Funcion nombre_mes()</h2>
+
+        <pre><code>def nombre_mes(num_mes):
+    """Convierte un número de mes (string de 2 dígitos) a su nombre en español."""
+    meses = {
+        "01": "Enero", "02": "Febrero", "03": "Marzo",
+        "04": "Abril", "05": "Mayo", "06": "Junio",
+        "07": "Julio", "08": "Agosto", "09": "Septiembre",
+        "10": "Octubre", "11": "Noviembre", "12": "Diciembre"
+    }
+    return meses.get(num_mes, num_mes)</code></pre>
+
+        <p>
+            Funcion auxiliar que convierte <span class="inline-code">"05"</span> en <span class="inline-code">"Mayo"</span>
+            para que el informe sea mas legible. Usa <span class="inline-code">.get()</span> para que si el mes no existe
+            en el diccionario, devuelva el numero tal cual (nunca deberia pasar, pero es una buena practica defensiva).
+        </p>
+
+        <!-- --- mostrar_informe --- -->
+        <h2>8. Funcion mostrar_informe()</h2>
+
+        <div class="consigna-card">
+            <div class="label">Cumple con</div>
+            <div class="text">
+                "Mostrar un listado ordenado alfabeticamente por descripcion. Cada articulo debe aparecer una sola vez." + lambda + modularizacion
+            </div>
+        </div>
+
+        <pre><code>def mostrar_informe(articulos):
+    """Muestra el listado ordenado alfabéticamente por descripción."""
+    if not articulos:
+        print("No se encontraron artículos.")
+        return
+
+    # Armo una lista de tuplas (descripcion, SKU, mes_mayor, cantidad) para ordenar
+    listado = []
+    for SKU, datos in articulos.items():
+        descripcion = datos[0]
+        cantidades = datos[1]
+        mejor_mes = mes_mayor_demanda(cantidades)
+        listado.append((descripcion, SKU, mejor_mes, cantidades[mejor_mes]))
+
+    # Ordeno alfabéticamente por descripción
+    listado.sort(key=lambda x: x[0])
+
+    print(f"{'='*85}")
+    print(f"  LISTADO DE ARTÍCULOS - MES DE MAYOR DEMANDA")
+    print(f"{'='*85}")
+    for desc, sku, mes, cant in listado:
+        print(f"  SKU {sku:<8} | {desc:<35} | {nombre_mes(mes):<12} | {cant} unidades")
+    print(f"{'='*85}")
+    print(f"  Total de artículos: {len(listado)}")</code></pre>
+
+        <h3>Desglose paso a paso:</h3>
+
+        <p><strong>Paso 1 - Armar la lista:</strong></p>
+        <pre><code># Para cada artículo, busco su mes de mayor demanda y armo una tupla
+for SKU, datos in articulos.items():
+    descripcion = datos[0]           # "Broche Dorado N8..."
+    cantidades = datos[1]            # {"12": 85, "05": 350}
+    mejor_mes = mes_mayor_demanda(cantidades)  # "05"
+    listado.append((descripcion, SKU, mejor_mes, cantidades[mejor_mes]))
+    # ("Broche Dorado N8...", "12316", "05", 350)</code></pre>
+
+        <p><strong>Paso 2 - Ordenar alfabeticamente:</strong></p>
+        <pre><code># sort() con lambda para ordenar por el primer elemento (descripcion)
+listado.sort(key=lambda x: x[0])
+
+# Antes: [("Broche...", ...), ("Abro...", ...), ("Agen...", ...)]
+# Después: [("Abro...", ...), ("Agen...", ...), ("Broche...", ...)]</code></pre>
+
+        <div class="note">
+            <strong>Cada articulo aparece una sola vez</strong> porque el diccionario usa el SKU como clave.
+            Si un articulo aparece 100 veces en el archivo, todas las cantidades se acumulan en la misma entrada.
+            Cuando recorremos el diccionario al final, cada SKU se procesa exactamente una vez.
+        </div>
+
+        <h3>Ejemplo de salida:</h3>
+
+        <div class="output-box">
+            =====================================================================================<br>
+            &nbsp;&nbsp;LISTADO DE ARTICULOS - MES DE MAYOR DEMANDA<br>
+            =====================================================================================<br>
+            &nbsp;&nbsp;SKU 5332 &nbsp;&nbsp;&nbsp;| Abro.Maped 26/6 Advan. 354511 &nbsp;&nbsp;&nbsp;&nbsp;| Enero &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 109 unidades<br>
+            &nbsp;&nbsp;SKU 5294 &nbsp;&nbsp;&nbsp;| Abrochadora Kangaro Hd-23S13 &nbsp;&nbsp;&nbsp;&nbsp;| Abril &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 136 unidades<br>
+            &nbsp;&nbsp;SKU 1003 &nbsp;&nbsp;&nbsp;| Acetato Rollo 10*0.45 Mac &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| Diciembre &nbsp;&nbsp;| 39 unidades<br>
+            &nbsp;&nbsp;SKU 2669 &nbsp;&nbsp;&nbsp;| Adhesivo Brillitos Plasticola &nbsp;&nbsp;&nbsp;| Febrero &nbsp;&nbsp;&nbsp;&nbsp;| 26 unidades<br>
+            &nbsp;&nbsp;... (miles de artículos mas)<br>
+            =====================================================================================<br>
+            &nbsp;&nbsp;Total de articulos: XXXX
+        </div>
+
+        <!-- --- contar_elementos --- -->
+        <div class="section-divider"><span>PUNTO 2 - FUNCION RECURSIVA</span></div>
+
+        <h2>9. Funcion contar_elementos() - Recursiva</h2>
+
+        <div class="consigna-card">
+            <div class="label">Cumple con</div>
+            <div class="text">
+                "Funcion recursiva que cuente la cantidad de elementos de un conjunto sin utilizar len(),
+                cuyo funcionamiento se base en el manejo de excepciones."
+            </div>
+        </div>
+
+        <pre><code>def contar_elementos(conjunto):
+    """Cuenta los elementos de un conjunto sin usar len().
+    Usa recursión y manejo de excepciones: cuando el conjunto está vacío,
+    pop() lanza KeyError, que funciona como caso base."""
+    try:
+        conjunto.pop()  # Saco un elemento; si está vacío lanza KeyError
+        return 1 + contar_elementos(conjunto)
+    except KeyError:
+        return 0  # Conjunto vacío: caso base</code></pre>
+
+        <h3>Como funciona la recursion:</h3>
+
+        <p>La idea es simple: saco un elemento con <span class="inline-code">pop()</span>, cuento 1, y recursivamente
+        cuento el resto. Cuando el conjunto esta vacio, <span class="inline-code">pop()</span> lanza
+        <span class="inline-code">KeyError</span>, que actua como caso base.</p>
+
+        <pre><code># Ejemplo: conjunto = {10, 20, 30}
+
+contar_elementos({10, 20, 30})
+    pop() -> saca 10, queda {20, 30}
+    return 1 + contar_elementos({20, 30})
+                    pop() -> saca 20, queda {30}
+                    return 1 + contar_elementos({30})
+                                    pop() -> saca 30, queda {}
+                                    return 1 + contar_elementos({})
+                                                    pop() -> KeyError!
+                                                    return 0
+                                    return 1 + 0 = 1
+                    return 1 + 1 = 2
+    return 1 + 2 = 3   # Correcto!</code></pre>
+
+        <div class="warning">
+            <strong>Importante:</strong> <span class="inline-code">pop()</span> modifica el conjunto original, por eso al llamarla
+            usamos <span class="inline-code">contar_elementos(ejemplo.copy())</span> para no destruir el conjunto.
+        </div>
+
+        <h3>Por que KeyError y no IndexError?</h3>
+
+        <p>
+            Los conjuntos (<span class="inline-code">set</span>) en Python usan <span class="inline-code">pop()</span>
+            que lanza <span class="inline-code">KeyError</span> cuando estan vacios (no IndexError como las listas).
+            Esto es porque los conjuntos no tienen indices, solo claves.
+        </p>
+
+        <h3>Verificacion:</h3>
+
+        <pre><code>ejemplo = {10, 20, 30, 40, 50}
+print(f"Conjunto: {ejemplo}")
+print(f"Cantidad (sin len): {contar_elementos(ejemplo.copy())}")  # 5
+print(f"Verificación con len(): {len(ejemplo)}")                  # 5</code></pre>
+
+        <!-- --- main --- -->
+        <h2>10. Funcion main()</h2>
+
+        <pre><code>def main():
+    # Punto 1: informe de artículos
+    articulos = leer_archivo()
+    mostrar_informe(articulos)
+
+    # Punto 2: demostración de función recursiva
+    print("\n--- Función recursiva: contar elementos de un conjunto ---")
+    ejemplo = {10, 20, 30, 40, 50}
+    print(f"Conjunto: {ejemplo}")
+    print(f"Cantidad de elementos (sin len): {contar_elementos(ejemplo.copy())}")
+    print(f"Verificación con len(): {len(ejemplo)}")
+
+main()</code></pre>
+
+        <!-- ===================== ERRORES DEL CODIGO ORIGINAL ===================== -->
+        <div class="section-divider"><span>ERRORES DEL CODIGO ORIGINAL</span></div>
+
+        <h2>11. Errores que tenia el codigo original y como se corrigieron</h2>
+
+        <p>El archivo original <span class="inline-code">productos.py</span> tenia varios errores. Veamos cada uno:</p>
+
+        <div class="error-card">
+            <div class="label">Error 1: variable "total" no definida</div>
+            <div class="text">
+                <pre><code>articulos[SKU] = [descripcion, mes, cantidad, total]  # total no existe!</code></pre>
+            </div>
+        </div>
+        <div class="fix-card">
+            <div class="label">Correccion</div>
+            <div class="text">
+                Se reemplazo por un sub-diccionario de meses:
+                <pre><code>articulos[SKU] = [descripcion, {}]  # diccionario vacío para acumular por mes</code></pre>
+            </div>
+        </div>
+
+        <div class="error-card">
+            <div class="label">Error 2: typo "articulo" en vez de "articulos"</div>
+            <div class="text">
+                <pre><code>mes_guardado = articulo[SKU][1]  # debería ser "articulos" con S</code></pre>
+            </div>
+        </div>
+
+        <div class="error-card">
+            <div class="label">Error 3: comparar strings en vez de enteros</div>
+            <div class="text">
+                <pre><code>if cantidad > cantidad_guardada:  # compara strings! "85" > "200" da True (compara caracter a caracter)</code></pre>
+                La cantidad nunca se convirtio a <span class="inline-code">int()</span>, asi que la comparacion es incorrecta.
+            </div>
+        </div>
+
+        <div class="error-card">
+            <div class="label">Error 4: logica incorrecta para encontrar el mes de mayor demanda</div>
+            <div class="text">
+                El codigo original solo guardaba una cantidad y un mes, comparando linea por linea.
+                Pero la consigna pide el mes con mayor <strong>demanda total acumulada</strong>,
+                no la linea individual con mayor cantidad.
+            </div>
+        </div>
+        <div class="fix-card">
+            <div class="label">Correccion</div>
+            <div class="text">
+                Se usa un diccionario de meses para acumular TODAS las cantidades de cada mes,
+                y luego se busca el mes con mayor total usando <span class="inline-code">max()</span> con lambda.
+            </div>
+        </div>
+
+        <div class="error-card">
+            <div class="label">Error 5: typo "NamerError" en vez de "NameError"</div>
+            <div class="text">
+                <pre><code>except NamerError:  # debería ser NameError (sin la 'r' extra)</code></pre>
+            </div>
+        </div>
+
+        <!-- ===================== RESUMEN ===================== -->
+        <div class="section-divider"><span>RESUMEN FINAL</span></div>
+
+        <h2>12. Checklist de requisitos cumplidos</h2>
+
+        <table>
+            <tr>
+                <th>Requisito de la consigna</th>
+                <th>Donde se cumple</th>
+            </tr>
+            <tr>
+                <td>Leer archivo CSV con punto y coma</td>
+                <td><span class="inline-code">leer_archivo()</span> - split(";") para parsear cada linea</td>
+            </tr>
+            <tr>
+                <td>Mes de mayor demanda por articulo</td>
+                <td><span class="inline-code">mes_mayor_demanda()</span> - max() con lambda sobre el dict de meses</td>
+            </tr>
+            <tr>
+                <td>Ordenar alfabeticamente por descripcion</td>
+                <td><span class="inline-code">mostrar_informe()</span> - sort() con lambda sobre la lista</td>
+            </tr>
+            <tr>
+                <td>Cada articulo aparece una sola vez</td>
+                <td>El diccionario usa SKU como clave: cada artículo tiene una unica entrada</td>
+            </tr>
+            <tr>
+                <td>Funcionar con cualquier archivo similar</td>
+                <td>No hay nada hardcodeado: cualquier CSV con el mismo formato funciona</td>
+            </tr>
+            <tr>
+                <td>Manejo de excepciones</td>
+                <td>FileNotFoundError, OSError, NameError, KeyError (en recursiva)</td>
+            </tr>
+            <tr>
+                <td>Modularizacion (funciones)</td>
+                <td>6 funciones: main, leer_archivo, mes_mayor_demanda, nombre_mes, mostrar_informe, contar_elementos</td>
+            </tr>
+            <tr>
+                <td>Al menos una funcion lambda</td>
+                <td>Lambda en max() de mes_mayor_demanda() y en sort() de mostrar_informe()</td>
+            </tr>
+            <tr>
+                <td>Comentario sobre estructura de datos</td>
+                <td>Comentario al inicio del archivo con justificacion</td>
+            </tr>
+            <tr>
+                <td>Funcion recursiva sin len()</td>
+                <td><span class="inline-code">contar_elementos()</span> - usa pop() + KeyError como caso base</td>
+            </tr>
+        </table>
+
+    </div>
+</body>
+</html>
