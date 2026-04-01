@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explicacion - Previo 2021</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.7;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #58a6ff;
+            font-size: 2em;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #21262d;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            color: #58a6ff;
+            font-size: 1.4em;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 4px solid #58a6ff;
+        }
+
+        h3 {
+            color: #79c0ff;
+            font-size: 1.15em;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 14px;
+            color: #b0b8c1;
+        }
+
+        .subtitle {
+            color: #8b949e;
+            font-size: 1em;
+            margin-bottom: 30px;
+        }
+
+        /* Bloques de codigo */
+        pre {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 18px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        code {
+            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+            color: #e6edf3;
+        }
+
+        .inline-code {
+            background-color: #1c2129;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #79c0ff;
+        }
+
+        /* Tarjetas de consigna */
+        .consigna-card {
+            background: linear-gradient(135deg, #1a2332, #161b22);
+            border: 1px solid #238636;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .consigna-card .label {
+            color: #3fb950;
+            font-weight: bold;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .consigna-card .text {
+            color: #c9d1d9;
+            font-style: italic;
+        }
+
+        /* Diagrama visual */
+        .diagram {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Cascadia Code', 'Consolas', monospace;
+            font-size: 0.88em;
+            line-height: 1.9;
+            overflow-x: auto;
+        }
+
+        .diagram .pos {
+            color: #8b949e;
+        }
+
+        .diagram .vendedor {
+            color: #ff7b72;
+            font-weight: bold;
+        }
+
+        .diagram .articulo {
+            color: #d2a8ff;
+            font-weight: bold;
+        }
+
+        .diagram .cantidad {
+            color: #3fb950;
+            font-weight: bold;
+        }
+
+        .diagram .fecha {
+            color: #79c0ff;
+            font-weight: bold;
+        }
+
+        .diagram .mes-highlight {
+            color: #ffa657;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        /* Flujo / pasos */
+        .step {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+            padding-left: 65px;
+        }
+
+        .step-number {
+            position: absolute;
+            left: 15px;
+            top: 18px;
+            background: #58a6ff;
+            color: #0d1117;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1em;
+        }
+
+        .step-title {
+            color: #e6edf3;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .step-desc {
+            color: #8b949e;
+        }
+
+        /* Tabla de estructura */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.92em;
+        }
+
+        th {
+            background-color: #21262d;
+            color: #58a6ff;
+            padding: 12px 15px;
+            text-align: left;
+            border: 1px solid #30363d;
+        }
+
+        td {
+            padding: 10px 15px;
+            border: 1px solid #30363d;
+            color: #b0b8c1;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #161b22;
+        }
+
+        /* Alerta/nota */
+        .note {
+            background-color: #1a1e2e;
+            border-left: 4px solid #58a6ff;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .note strong {
+            color: #58a6ff;
+        }
+
+        .warning {
+            background-color: #2a1e0e;
+            border-left: 4px solid #d29922;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .warning strong {
+            color: #d29922;
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        .checklist li {
+            padding: 8px 0 8px 35px;
+            position: relative;
+            color: #b0b8c1;
+        }
+
+        .checklist li::before {
+            content: "\2713";
+            position: absolute;
+            left: 5px;
+            color: #3fb950;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* Separador */
+        hr {
+            border: none;
+            border-top: 1px solid #21262d;
+            margin: 40px 0;
+        }
+
+        /* Flecha entre pasos */
+        .flow-arrow {
+            text-align: center;
+            color: #484f58;
+            font-size: 1.5em;
+            margin: 5px 0;
+        }
+
+        .dict-visual {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Cascadia Code', 'Consolas', monospace;
+            font-size: 0.88em;
+            line-height: 2;
+        }
+
+        .dict-visual .key {
+            color: #ff7b72;
+        }
+
+        .dict-visual .key2 {
+            color: #d2a8ff;
+        }
+
+        .dict-visual .value {
+            color: #3fb950;
+        }
+
+        .dict-visual .comment {
+            color: #484f58;
+        }
+
+        .output-box {
+            background-color: #0d1117;
+            border: 1px solid #3fb950;
+            border-radius: 8px;
+            padding: 18px;
+            margin: 15px 0;
+            font-family: 'Cascadia Code', 'Consolas', monospace;
+            font-size: 0.88em;
+            color: #3fb950;
+            line-height: 1.8;
+        }
+
+        .section-divider {
+            display: flex;
+            align-items: center;
+            margin: 50px 0 30px 0;
+        }
+
+        .section-divider span {
+            color: #484f58;
+            font-size: 0.85em;
+            padding: 0 15px;
+            white-space: nowrap;
+        }
+
+        .section-divider::before,
+        .section-divider::after {
+            content: "";
+            flex: 1;
+            border-top: 1px solid #21262d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <h1>Resolucion del Previo 2021 - Ventas</h1>
+        <p class="subtitle">Explicacion completa del ejercicio previo2021.py, paso a paso y vinculando cada parte con la consigna original.</p>
+
+        <!-- ===================== CONSIGNA ===================== -->
+        <h2>1. Que pide la consigna</h2>
+
+        <p>La consigna plantea lo siguiente:</p>
+
+        <div class="consigna-card">
+            <div class="label">Consigna textual</div>
+            <div class="text">
+                "Escribir un programa para mostrar un informe donde se indique por cada vendedor y articulo
+                la cantidad de unidades vendidas en un determinado mes, solicitado por teclado."
+            </div>
+        </div>
+
+        <p>Desglosando eso, el programa debe:</p>
+        <ul class="checklist">
+            <li>Leer el archivo <span class="inline-code">ventas.txt</span> con formato de registro fijo</li>
+            <li>Pedir al usuario un mes por teclado</li>
+            <li>Filtrar solo las ventas que correspondan a ese mes</li>
+            <li>Acumular las cantidades por vendedor y articulo</li>
+            <li>Mostrar un informe claro y legible con los resultados</li>
+        </ul>
+
+        <p>Ademas, la consigna exige requisitos tecnicos:</p>
+        <ul class="checklist">
+            <li>Usar manejo de excepciones</li>
+            <li>Crear funciones que modularicen el codigo</li>
+            <li>Incluir al menos una funcion lambda</li>
+            <li>Comentar la estructura de datos elegida y justificar por que es la adecuada</li>
+        </ul>
+
+        <!-- ===================== FORMATO DEL REGISTRO ===================== -->
+        <h2>2. Formato del registro en ventas.txt</h2>
+
+        <p>Cada linea del archivo tiene exactamente 16 caracteres con este formato fijo:</p>
+
+        <table>
+            <tr>
+                <th>Campo</th>
+                <th>Posiciones</th>
+                <th>Largo</th>
+                <th>Ejemplo</th>
+            </tr>
+            <tr>
+                <td>Numero de vendedor</td>
+                <td>0 - 1</td>
+                <td>2</td>
+                <td>02</td>
+            </tr>
+            <tr>
+                <td>Codigo de articulo</td>
+                <td>2 - 3</td>
+                <td>2</td>
+                <td>04</td>
+            </tr>
+            <tr>
+                <td>Cantidad vendida</td>
+                <td>4 - 7</td>
+                <td>4</td>
+                <td>0150</td>
+            </tr>
+            <tr>
+                <td>Fecha (ddmmaaaa)</td>
+                <td>8 - 15</td>
+                <td>8</td>
+                <td>01022020</td>
+            </tr>
+        </table>
+
+        <p>Veamos el ejemplo de la consigna: <span class="inline-code">0204015001022020</span></p>
+
+        <div class="diagram">
+            <span class="pos">Posicion: </span>
+            <span class="pos"> 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15</span><br>
+            <span class="pos">Caracter: </span>
+            <span class="vendedor"> 0  2</span>
+            <span class="articulo">  0  4</span>
+            <span class="cantidad">  0  1  5  0</span>
+            <span class="fecha">  0  1</span>
+            <span class="mes-highlight">  0  2</span>
+            <span class="fecha">  2  0  2  0</span><br><br>
+            <span class="vendedor">02</span> = Vendedor numero 02<br>
+            <span class="articulo">04</span> = Articulo numero 04<br>
+            <span class="cantidad">0150</span> = 150 unidades vendidas<br>
+            <span class="fecha">01</span><span class="mes-highlight">02</span><span class="fecha">2020</span> = dia 01, <span class="mes-highlight">mes 02 (febrero)</span>, anio 2020
+        </div>
+
+        <div class="note">
+            <strong>Clave:</strong> El mes esta en las posiciones 10-11 del registro completo
+            (posiciones 2-3 dentro de la fecha). En Python: <span class="inline-code">linea[10:12]</span>
+        </div>
+
+        <!-- ===================== ESTRUCTURA DE DATOS ===================== -->
+        <h2>3. Estructura de datos elegida</h2>
+
+        <div class="consigna-card">
+            <div class="label">Requisito de la consigna</div>
+            <div class="text">
+                "Indicar en un comentario la estructura de datos utilizada para contener la informacion necesaria
+                para el informe solicitado y por que considera que es la adecuada respecto a otras estructuras
+                de datos tratadas en la catedra."
+            </div>
+        </div>
+
+        <p>Elegimos un <strong>diccionario de diccionarios</strong>:</p>
+
+        <div class="dict-visual">
+            vendedores = {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"01"</span>: { <span class="key2">"25"</span>: <span class="value">40</span> },
+            <span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# vendedor 01, articulo 25, 40 unidades</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"02"</span>: { <span class="key2">"04"</span>: <span class="value">290</span> },
+            <span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# vendedor 02, articulo 04, 290 unidades</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"07"</span>: { <span class="key2">"11"</span>: <span class="value">80</span>, <span class="key2">"20"</span>: <span class="value">40</span> },
+            <span class="comment">&nbsp;&nbsp;# vendedor 07, dos articulos distintos</span><br>
+            }
+        </div>
+
+        <h3>Por que un diccionario y no otra estructura?</h3>
+
+        <table>
+            <tr>
+                <th>Estructura</th>
+                <th>Acceso</th>
+                <th>Problema</th>
+            </tr>
+            <tr>
+                <td>Diccionario (elegida)</td>
+                <td>O(1) por clave</td>
+                <td>Ninguno: acceso directo por vendedor y articulo</td>
+            </tr>
+            <tr>
+                <td>Lista</td>
+                <td>O(n) secuencial</td>
+                <td>Hay que recorrer toda la lista para buscar un vendedor</td>
+            </tr>
+            <tr>
+                <td>Lista enlazada</td>
+                <td>O(n) secuencial</td>
+                <td>Mismo problema que la lista, mas complejidad de implementacion</td>
+            </tr>
+            <tr>
+                <td>Arbol binario</td>
+                <td>O(log n)</td>
+                <td>Innecesario: no necesitamos orden especial para busqueda</td>
+            </tr>
+        </table>
+
+        <p>
+            El diccionario es ideal porque necesitamos agrupar datos por dos claves (vendedor y articulo)
+            y acumular valores. El acceso por clave es instantaneo, lo que hace eficiente tanto
+            la carga de datos como la consulta posterior.
+        </p>
+
+        <!-- ===================== FLUJO DEL PROGRAMA ===================== -->
+        <h2>4. Flujo completo del programa</h2>
+
+        <p>El programa se ejecuta en 3 pasos secuenciales desde la funcion <span class="inline-code">main()</span>:</p>
+
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-title">pedir_mes()</div>
+            <div class="step-desc">Se pide al usuario un mes por teclado. Se valida que sea un numero entre 1 y 12. Se formatea a 2 digitos ("3" se convierte en "03").</div>
+        </div>
+        <div class="flow-arrow">|</div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-title">leer_archivo(mes_buscado)</div>
+            <div class="step-desc">Se lee ventas.txt linea por linea. De cada linea se extraen los campos. Si el mes de la venta coincide con el mes pedido, se acumula la cantidad en el diccionario.</div>
+        </div>
+        <div class="flow-arrow">|</div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-title">mostrar_informe(vendedores)</div>
+            <div class="step-desc">Se recorre el diccionario ya armado, ordenado por vendedor y articulo, y se muestra el informe formateado.</div>
+        </div>
+
+        <!-- ===================== FUNCION POR FUNCION ===================== -->
+        <div class="section-divider"><span>EXPLICACION FUNCION POR FUNCION</span></div>
+
+        <!-- --- pedir_mes --- -->
+        <h2>5. Funcion pedir_mes()</h2>
+
+        <div class="consigna-card">
+            <div class="label">Cumple con</div>
+            <div class="text">
+                "...en un determinado mes, solicitado por teclado" + manejo de excepciones + modularizacion
+            </div>
+        </div>
+
+        <pre><code>def pedir_mes():
+    """Pide al usuario un mes (1-12) y lo devuelve formateado a 2 digitos."""
+    while True:
+        try:
+            mes = int(input("Ingrese el numero de mes (1-12): "))
+            if 1 <= mes <= 12:
+                return str(mes).zfill(2)
+            else:
+                print("Error: ingrese un numero entre 1 y 12.")
+        except ValueError:
+            print("Error: debe ingresar un numero entero.")</code></pre>
+
+        <h3>Que hace cada parte:</h3>
+
+        <table>
+            <tr>
+                <th>Linea</th>
+                <th>Explicacion</th>
+            </tr>
+            <tr>
+                <td><span class="inline-code">while True</span></td>
+                <td>Bucle infinito que solo se rompe cuando el usuario ingresa un valor valido</td>
+            </tr>
+            <tr>
+                <td><span class="inline-code">int(input(...))</span></td>
+                <td>Pide input y lo convierte a entero. Si el usuario escribe "abc", lanza ValueError</td>
+            </tr>
+            <tr>
+                <td><span class="inline-code">except ValueError</span></td>
+                <td>Captura el error si el usuario no ingreso un numero (ej: letras)</td>
+            </tr>
+            <tr>
+                <td><span class="inline-code">if 1 &lt;= mes &lt;= 12</span></td>
+                <td>Valida que el mes este en rango valido</td>
+            </tr>
+            <tr>
+                <td><span class="inline-code">str(mes).zfill(2)</span></td>
+                <td>Convierte a string de 2 digitos: 3 se convierte en "03", 12 queda "12". Esto es necesario porque en el archivo el mes siempre tiene 2 digitos</td>
+            </tr>
+        </table>
+
+        <!-- --- leer_archivo --- -->
+        <h2>6. Funcion leer_archivo(mes_buscado)</h2>
+
+        <div class="consigna-card">
+            <div class="label">Cumple con</div>
+            <div class="text">
+                Lectura del archivo ventas.txt + filtrado por mes + acumulacion por vendedor/articulo + manejo de excepciones + modularizacion
+            </div>
+        </div>
+
+        <pre><code>def leer_archivo(mes_buscado):
+    """Lee ventas.txt y devuelve un diccionario con las ventas del mes indicado."""
+    vendedores = {}
+    try:
+        archivo = open("ventas.txt", "r")
+        for linea in archivo:
+            linea = linea.strip("\n")
+            # Parseo del registro segun el formato fijo
+            num_vendedor = linea[0:2]
+            cod_articulo = linea[2:4]
+            cantidad = int(linea[4:8])
+            mes = linea[10:12]
+
+            # Solo acumulo las ventas que correspondan al mes pedido
+            if mes == mes_buscado:
+                if num_vendedor not in vendedores:
+                    vendedores[num_vendedor] = {}
+                if cod_articulo not in vendedores[num_vendedor]:
+                    vendedores[num_vendedor][cod_articulo] = 0
+                vendedores[num_vendedor][cod_articulo] += cantidad
+    except FileNotFoundError:
+        print("Error: no se encontro el archivo ventas.txt")
+    finally:
+        try:
+            archivo.close()
+        except NameError:
+            pass
+    return vendedores</code></pre>
+
+        <h3>Parseo del registro - el corazon del programa:</h3>
+
+        <p>Cada linea se corta con slicing de strings. Tomemos como ejemplo la linea <span class="inline-code">0204015001022020</span>:</p>
+
+        <pre><code># linea = "0204015001022020"
+
+num_vendedor = linea[0:2]    # "02"
+cod_articulo = linea[2:4]    # "04"
+cantidad     = int(linea[4:8])  # int("0150") = 150
+mes          = linea[10:12]  # "02"  (febrero)</code></pre>
+
+        <div class="warning">
+            <strong>Atencion con las posiciones del mes:</strong> La fecha empieza en la posicion 8
+            (formato ddmmaaaa). El dia ocupa posiciones 8-9, y el mes posiciones 10-11.
+            Por eso usamos <span class="inline-code">linea[10:12]</span> y NO <span class="inline-code">linea[8:10]</span>.
+        </div>
+
+        <h3>Filtrado y acumulacion:</h3>
+
+        <pre><code>if mes == mes_buscado:                          # Solo si el mes coincide
+    if num_vendedor not in vendedores:           # Si el vendedor es nuevo
+        vendedores[num_vendedor] = {}            #   creo su sub-diccionario
+    if cod_articulo not in vendedores[num_vendedor]:  # Si el articulo es nuevo
+        vendedores[num_vendedor][cod_articulo] = 0    #   inicializo en 0
+    vendedores[num_vendedor][cod_articulo] += cantidad  # Sumo la cantidad</code></pre>
+
+        <p>Veamos como se va llenando el diccionario paso a paso para el mes <span class="inline-code">"03"</span> (marzo):</p>
+
+        <div class="dict-visual">
+            <span class="comment"># Linea: 0125004026032020 -> vendedor="01", art="25", cant=40, mes="03" (coincide!)</span><br>
+            vendedores = { <span class="key">"01"</span>: { <span class="key2">"25"</span>: <span class="value">40</span> } }<br><br>
+
+            <span class="comment"># Linea: 0204015001022020 -> mes="02" (NO coincide, la salteamos)</span><br><br>
+
+            <span class="comment"># Linea: 0204014009032020 -> vendedor="02", art="04", cant=140, mes="03" (coincide!)</span><br>
+            vendedores = { <span class="key">"01"</span>: { <span class="key2">"25"</span>: <span class="value">40</span> }, <span class="key">"02"</span>: { <span class="key2">"04"</span>: <span class="value">140</span> } }<br><br>
+
+            <span class="comment"># Linea: 0510004001032020 -> vendedor="05", art="10", cant=40, mes="03" (coincide!)</span><br>
+            vendedores = { <span class="key">"01"</span>: {<span class="key2">"25"</span>: <span class="value">40</span>}, <span class="key">"02"</span>: {<span class="key2">"04"</span>: <span class="value">140</span>}, <span class="key">"05"</span>: {<span class="key2">"10"</span>: <span class="value">40</span>} }<br><br>
+
+            <span class="comment"># ... y asi sigue con cada linea del archivo</span>
+        </div>
+
+        <h3>Manejo de excepciones en esta funcion:</h3>
+
+        <table>
+            <tr>
+                <th>Excepcion</th>
+                <th>Cuando ocurre</th>
+                <th>Que hacemos</th>
+            </tr>
+            <tr>
+                <td><span class="inline-code">FileNotFoundError</span></td>
+                <td>Si ventas.txt no existe</td>
+                <td>Mostramos mensaje de error</td>
+            </tr>
+            <tr>
+                <td><span class="inline-code">NameError</span></td>
+                <td>En el finally, si el archivo nunca se abrio (porque fallo el open), la variable "archivo" no existe</td>
+                <td>pass - no hay nada que cerrar</td>
+            </tr>
+        </table>
+
+        <!-- --- mostrar_informe --- -->
+        <h2>7. Funcion mostrar_informe(vendedores)</h2>
+
+        <div class="consigna-card">
+            <div class="label">Cumple con</div>
+            <div class="text">
+                "Mostrar un informe claro y legible" + funcion lambda + modularizacion
+            </div>
+        </div>
+
+        <pre><code>def mostrar_informe(vendedores):
+    """Muestra el informe de ventas por vendedor y articulo."""
+    if not vendedores:
+        print("No se encontraron ventas para el mes indicado.")
+        return
+
+    # Lambda para formatear una linea del informe
+    formato_linea = lambda vend, art, cant: f"  Articulo {art}: {cant} unidades"
+
+    for vendedor in sorted(vendedores.keys()):
+        print(f"Vendedor {vendedor}:")
+        articulos = vendedores[vendedor]
+        for articulo in sorted(articulos.keys()):
+            print(formato_linea(vendedor, articulo, articulos[articulo]))
+
+    total = sum(
+        cant
+        for arts in vendedores.values()
+        for cant in arts.values()
+    )
+    print(f"\nTotal de unidades vendidas en el mes: {total}")</code></pre>
+
+        <h3>Desglose:</h3>
+
+        <p><strong>La funcion lambda</strong> (requisito de la consigna):</p>
+        <pre><code>formato_linea = lambda vend, art, cant: f"  Articulo {art}: {cant} unidades"
+
+# Es equivalente a escribir:
+# def formato_linea(vend, art, cant):
+#     return f"  Articulo {art}: {cant} unidades"</code></pre>
+
+        <p><strong>El recorrido ordenado:</strong></p>
+        <pre><code>for vendedor in sorted(vendedores.keys()):     # recorro vendedores en orden
+    for articulo in sorted(articulos.keys()):   # dentro de cada uno, articulos en orden</code></pre>
+        <p>
+            Usamos <span class="inline-code">sorted()</span> para que el informe aparezca ordenado por numero de vendedor
+            y por codigo de articulo, como pide la consigna (informe "claro y legible").
+        </p>
+
+        <p><strong>El calculo del total general:</strong></p>
+        <pre><code>total = sum(
+    cant                              # tomo cada cantidad
+    for arts in vendedores.values()   # de cada sub-diccionario de articulos
+    for cant in arts.values()         # de cada valor (cantidad) dentro
+)</code></pre>
+        <p>
+            Esto es una <strong>expresion generadora</strong> que recorre todos los valores del diccionario anidado
+            y los suma. Es una forma compacta y eficiente de calcular el total.
+        </p>
+
+        <h3>Ejemplo de salida para el mes 03 (marzo):</h3>
+
+        <div class="output-box">
+            Vendedor 01:<br>
+            &nbsp;&nbsp;Articulo 25: 40 unidades<br>
+            Vendedor 02:<br>
+            &nbsp;&nbsp;Articulo 04: 140 unidades<br>
+            Vendedor 05:<br>
+            &nbsp;&nbsp;Articulo 10: 40 unidades<br>
+            &nbsp;&nbsp;Articulo 20: 40 unidades<br>
+            Vendedor 07:<br>
+            &nbsp;&nbsp;Articulo 11: 80 unidades<br>
+            &nbsp;&nbsp;Articulo 12: 40 unidades<br>
+            &nbsp;&nbsp;Articulo 20: 40 unidades<br>
+            Vendedor 08:<br>
+            &nbsp;&nbsp;Articulo 20: 40 unidades<br>
+            Vendedor 10:<br>
+            &nbsp;&nbsp;Articulo 01: 80 unidades<br>
+            Vendedor 11:<br>
+            &nbsp;&nbsp;Articulo 10: 80 unidades<br>
+            Vendedor 12:<br>
+            &nbsp;&nbsp;Articulo 35: 80 unidades<br>
+            &nbsp;&nbsp;Articulo 50: 80 unidades<br>
+            Vendedor 15:<br>
+            &nbsp;&nbsp;Articulo 80: 40 unidades<br>
+            &nbsp;&nbsp;Articulo 95: 40 unidades<br>
+            <br>
+            Total de unidades vendidas en el mes: 860
+        </div>
+
+        <!-- --- main --- -->
+        <h2>8. Funcion main()</h2>
+
+        <div class="consigna-card">
+            <div class="label">Cumple con</div>
+            <div class="text">
+                Modularizacion - funcion principal que coordina todo el flujo del programa
+            </div>
+        </div>
+
+        <pre><code>def main():
+    mes = pedir_mes()                   # Paso 1: pedir el mes
+    vendedores = leer_archivo(mes)      # Paso 2: leer y filtrar
+    mostrar_informe(vendedores)         # Paso 3: mostrar resultados
+
+main()  # Ejecutar el programa</code></pre>
+
+        <p>
+            <span class="inline-code">main()</span> es la funcion orquestadora. Cada paso delega
+            el trabajo a una funcion especializada, cumpliendo con el principio de modularizacion.
+        </p>
+
+        <!-- ===================== RESUMEN DE REQUISITOS ===================== -->
+        <div class="section-divider"><span>RESUMEN FINAL</span></div>
+
+        <h2>9. Checklist de requisitos cumplidos</h2>
+
+        <table>
+            <tr>
+                <th>Requisito de la consigna</th>
+                <th>Donde se cumple</th>
+            </tr>
+            <tr>
+                <td>Leer archivo ventas.txt</td>
+                <td><span class="inline-code">leer_archivo()</span> - abre y recorre el archivo linea por linea</td>
+            </tr>
+            <tr>
+                <td>Mes solicitado por teclado</td>
+                <td><span class="inline-code">pedir_mes()</span> - input con validacion</td>
+            </tr>
+            <tr>
+                <td>Informe por vendedor y articulo</td>
+                <td><span class="inline-code">mostrar_informe()</span> - recorre el diccionario ordenado</td>
+            </tr>
+            <tr>
+                <td>Informe claro y legible</td>
+                <td>Salida formateada con indentacion y totales</td>
+            </tr>
+            <tr>
+                <td>Manejo de excepciones</td>
+                <td>FileNotFoundError, ValueError, NameError en las 3 funciones</td>
+            </tr>
+            <tr>
+                <td>Modularizacion (funciones)</td>
+                <td>4 funciones: main, pedir_mes, leer_archivo, mostrar_informe</td>
+            </tr>
+            <tr>
+                <td>Al menos una funcion lambda</td>
+                <td><span class="inline-code">formato_linea</span> en mostrar_informe()</td>
+            </tr>
+            <tr>
+                <td>Comentario sobre estructura de datos</td>
+                <td>Comentario al inicio del archivo explicando eleccion y justificacion</td>
+            </tr>
+            <tr>
+                <td>Funcionar con otros archivos similares</td>
+                <td>No hay nada hardcodeado: cualquier ventas.txt con el mismo formato funciona</td>
+            </tr>
+        </table>
+
+    </div>
+</body>
+</html>
